@@ -49,6 +49,7 @@ docs/       Full product/domain/execution doc pack — START at docs/00-INDEX.md
 ## Working agreement (non-negotiable)
 
 1. `main` is always demoable. No direct pushes — branch + PR + review by lead.
+1a. **All frontend code (`frontend/**`) and core backend code are owned by @k4ssymzhomart.** Contributor PRs may touch only: `shared/`, `backend/rules/`, `backend/regs/`, `backend/tests/fixtures/`, `backend/eval/`, `backend/templates/drafts/`, `docs/`. CI enforces this.
 2. Branch naming: `feat/<issue-key>-short-name` (e.g. `feat/e2-rules-catalog`).
 3. PR < 400 lines diff. Fill the PR template. Review SLA: 30 min.
 4. No hardcoded UI strings — every label goes through i18n keys; `shared/glossary.csv` is the terminology law.

@@ -9,7 +9,8 @@ Condensed from docs/03-USER-STORIES.md §12 and docs/08-EXECUTION.md §5. LEAD e
 - **Branch naming:** `feat/<key>-name`, e.g. `feat/a1-contract-import` (issue key lowercase, short kebab-case name).
 - **PR template is mandatory:** what / screenshots / i18n-keys-added? / rules-touched? / how-tested.
 - **PRs are small: <400 lines diff.** Split anything bigger.
-- **Review:** request review from **@k4ssymzhomart**; SLA is 30 minutes. Self-merge is allowed ONLY for docs and locale files (`docs/**`, `frontend/locales/**`).
+- **Review:** request review from **@k4ssymzhomart**; SLA is 30 minutes. Self-merge is allowed ONLY for LEAD and only on `docs/**`. Contributors always wait for review — no exceptions.
+- **Ownership fence (CI-enforced):** `frontend/**` and core backend code belong to **@k4ssymzhomart only**. Contributor PRs may touch only: `shared/`, `backend/rules/`, `backend/regs/`, `backend/tests/fixtures/`, `backend/eval/`, `backend/templates/drafts/`, `docs/`. A PR outside this allowlist fails CI and will be closed.
 - **Merge order priority:** golden-path blockers > MUST > SHOULD.
 - **Conventional commits** with issue refs, e.g. `feat: forecast burn-out date (#D3)`.
 - **No hardcoded UI strings.** All UI text lives in `frontend/locales/{kk,ru,en}.json` with namespaced keys (`risk.class.critical_under`). The PR checklist blocks hardcoded strings.
@@ -25,7 +26,7 @@ Condensed from docs/03-USER-STORIES.md §12 and docs/08-EXECUTION.md §5. LEAD e
 5. Open a PR and fill the template completely.
 6. Request review from @k4ssymzhomart.
 7. Respond to every review comment (fix or reply) — do not merge past unresolved comments.
-8. **Never push to `main`.** Merge only after approval (except docs/locales self-merge).
+8. **Never push to `main`.** Merge only after approval — always.
 
 ## Issues
 
