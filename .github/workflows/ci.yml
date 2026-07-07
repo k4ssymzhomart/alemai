@@ -6,6 +6,25 @@ on:
   pull_request:
 
 jobs:
+  data-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: rules catalog
+        run: python backend/scripts/validate_rules.py
+      - name: glossary
+        run: python backend/scripts/validate_glossary.py
+      - name: rule golden-test cases
+        run: python backend/scripts/validate_rule_cases.py
+      - name: copilot eval set
+        run: python backend/scripts/validate_eval_set.py
+      - name: ui strings
+        run: python backend/scripts/validate_ui_strings.py
+
   backend:
     runs-on: ubuntu-latest
     defaults:
