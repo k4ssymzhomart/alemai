@@ -1,0 +1,30 @@
+{
+  "app": {
+    "title": "IGERIM",
+    "tagline": "Financial autopilot for contract execution"
+  },
+  "nav": {
+    "overview": "Overview",
+    "risks": "Risks",
+    "prebilling": "Pre-billing check",
+    "reconcile": "Reconciliation",
+    "anomalies": "Anomalies",
+    "calendar": "Calendar",
+    "copilot": "Copilot",
+    "reports": "Reports",
+    "city": "City panel",
+    "admin": "Admin"
+  },
+  "common": {
+    "loading": "Loading…",
+    "empty": "No data yet",
+    "demo_data_note": "demo data, calibrated against open statistics"
+  },
+  "roles": {
+    "label": "Role",
+    "economist": "Aigerim — Economist",
+    "statistician": "Dana — Statistician",
+    "head": "Yerlan — Director",
+    "curator": "Marat — Curator"
+  }
+}

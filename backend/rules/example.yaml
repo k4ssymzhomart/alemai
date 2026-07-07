@@ -1,0 +1,8 @@
+# Sample rule per docs/06 §7 YAML shape. The full R01..R25 catalog lands here.
+- code: R02
+  severity: block
+  scope: claim
+  origin: АУДИТ-2025
+  params: {sex_gated: {mammography: F, psa: M, cervical: F}}
+  message_ru: "Услуга {service} несовместима с полом пациента"
+  message_kk: "{service} қызметі пациенттің жынысына сәйкес келмейді"

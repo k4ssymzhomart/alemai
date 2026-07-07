@@ -1,0 +1,18 @@
+[project]
+name = "igerim-backend"
+version = "0.1.0"
+description = "IGERIM — clinic-side control loop for GOBMP/OSMS contracts (FastAPI backend)"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = ["regs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = ["smoke: fast API smoke tests that must pass without a database"]

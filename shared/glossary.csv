@@ -1,0 +1,35 @@
+key,kk,ru,en
+gobmp,ТМККК,ГОБМП,Guaranteed volume of free care
+osms,МӘМС,ОСМС,Mandatory social health insurance
+fund,Әлеуметтік медициналық сақтандыру қоры (ӘМСҚ),ФСМС / Фонд,Social Health Insurance Fund (single payer)
+contract,шарт,договор закупа,procurement contract
+amendment,қосымша келісім,доп. соглашение,contract amendment
+volume_adjustment,көлемдерді түзету,корректировка объёмов,volume adjustment
+application_request,өтінім,заявка,application/request
+invoice_registry,шот-тізілім,счёт-реестр,invoice-registry of cases
+execution_utilization,игеру / игерілуі,освоение,utilization/execution of contracted funds
+under_execution,игерілмеу,недоосвоение,under-execution
+over_execution,асыра орындау,перевыполнение,over-execution
+defects,ақаулар,дефекты,defects
+payment_removal,төлемнен алу,снятие с оплаты,payment deduction/removal
+penalties,айыппұл санкциялары,штрафные санкции,penalties
+false_claims,жазба қосу / қосып жазу,приписки,false claims (unconfirmed services)
+attached_population,бекітілген халық,прикреплённое население,attached population
+per_capita_rate,жан басына шаққандағы норматив (ЖБШН),подушевой норматив (КПН),per-capita rate
+sex_age_coefficient,жынысы-жасы бойынша түзету коэффициенті,половозрастной поправочный коэффициент (ПВК),sex-age adjustment coefficient
+primary_healthcare,МСАК,ПМСП,primary healthcare (PHC)
+consultative_diagnostic,КДҚ (консультациялық-диагностикалық қызметтер),КДУ,consultative-diagnostic services
+referral,жолдама,направление,referral
+clinical_cost_groups,КШТ (клиникалық-шығындық топтар),КЗГ,clinical-cost groups (DRG analog)
+inpatient_hospital,тәуліктік стационар,круглосуточный стационар,inpatient hospital
+day_hospital,күндізгі стационар,дневной стационар,day hospital
+screenings,скринингтер,скрининги,screenings
+insurance_status,сақтандыру мәртебесі,статус застрахованности,insurance status
+defect_classifier,Бірыңғай ақаулар жіктеуіші (БАЖ),ЕКД (Единый классификатор дефектов),Unified defect classifier
+format_logic_control,ФЛК,ФЛК,format-logic control (schema validation)
+current_monitoring,ағымдағы мониторинг,текущий мониторинг,current monitoring
+proactive_monitoring,проактивті мониторинг,проактивный мониторинг,proactive monitoring
+unified_package,Бірыңғай пакет,Единый пакет,Unified package (2026 reform)
+forecast,болжам,прогноз,forecast
+risk,тәуекел,риск,risk
+report,есеп,отчёт,report
