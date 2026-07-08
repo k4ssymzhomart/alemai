@@ -195,8 +195,9 @@ def check_objections(r: Report, s: dict, m: dict, demo_today: str) -> None:
 
 
 def check_forecast_risk(r: Report, conn: Connection, s5: dict) -> None:
-    n_grain = int(scalar(conn, "SELECT count(*) FROM (SELECT DISTINCT care_type, funding_source, "
-                         "COALESCE(service_group,'') FROM contract_lines WHERE month LIKE '2026-%') t"))
+    n_grain = int(scalar(conn, "SELECT count(*) FROM (SELECT DISTINCT care_type, "
+                         "funding_source, COALESCE(service_group,'') FROM contract_lines "
+                         "WHERE month LIKE '2026-%') t"))
     n_fc = int(scalar(conn, "SELECT count(*) FROM forecasts"))
     r.eq("F2 forecasts == 2026 line grains", n_grain, n_fc)
     n_risk = int(scalar(conn, "SELECT count(*) FROM risk_assessments"))

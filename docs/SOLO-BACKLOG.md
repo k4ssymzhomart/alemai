@@ -41,12 +41,21 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md) laws + [17-NEXT-DIRECTIVE
 
 ## EPIC C — GUARD: the demo's teeth (≈5h) → auto-continue if green
 
+Original AC:
 - [ ] P4′ rules engine: ≥12 rules covering all storylines (R01–R04, R07, R10, R11, R16, R17, R20 + as needed), real ЕКД code + sanction columns (ekd_notes.md §4); ЕКД version by claim date (ред. №68 → ред. №19, код 1.3 archived); «жёлтые» severity 2.0/7.0 (0 ₸); R17 from package_mapping_2026.csv
 - [ ] Golden tests: 8/8 storylines caught; 50k claims timing printed
 - [ ] P5′ pre-billing screen (verdict header, findings by rule, CodeChips, StampMark on block rows, export exceptions XLSX)
 - [ ] P5′ reconciliation 4 buckets; DF-лента возражений with DeadlineBox timers (5/3/3 раб. дней, working-day aware, «молчание = автоснятие (п. 27)», ≤2 days → inverted black box)
 - [ ] PD2 Passport pattern on line passport, pre-billing, reconcile: Кто я → Вердикт → Почему → Что делать → Данные(collapsed); breadcrumbs; «как посчитано» popovers; designed empty states
-- [ ] AC: golden tests 8/8; timing; QA beats 1–5 per REGENERATED checklist; screenshot per beat; timer visibly at «осталось 2 раб. дня»
+
+Overview findings folded in (lead's screenshot review, now Epic C AC):
+- [ ] **F1** execution semantics: primary % = fact_ytd/plan_ytd (verify API already does this); annual as secondary 11px «жылдық: X%»; replace ambiguous ▽/△ glyphs with the §4 severity chip system (soft hatch/outline)
+- [ ] **F2** no dead tiles: wire the API read-side to surface the seeded `forecasts`/`risk_assessments` (forecast_gap, risk_count, burn_out_date, risk_class non-null) → Overview renders COMPLETE, no «есептелуде…»/dashes at demo
+- [ ] **F4** group ledger by care type: group header row («МСАК / ПМСП», hairline) → source rows with ТМККК/МӘМС chips; full human line names (13px secondary service group); acronyms die in kk/ru, en keeps short
+- [ ] **F5** progress bar: 6px track ink/10 = annual plan; solid fill = fact YTD; 1px vertical marker = YTD-expected; dotted extension to year-end if forecast exists
+- [ ] **F6** demo defaults kk (verify first-load kk + fmtPct comma-decimal everywhere incl. KPI hero); ENG one click away
+- [ ] **F7** ticker rotates real seeded alerts (burn-out, возражение ≤2 дн, 260 недовыставлено), not org+trivia
+- [ ] AC: golden tests 8/8; timing; QA beats 1–5 per REGENERATED checklist; screenshot per beat; timer visibly at «осталось 2 раб. дня»; **one full-page kk Overview that survives an economist's squint (F1/F2/F4/F5/F6 visibly done)**
 
 ## EPIC D — ACT + SPEAK (≈4h) → **HARD STOP: native review + freeze GO**
 

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# ruff: noqa: E501 -- this is a Markdown generator; table-row f-strings are
+# intentionally long and read better unwrapped than split across lines.
 """Regenerate docs/QA-CHECKLIST.md from storylines.yaml + the datagen manifest.
 
 The golden-path numbers (143 позиции / 8.4 млн / 12.4 млн …) are STALE at the
@@ -47,7 +49,6 @@ def render(cfg: dict[str, Any], manifest: dict[str, Any]) -> str:
     claims_total = int(manifest["claims"]["count"])
     profile = manifest.get("profile", "gp14-real")
 
-    mri = story(cfg, "mri_over_execution")["params"]
     mri_rec = int(m["mri_over_execution"]["recoverable_amount"])
     burn = m["mri_over_execution"]["burn_out_date"]
     dent_gap = int(m["dent_under_execution"]["expected_year_end_gap"])
