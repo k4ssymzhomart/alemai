@@ -9,13 +9,13 @@ interface PageShellProps {
   titleKey: string;
 }
 
-/** Standard skeleton screen: localized h1 + empty-state card. */
+/** Standard skeleton screen: display h1 + designed empty state. */
 export default function PageShell({ titleKey }: PageShellProps) {
   const { t } = useTranslation();
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+      <h1 className="font-display text-h1 font-medium uppercase tracking-tight text-ink">
         {t(titleKey)}
       </h1>
       <EmptyState />

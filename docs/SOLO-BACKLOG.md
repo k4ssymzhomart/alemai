@@ -1,85 +1,70 @@
-# SOLO BACKLOG — the single ordered queue
+# SOLO BACKLOG — the single ordered queue (EPICS A–E)
 
-Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md). This file replaces issue-based tracking. Packets execute strictly in order; each packet ends with its acceptance commands run and real output pasted into the status report. Research pack (`docs/research/`) checked at every packet boundary.
+Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md) laws + [17-NEXT-DIRECTIVE.md](17-NEXT-DIRECTIVE.md) compression plan (§5), restructured into gated epics for the ≤24h demo runway. Epics **A** and **D** end in a HARD STOP for the lead's review; **B** and **C** auto-continue when all AC are green. Research pack (`docs/research/`) consumed via the [16-RESEARCH-INTEGRATION.md](16-RESEARCH-INTEGRATION.md) §5 index.
 
 **Status legend:** `[ ]` todo · `[~]` in progress · `[x]` done (AC output exists)
 
-## P1 — Data spine ✅ (2026-07-08)
-- [x] Alembic wired; initial migration 0001 for all 21 tables (+pgvector, +service_group_map aux, composite indexes)
-- [x] `mv_line_execution` materialized view (FULL OUTER JOIN plan×fact) + refresh hook
-- [x] `make seed` = datagen → COPY loader: full 497,917 claims in ~15s in-container, idempotent, manifest-verified
-- [x] Real `/metrics/overview`, `/metrics/lines`, `/metrics/line/{key}/monthly` from the view
-- [x] `scripts/assert_seed_integrity.py`: PASS — 81 checks, 0 mismatches (in-container + host)
-- [x] Tests 37 passed (integration auto-skip without DB); CI backend job runs pgvector service + seed + integrity
-- Note: host ports remapped (db 55432, api 8800) — 5432/8000 occupied by another local project; in-container unchanged
+## Done before the epics (previous sessions)
 
-## P2 — Beat 1 clickable ✅ (2026-07-08)
-- [x] Overview C1 on live metrics (hero KPIs + lines table + filters, kk default) — verified in browser vs API numbers
-- [x] Drill-down C2 (monthly plan/fact/rejected bars, cumulative curves, forecast placeholder honest)
-- [x] Traffic-light execution chips (stub thresholds isolated in ExecutionChip.tsx, TODO(P6))
-- [x] `next build` zero type errors; 70 i18n keys ×3 locales; NEXT_PUBLIC_API_MOCK=1 contingency mode
-- NEEDS-NATIVE-REVIEW kk list collected → goes to lead in batch 1 (after P7)
+### P1 — Data spine ✅ (2026-07-08)
+- [x] Alembic migration 0001 for all 21 tables (+pgvector, composite indexes); `mv_line_execution` MV + refresh hook
+- [x] `make seed` COPY loader: 497,917 claims ~15s, idempotent, manifest-verified; real `/metrics/*` endpoints
+- [x] `scripts/assert_seed_integrity.py` — 81 checks PASS; CI backend job runs pgvector + seed + integrity
+- Note: host ports remapped (db 55432, api 8800) — 5432/8000 belong to mova
 
-## P3 — 7 storylines + QA automation
-- [ ] **Recalibrate datagen execution profiles** — P1 finding: claims fact ≈ 8–16% of plan (internally consistent, but implausible); baseline lines must read ~85–105% and overview ≈61% before storylines are planted on top
-- [ ] Storyline 1: МРТ 118% from 2026-03 → burn-out 14.10.2026, 12.4 млн ₸
-- [ ] Storyline 2: стоматология 71% → gap 9.8 млн ₸
-- [ ] Storyline 3: creative doctor (templates, ~30% weekend, 80+ day spikes)
-- [ ] Storyline 4: 2 deceased patients, 3 claims after death
-- [ ] Storyline 5: Nov registry — 31 male mammography + 12 underage → «143 позиции, 8.4 млн ₸»
-- [ ] Storyline 6: недовыставление 260 cases ≈ 4.2 млн ₸
-- [ ] Storyline 7: 180 diabetes claims Jan–Feb 2026 on ГОБМП (post-reform mis-billing)
-- [ ] `scripts/assert_storylines.py` green (automated half of QA-CHECKLIST)
-- [ ] Research integration: schet_reestr/damumed formats → datagen columns + adapters (when files land)
+### P2 — Beat 1 clickable ✅ (2026-07-08)
+- [x] Overview C1 + drill-down C2 on live metrics, kk default; `next build` clean; NEXT_PUBLIC_API_MOCK=1 contingency
 
-## P4 — Rules engine + full catalog
-- [ ] E1 engine core (YAML → evaluator, persisted findings, runs, toggles)
-- [ ] 25 rules transcribed (absorbs #4); `validate_rules.py` OK
-- [ ] Reference data: тарификатор ~40 услуг, ICD-10 sets, sex/age gates, package_mapping (source: draft-needs-mentor-check) (absorbs #5 #6 #7)
-- [ ] Golden tests: `pytest -m rules_golden` 7/7 (absorbs #51); `validate_rule_cases.py` OK
-- [ ] 50k claims < 30s (timing printed)
-- [ ] Research integration: ekd_codes/tarifikator/package_mapping swap-in (when files land)
+---
 
-## P5 — Reconciliation + pre-billing screens
-- [ ] B3 three-way reconcile: 4 buckets ₸ + drill-down (API + screen)
-- [ ] E3 pre-billing check screen: verdict header, findings by rule/severity, XLSX export
-- [ ] Beat 4 shows «143 позиции, 8.4 млн ₸» live; beat 5 shows «4.2 млн ₸ / 260» live
-- [ ] QA beats 1–5 manual pass
+## EPIC A — Absorb + Reskin (≈4h) → **HARD STOP: lead approves the look**
 
-## P6 — Forecast & risk
-- [ ] D1 forecast: run-rate × wd × seasonality; HW ≥24m; ensemble; bootstrap CI; explanation kk/ru
-- [ ] D2 risk classes + register (ranked by ₸); D3 burn-out date
-- [ ] Backtest MAPE badge; `pytest -m forecast_backtest` ≤8% synthetic
-- [ ] МРТ card: 14.10.2026 + explanation visible
+- [x] §2 reading done (docs 17→16→15→14/13, skims of 11/QA/backlog); docs 13–18 landed into the repo
+- [x] SOLO-BACKLOG restructured to epics A–E (this file); README SOLO note verified present
+- [x] PD1 «Ведомость» per docs/15: Tailwind palette stripped to ink/paper (violations impossible), radius 0 global
+- [x] Fonts Unbounded / Inter Tight / IBM Plex Mono via next/font (cyrillic-ext); KZ glyph gate PASSES for all faces incl. ₸ — Unbounded keeps display role
+- [x] ECharts `vedomost` theme: black + decal patterns, dashed plan, hard-shadow tooltips
+- [x] Restyle Overview + drill screens; live Marquee ticker (live metrics + cited regulation constants)
+- [x] Components: VerdictBlock, ExecutionBar (hatch), DeadlineBox, CodeChip, StampMark (+ /design specimens page)
+- [x] Logo slot (`/public/brand/logo.svg` → fallback wordmark IGERIM▮); print stylesheet (A4, chrome hidden)
+- [x] AC: grep gates PASS (zero rounded-*, zero hex in app/components); glyph-gate screenshot; before/after screenshots; `npm run build` zero errors; beat 1 in new skin
 
-## P7 — Recommendations + documents
-- [ ] F2 recommendation cards (₸ + deadline, docs/06 §9)
-- [ ] F3 docx: заявка kk+ru, monthly report kk+ru (absorbs #53; kk flagged NEEDS-NATIVE-REVIEW)
-- [ ] Template lint test (no {{}} leaks); beat 3 docx in <20s
-- [ ] **Kazakh native-review batch 1 → lead** (letters + any kk to date)
+## EPIC B — Data truth: rescale + manifest (≈3h) → auto-continue if green
 
-## P8 — Copilot (RapidAPI GPT-4o-mini pipeline)
-- [ ] `services/llm_client.py`: timeout 20s, 2 retries, logging, call counter (alarm 150), LLM_MODE=live|canned|off
-- [ ] PARSE→EXECUTE→ANSWER pipeline; keyword-heuristic fallback router covering 6 demo questions
-- [ ] Deterministic bilingual answer templates (numbers injected by code); optional ru POLISH behind numbers-validator
-- [ ] RAG: multilingual-e5-small local embeddings (pre-downloaded, baked into image) + pgvector; adilet corpus kk+ru fetched/chunked (absorbs #3)
-- [ ] Citation enforcement: uncited sentence → extractive fallback
-- [ ] Canned mode: cached outputs for 6 demo questions, auto-engage on network fail
-- [ ] Eval set YAML 24q (absorbs #52) + `make eval-copilot` ≥22/24
-- [ ] Copilot panel UI (single response, citation chips, «как посчитано»)
-- [ ] `git grep -i rapidapi` → env names/docs only; RAPIDAPI_KEY in `.env` only (lead pastes)
+- [ ] (a) Datagen profile system: `gp14-real` DEFAULT (31,000 прикреплённых, 20 участков, ~1.2 bn ₸/yr, КПН 1,700 ₸/чел/мес, отделения per research/clinic14_facts.md §4) + `city-composite` (14 clinics 31k–120k)
+- [ ] (b) `datagen/storylines.yaml` = single source of all planted numbers — 7 storylines rescaled to gp14 (keep burn-out 14.10.2026; recompute all ₸) + storyline 8: возражения (4 потенциальных дефекта, deadlines in 1/3/4/5 раб. дней)
+- [ ] (c) `assert_storylines.py` asserts every manifest number post-seed
+- [ ] (d) Regenerate docs/QA-CHECKLIST.md from the manifest by script (old 143/8.4/12.4 numbers die here)
+- [ ] (e) Export columns aligned to research/schet_reestr_columns.csv + damumed format (INFERRED marked in adapter preset)
+- [ ] AC: `make seed` (gp14-real) + assert_storylines PASS pasted; regenerated QA-CHECKLIST committed; overview ≈61% mid-year; canonical numbers table in report
 
-## P9 — Scale & alerts
-- [ ] City panel: 14 clinics, 3 archetypes (beat 7)
-- [ ] F1 alerts + deadlines seed (⚠️verify-with-mentors flags) (absorbs #10)
-- [ ] Full UI locales kk/ru/en all screens (absorbs #50/#9); `validate_ui_strings.py` OK
-- [ ] **Kazakh native-review batch 2 → lead** (locales + copilot templates)
+## EPIC C — GUARD: the demo's teeth (≈5h) → auto-continue if green
 
-## P10 — Freeze & stagecraft (DEMO−3h, or after P9)
+- [ ] P4′ rules engine: ≥12 rules covering all storylines (R01–R04, R07, R10, R11, R16, R17, R20 + as needed), real ЕКД code + sanction columns (ekd_notes.md §4); ЕКД version by claim date (ред. №68 → ред. №19, код 1.3 archived); «жёлтые» severity 2.0/7.0 (0 ₸); R17 from package_mapping_2026.csv
+- [ ] Golden tests: 8/8 storylines caught; 50k claims timing printed
+- [ ] P5′ pre-billing screen (verdict header, findings by rule, CodeChips, StampMark on block rows, export exceptions XLSX)
+- [ ] P5′ reconciliation 4 buckets; DF-лента возражений with DeadlineBox timers (5/3/3 раб. дней, working-day aware, «молчание = автоснятие (п. 27)», ≤2 days → inverted black box)
+- [ ] PD2 Passport pattern on line passport, pre-billing, reconcile: Кто я → Вердикт → Почему → Что делать → Данные(collapsed); breadcrumbs; «как посчитано» popovers; designed empty states
+- [ ] AC: golden tests 8/8; timing; QA beats 1–5 per REGENERATED checklist; screenshot per beat; timer visibly at «осталось 2 раб. дня»
+
+## EPIC D — ACT + SPEAK (≈4h) → **HARD STOP: native review + freeze GO**
+
+- [ ] P7′ docgen: «Обращение в Фонд о размещении доп. объёмов (пп. 25)/26) п. 19 Правил закупа)» docx ru+kk with авто-расчёт остатка; возражение template; monthly report kk; all kk flagged NEEDS-NATIVE-REVIEW
+- [ ] P8-lite copilot: canned mode mandatory (6 demo Q&A incl. Q13 «екі түрі» + возражение-timer), receipt-style dock UI with citation chips; live RapidAPI mode ONLY if RAPIDAPI_KEY in .env (3-stage pipeline, number-validator)
+- [ ] PD3-lite: role switcher (Директор / Экономист / Статистик / Куратор УОЗ) changing nav + data scope; Settings with пороги + «О системе» (справочник versions: «ЕКД ред. №19 от 27.02.2026»); footer «демо-деректер» badge everywhere
+- [ ] AC: обращение.docx both langs attached; copilot beat with network OFF; role-switch screenshots; NEEDS-NATIVE-REVIEW batch as table (key | kk | ru | confidence | question)
+
+## EPIC E — Freeze & stagecraft (≈2h)
+
 - [ ] `make demo-reset` <60s (pg restore); tag `demo-stable`
-- [ ] QA checklist ×2 clean, <7 min (one on battery/hotspot)
-- [ ] Golden-path fallback video recorded
-- [ ] docs/09 patched: solo-presenter plan + `scripts/prewarm_copilot.sh`
+- [ ] Two full QA runs (one on battery + phone hotspot); screen-record full golden path as fallback video
+- [ ] Print pack: Line Passport A4 + kk monthly report; pitch asset cards from 16 §3 (Qalqan answer, «38 млрд ₸ оспорено», «п. 24/п. 15», 3.4 трлн)
+- [ ] Update docs/09 demo-script numbers from the manifest
+- [ ] AC: two QA run logs; reset timing; video file path; asset cards committed; `git grep -i rapidapi` clean
+
+## Deferred to post-demo (from the old P-queue, if time never allows)
+
+P6 full forecast engine (manifest-precomputed forecasts cover the demo) · P8 live RAG/eval ≥22/24 · P9 city panel full + alerts engine · PD3 full 12-role matrix · adapter round-trip demo.
 
 ## Icebox
 
@@ -87,7 +72,6 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md). This file replaces issue
 
 ## Interrupt-the-lead queue (batched)
 
-1. RAPIDAPI_KEY into local `.env` — needed at P8 start.
-2. DEMO AT / FREEZE AT — the moment known.
-3. Kazakh native-review batches: after P7 and after P9.
-4. Research-pack contradictions with docs/06 specs — only if they change planted numbers/rule logic.
+1. Exact pitch slot/format when known → recompute cuts if <18h (drop order: city panel, live copilot, kk-полировка; never beats 2/4/6-canned).
+2. ~~RAPIDAPI_KEY into local `.env`~~ — done (key stored locally, untracked; verified `git check-ignore`).
+3. Review gates: Epic A look approval; Epic D kk native review + freeze GO.

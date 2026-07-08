@@ -21,6 +21,8 @@ import { useTranslation } from 'react-i18next';
 
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import RoleSwitcher from '@/components/RoleSwitcher';
+import Ticker from '@/components/Ticker';
+import Logo from '@/components/brand/Logo';
 
 interface NavItem {
   href: string;
@@ -42,65 +44,73 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin', labelKey: 'nav.admin', icon: Settings },
 ];
 
+/**
+ * «Ведомость» shell (docs/15 §8): header [Logo · org · ticker · role · lang]
+ * over a bordered sidebar + document body. All chrome is print-hidden.
+ */
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-4 py-5">
-          <Link href="/overview" className="block">
-            <span className="text-xl font-bold uppercase tracking-widest text-accent">
-              {t('app.title')}
-            </span>
-          </Link>
-          <p className="mt-1 text-xs leading-snug text-slate-500">
-            {t('app.tagline')}
-          </p>
-        </div>
-
-        <nav className="flex-1 space-y-0.5 overflow-y-auto px-2 py-3">
-          {NAV_ITEMS.map((item) => {
-            const active =
-              pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={active ? 'page' : undefined}
-                className={clsx(
-                  'flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-                  active
-                    ? 'bg-accent-50 text-accent-700'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-                )}
-              >
-                <Icon
-                  className={clsx(
-                    'h-4 w-4 shrink-0',
-                    active ? 'text-accent-600' : 'text-slate-400',
-                  )}
-                  aria-hidden
-                />
-                {t(item.labelKey)}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="space-y-2 border-t border-slate-200 px-3 py-3">
+    <div className="flex min-h-screen flex-col">
+      <header className="print-hidden flex items-center gap-3 border-b-2 border-ink bg-paper px-4 py-2">
+        <Link href="/overview" className="flex shrink-0 items-center">
+          <Logo height={28} />
+        </Link>
+        <span className="hidden shrink-0 border border-ink px-2 py-1 font-mono text-caption uppercase md:inline-block">
+          {t('app.org')}
+        </span>
+        <Ticker />
+        <div className="flex shrink-0 items-center gap-2">
           <RoleSwitcher />
           <LocaleSwitcher />
         </div>
-      </aside>
+      </header>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <main className="flex-1 px-8 py-6">{children}</main>
-        <footer className="border-t border-slate-200 px-8 py-3 text-xs text-slate-400">
-          {t('common.demo_data_note')}
-        </footer>
+      <div className="flex min-h-0 flex-1">
+        <aside className="print-hidden sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r-2 border-ink bg-paper">
+          <nav className="flex-1 overflow-y-auto py-2">
+            {NAV_ITEMS.map((item) => {
+              const active =
+                pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={clsx(
+                    'hover-stamp flex items-center gap-2.5 border-b border-ink/[.12] px-4 py-2.5 text-sm font-medium uppercase tracking-wide',
+                    active
+                      ? 'bg-ink text-paper'
+                      : 'text-ink hover:bg-ink hover:text-paper',
+                  )}
+                >
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden />
+                  {t(item.labelKey)}
+                </Link>
+              );
+            })}
+          </nav>
+          <p className="border-t-2 border-ink px-4 py-3 text-caption uppercase text-ink/40">
+            {t('app.tagline')}
+          </p>
+        </aside>
+
+        <div className="flex min-w-0 flex-1 flex-col">
+          <main className="flex-1 px-6 py-6">{children}</main>
+          {/* NOT print-hidden: printed output must carry the demo-data label
+              (docs/11 §1) — it doubles as the document footer. */}
+          <footer className="flex items-center gap-2 border-t-2 border-ink px-6 py-2.5">
+            <span className="bg-ink px-1.5 py-0.5 font-mono text-caption uppercase text-paper">
+              {t('common.demo_badge')}
+            </span>
+            <span className="text-caption uppercase text-ink/40">
+              {t('common.demo_data_note')}
+            </span>
+          </footer>
+        </div>
       </div>
     </div>
   );

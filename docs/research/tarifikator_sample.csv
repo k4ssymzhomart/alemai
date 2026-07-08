@@ -1,0 +1,52 @@
+code,name_ru,price_kzt,unit,source_url,source_year,confidence
+A01.001.000,"Прием: Терапевт",2487.71,услуга,https://prg.kz/document/?doc_id=36534682,2026,CONFIRMED
+A01.002.000,"Прием: Педиатр",2487.71,услуга,https://prg.kz/document/?doc_id=36534682,2026,CONFIRMED
+A01.003.000,"Прием: Семейный врач (врач общей практики)",2889.51,услуга,https://prg.kz/document/?doc_id=36534682,2026,CONFIRMED
+A01.005.000,"Прием: Психолог",1291.27,услуга,https://prg.kz/document/?doc_id=36534682,2026,CONFIRMED
+UNKNOWN,"Прием: Кардиолог",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Невролог (невропатолог)",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Эндокринолог",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Хирург",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Офтальмолог",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Оториноларинголог",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Акушер-гинеколог",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Уролог",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Прием: Травматолог-ортопед",UNKNOWN,услуга,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"МРТ головного мозга (без контраста)",29000,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"МРТ головного мозга с контрастированием",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"МРТ шейного отдела позвоночника",26400,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"МРТ грудного отдела позвоночника",26400,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"МРТ пояснично-крестцового отдела позвоночника",26400,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"МРТ одного сустава (коленный/плечевой)",27720,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"МРТ органов брюшной полости",27720,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"МРТ органов малого таза",27720,исследование,https://mrt-kt.info/mrt/almaty/osms/,2026,LIKELY
+UNKNOWN,"КТ головного мозга (без контраста)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"КТ органов грудной клетки",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"КТ органов брюшной полости",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"КТ одной зоны с контрастированием",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"КТ придаточных пазух носа",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"УЗИ органов брюшной полости (комплекс)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"УЗИ щитовидной железы",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"УЗИ органов малого таза",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Эхокардиография (УЗИ сердца)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"УЗИ почек и надпочечников",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"УЗИ молочных желез",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"УЗДГ сосудов шеи (допплерография)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Общий анализ крови (ОАК)",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Общий анализ мочи (ОАМ)",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение глюкозы в сыворотке крови",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение АЛТ в сыворотке крови",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение АСТ в сыворотке крови",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение креатинина в сыворотке крови",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение общего холестерина",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение общего билирубина",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"ИФА на ВИЧ (скрининг)",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение ТТГ (тиреотропный гормон)",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Определение свободного Т4",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Гликированный гемоглобин (HbA1c)",UNKNOWN,анализ,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Фиброэзофагогастродуоденоскопия (ФГДС)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Колоноскопия (тотальная)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Рентгенография органов грудной клетки (обзорная)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"ЭКГ в 12 отведениях (снятие и расшифровка)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Маммография (обе молочные железы)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
+UNKNOWN,"Флюорография профилактическая (цифровая)",UNKNOWN,исследование,https://prg.kz/document/?doc_id=36534682,2026,UNKNOWN
