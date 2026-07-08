@@ -227,3 +227,26 @@ export interface ReconcileRows {
   bucket_no: number;
   rows: ReconcileRow[];
 }
+
+// ─── Epic D: copilot ───────────────────────────────────────────────────────
+
+export interface CopilotCitation {
+  doc_title: string;
+  doc_number: string;
+  anchor: string;
+  lang?: string;
+}
+
+export interface CopilotToolTrace {
+  tool: string;
+  arguments?: Record<string, unknown>;
+  result_preview?: string | null;
+}
+
+export interface CopilotAnswer {
+  answer: string;
+  intent: 'data' | 'regulation' | 'report' | 'out_of_scope';
+  locale: string;
+  citations: CopilotCitation[];
+  tool_traces: CopilotToolTrace[];
+}
