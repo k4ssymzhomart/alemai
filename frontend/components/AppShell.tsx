@@ -99,8 +99,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <main className="flex-1 px-8 py-6">{children}</main>
-          <footer className="print-hidden flex items-center gap-2 border-t-2 border-ink px-8 py-2.5">
+          <main className="flex-1 px-6 py-6">{children}</main>
+          {/* NOT print-hidden: printed output must carry the demo-data label
+              (docs/11 §1) — it doubles as the document footer. */}
+          <footer className="flex items-center gap-2 border-t-2 border-ink px-6 py-2.5">
             <span className="bg-ink px-1.5 py-0.5 font-mono text-caption uppercase text-paper">
               {t('common.demo_badge')}
             </span>

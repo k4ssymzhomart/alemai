@@ -30,7 +30,8 @@
     "source": "Funding source",
     "computed_pending": "computing…",
     "demo_badge": "demo data",
-    "go_overview": "Go to overview"
+    "go_overview": "Go to overview",
+    "language_label": "Language"
   },
   "ticker": {
     "label": "Alert ticker",

@@ -11,11 +11,11 @@ import type { RiskClass } from '@/lib/types';
  * glyph carry the hierarchy — never hue, never icon-only.
  */
 const CLASS_STYLES: Record<RiskClass, { chip: string; glyph: string }> = {
-  critical_under: { chip: 'border-2 border-ink bg-ink text-paper', glyph: '▲' },
+  critical_under: { chip: 'border-4 border-ink bg-ink text-paper', glyph: '▲' },
   under: { chip: 'fill-hatch-light border-2 border-ink text-ink', glyph: '◤' },
   on_track: { chip: 'border border-ink text-ink', glyph: '' },
   over: { chip: 'fill-hatch-light border-2 border-ink text-ink', glyph: '◤' },
-  critical_over: { chip: 'border-2 border-ink bg-ink text-paper', glyph: '▲' },
+  critical_over: { chip: 'border-4 border-ink bg-ink text-paper', glyph: '▲' },
 };
 
 /**

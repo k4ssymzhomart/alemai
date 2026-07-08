@@ -55,9 +55,13 @@ export default function LinesTable({ lines, year }: LinesTableProps) {
             <tr
               key={line.line_key}
               tabIndex={0}
+              aria-label={line.service_group || t(`care_type.${line.care_type}`)}
               onClick={() => open(line)}
               onKeyDown={(event) => {
-                if (event.key === 'Enter') open(line);
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  open(line);
+                }
               }}
               className="hover-stamp group cursor-pointer border-b border-ink/[.12] last:border-b-2 last:border-ink hover:bg-ink hover:text-paper focus:bg-ink focus:text-paper focus:outline-none"
             >

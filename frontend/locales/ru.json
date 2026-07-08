@@ -30,7 +30,8 @@
     "source": "Источник финансирования",
     "computed_pending": "рассчитывается…",
     "demo_badge": "демо-данные",
-    "go_overview": "К обзору"
+    "go_overview": "К обзору",
+    "language_label": "Язык"
   },
   "ticker": {
     "label": "Лента предупреждений",

@@ -30,7 +30,8 @@
     "source": "Қаржыландыру көзі",
     "computed_pending": "есептелуде…",
     "demo_badge": "демо-деректер",
-    "go_overview": "Шолуға өту"
+    "go_overview": "Шолуға өту",
+    "language_label": "Тіл"
   },
   "ticker": {
     "label": "Ескертулер таспасы",

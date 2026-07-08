@@ -13,7 +13,7 @@ const LABELS: Record<Locale, string> = {
 
 /** Locale switcher: segmented mono control, active segment inverted. */
 export default function LocaleSwitcher() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const current = (i18n.resolvedLanguage ?? i18n.language) as Locale;
 
   const handleChange = (locale: Locale) => {
@@ -24,7 +24,11 @@ export default function LocaleSwitcher() {
   };
 
   return (
-    <div role="group" aria-label="Language" className="flex border border-ink">
+    <div
+      role="group"
+      aria-label={t('common.language_label')}
+      className="flex border border-ink"
+    >
       {locales.map((locale) => (
         <button
           key={locale}

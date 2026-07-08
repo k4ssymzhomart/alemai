@@ -23,10 +23,10 @@ export function stubExecutionStatus(pct: number): ExecutionStatus {
  * risk = 45° hatch + 2px border, normal = plain 1px chip. `over` maps to
  * critical here because overshoot burns the contract fastest.
  */
-const STATUS_STYLES: Record<ExecutionStatus, string> = {
-  under: 'fill-hatch-light border-2 border-ink text-ink',
-  on_track: 'border border-ink text-ink',
-  over: 'border-2 border-ink bg-ink text-paper',
+const STATUS_STYLES: Record<ExecutionStatus, { chip: string; glyph: string }> = {
+  under: { chip: 'fill-hatch-light border-2 border-ink text-ink', glyph: '◤' },
+  on_track: { chip: 'border border-ink text-ink', glyph: '' },
+  over: { chip: 'border-4 border-ink bg-ink text-paper', glyph: '▲' },
 };
 
 /** Execution % chip for the lines table (stub thresholds until P6). */
@@ -37,13 +37,15 @@ export default function ExecutionChip({
   pct: number;
   locale: NumLocale;
 }) {
+  const { chip, glyph } = STATUS_STYLES[stubExecutionStatus(pct)];
   return (
     <span
       className={clsx(
-        'inline-flex px-2 py-0.5 font-mono text-xs font-semibold tabular-nums',
-        STATUS_STYLES[stubExecutionStatus(pct)],
+        'inline-flex items-center gap-1 px-2 py-0.5 font-mono text-xs font-semibold tabular-nums',
+        chip,
       )}
     >
+      {glyph ? <span aria-hidden>{glyph}</span> : null}
       {fmtPct(pct, locale)}
     </span>
   );
