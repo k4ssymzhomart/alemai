@@ -1,18 +1,18 @@
 /**
- * QALAM applied type stack (Epic A.2, candidate 1 — «премиальный годовой
- * отчёт»): editorial serif display + neutral sans body + mono figures.
- *   display — Literata (headings, verdicts, sentence-case)
+ * QALAM applied type stack (Epic A.2, stack 2 — lead's gate pick):
+ *   display — Manrope (headings, verdicts, sentence-case)
  *   ui/body — Inter
  *   mono    — IBM Plex Mono (ALL numbers, ₸, dates, timers, codes)
- * Swapping the stack the lead picks at the gate is a one-line change here.
- * The kk glyph gate (/design) is the blocking check that Ә Ғ Қ Ң Ө Ұ Ү Һ І
- * render without a fallback weight/width jump.
+ * Swapping the display face is a one-line change here. The kk glyph gate
+ * (/design) is the blocking check that Ә Ғ Қ Ң Ө Ұ Ү Һ І render without a
+ * fallback weight/width jump; if Manrope misbehaves, fall back to stack 3
+ * (PT Serif + Golos Text).
  */
-import { IBM_Plex_Mono, Inter, Literata } from 'next/font/google';
+import { IBM_Plex_Mono, Inter, Manrope } from 'next/font/google';
 
-export const fontDisplay = Literata({
-  subsets: ['latin', 'cyrillic', 'cyrillic-ext'],
-  weight: ['500', '600'],
+export const fontDisplay = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['500', '600', '700'],
   variable: '--font-display',
   display: 'swap',
 });
