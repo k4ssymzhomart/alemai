@@ -1,0 +1,143 @@
+# ЕКД-grounded rule catalog (docs/06 §7, ЕКД mapping ekd_notes.md §4).
+# The YAML is the tunable source of truth: severity, ekd_code, thresholds and
+# bilingual messages live here; the matching predicate lives in
+# app/services/rules_engine/rules.py keyed by `code`. Domain experts edit this
+# file (no deploy) to retune thresholds/messages/ЕКД codes.
+#
+# severity: block  = снять до выставления (would be rejected in the счёт-реестр)
+#           warn   = требует проверки (probable defect)
+#           yellow = ЕКД 2.0/7.0 — фиксируется без снятия (0 ₸)
+# ekd_code: real code from docs/research/ekd_codes.csv (edition chosen by date).
+# origin:   ЕКД | АУДИТ | СВЕРКА | 2026 (shown in the finding badge).
+
+- code: R01
+  severity: block
+  scope: claim
+  origin: ЕКД
+  ekd_code: "5.1"
+  params: {}
+  message_ru: "Услуга оказана после даты смерти пациента — неподтверждённый случай"
+  message_kk: "Қызмет пациент қайтыс болған күннен кейін көрсетілген — расталмаған жағдай"
+
+- code: R02
+  severity: block
+  scope: claim
+  origin: ЕКД
+  ekd_code: "5.1"
+  params:
+    sex_by_code: {S029: "F", S030: "F"}   # маммография / цитология шейки матки — женские
+  message_ru: "Услуга несовместима с полом пациента — случай не может быть подтверждён"
+  message_kk: "Қызмет пациенттің жынысына сәйкес келмейді — жағдай расталмайды"
+
+- code: R03
+  severity: block
+  scope: claim
+  origin: ЕКД
+  ekd_code: "1.2"
+  params:
+    age_by_code:                          # целевые возрастные группы скринингов (config.yaml)
+      S029: [40, 70]
+      S030: [30, 70]
+      S031: [50, 70]
+      S032: [40, 70]
+      S033: [40, 70]
+  message_ru: "Скрининг вне целевой возрастной группы — необоснованное оказание"
+  message_kk: "Скрининг мақсатты жас тобынан тыс — негізсіз көрсету"
+
+- code: R04
+  severity: warn
+  scope: registry
+  origin: АУДИТ
+  ekd_code: "3.1"
+  params: {}                              # дубль: один пациент+услуга+дата встречается >1 раза
+  message_ru: "Дублирующая услуга (тот же пациент, услуга и дата) — задвоение"
+  message_kk: "Қайталанатын қызмет (бір пациент, қызмет және күн) — қосарлау"
+
+- code: R07
+  severity: warn
+  scope: claim
+  origin: ЕКД
+  ekd_code: "1.2"
+  params: {}                              # КДУ без направления (referral_id пуст)
+  message_ru: "КДУ оказана без направления — требует проверки обоснованности"
+  message_kk: "КДУ жолдамасыз көрсетілген — негізділігін тексеру қажет"
+
+- code: R10
+  severity: warn
+  scope: registry
+  origin: АУДИТ
+  ekd_code: "5.1"
+  params:
+    max_per_day: 80                       # физически неоказуемый объём услуг у врача за день
+  message_ru: "Нереальная суточная нагрузка врача — физически неоказуемый объём"
+  message_kk: "Дәрігердің тәуліктік жүктемесі шындыққа жанаспайды — орындалмайтын көлем"
+
+- code: R11
+  severity: warn
+  scope: registry
+  origin: АУДИТ
+  ekd_code: "5.1"
+  params:
+    min_weekend_per_month: 30             # аномальное число услуг врача в выходные за месяц
+  message_ru: "Аномальное число услуг врача в выходные за месяц — требует проверки графика"
+  message_kk: "Дәрігердің бір айдағы демалыс күндердегі қызмет саны аномальды — кестені тексеру"
+
+- code: R13
+  severity: warn
+  scope: registry
+  origin: ЕКД
+  ekd_code: "4.0"
+  params:
+    window_days: 30                       # повторная госпитализация в течение 30 кал. дней
+  message_ru: "Повторная госпитализация в течение 30 дней — необоснованная (кроме паллиатива)"
+  message_kk: "30 күн ішінде қайта емдеуге жатқызу — негізсіз (паллиативтен басқа)"
+
+- code: R16
+  severity: block
+  scope: claim
+  origin: ЕКД
+  ekd_code: "11.0"
+  params: {}                              # услуга на ОСМС незастрахованному пациенту
+  message_ru: "Услуга по ОСМС оказана незастрахованному пациенту"
+  message_kk: "МӘМС бойынша қызмет сақтандырылмаған пациентке көрсетілген"
+
+- code: R17
+  severity: block
+  scope: registry
+  origin: "2026"
+  ekd_code: "11.0"
+  params:
+    icd_prefixes: ["E10", "E11", "E12", "E13", "E14"]   # диабет: СЗЗ→ЗПДН с 01.01.2026
+    wrong_source: gobmp
+    correct_source: osms
+    effective_from: "2026-01-01"          # package_mapping_2026.csv (приказ ҚР ДСМ-109/2020)
+  message_ru: "Диабет (E10–E14) выставлен на ГОБМП — с 2026 источник ОСМС (ЗПДН)"
+  message_kk: "Диабет (E10–E14) ТМККК-ке қойылған — 2026 жылдан көзі МӘМС (ЗПДН)"
+
+- code: R18
+  severity: warn
+  scope: registry
+  origin: АУДИТ
+  ekd_code: "3.1"
+  params:
+    max_per_month_by_code: {S010: 3, S011: 3, S013: 3}  # превышение кратности КДУ/мес
+  message_ru: "Превышена разумная кратность услуги за месяц — необоснованное увеличение"
+  message_kk: "Айлық қызмет еселігі негізсіз асқан — санды негізсіз ұлғайту"
+
+- code: R20
+  severity: warn
+  scope: registry
+  origin: ЕКД
+  ekd_code: "1.2"
+  params: {}                              # повтор скрининга тому же пациенту в одном периоде
+  message_ru: "Повторный скрининг пациенту в том же периоде — вне периодичности"
+  message_kk: "Бір кезеңде пациентке қайталанған скрининг — кезеңділіктен тыс"
+
+- code: R25
+  severity: yellow
+  scope: claim
+  origin: ЕКД
+  ekd_code: "2.0"
+  params: {}                              # нет диагноза (icd10) — дефект оформления, 0 ₸
+  message_ru: "Отсутствует диагноз (МКБ-10) — дефект оформления документации"
+  message_kk: "Диагноз жоқ (АХЖ-10) — құжаттаманы ресімдеу ақауы"
