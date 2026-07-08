@@ -1,5 +1,7 @@
 # CONTRIBUTING — IGERIM working agreement
 
+> **⚡ SOLO MODE (current):** the contributor tracks are absorbed; the team is lead + engineering agent. The live plan is [docs/SOLO-BACKLOG.md](docs/SOLO-BACKLOG.md) per [docs/11-SOLO-AGENT-PROMPT.md](docs/11-SOLO-AGENT-PROMPT.md). Direct commits / self-merge on green CI are allowed; the ownership fence is retired. Junior-workflow sections below are kept for reference only.
+
 Condensed from docs/03-USER-STORIES.md §12 and docs/08-EXECUTION.md §5. LEAD enforces. When in doubt: does it make the golden demo path (docs/04 §8) stronger?
 
 ## Non-negotiables

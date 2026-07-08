@@ -6,27 +6,6 @@ on:
   pull_request:
 
 jobs:
-  ownership-fence:
-    # frontend/** and core code are LEAD-only; junior PRs may touch only data/content paths.
-    if: github.event_name == 'pull_request' && github.event.pull_request.user.login != 'k4ssymzhomart'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: enforce junior path allowlist
-        run: |
-          CHANGED=$(git diff --name-only "${{ github.event.pull_request.base.sha }}" "${{ github.event.pull_request.head.sha }}")
-          echo "Changed files:"; echo "$CHANGED"
-          VIOLATIONS=$(echo "$CHANGED" | grep -vE '^(shared/|backend/rules/|backend/regs/|backend/tests/fixtures/|backend/eval/|backend/templates/drafts/|docs/)' || true)
-          if [ -n "$VIOLATIONS" ]; then
-            echo "::error::These paths are outside the junior-track allowlist (frontend/** and core code are @k4ssymzhomart-only):"
-            echo "$VIOLATIONS"
-            echo "Allowed: shared/, backend/rules/, backend/regs/, backend/tests/fixtures/, backend/eval/, backend/templates/drafts/, docs/"
-            exit 1
-          fi
-          echo "OK: all changes within the junior allowlist"
-
   data-gates:
     runs-on: ubuntu-latest
     steps:

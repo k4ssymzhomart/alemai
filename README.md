@@ -46,10 +46,13 @@ docs/       Full product/domain/execution doc pack — START at docs/00-INDEX.md
 | [@folrwix](https://github.com/folrwix) | Data & rules track |
 | [@rasssppberrry](https://github.com/rasssppberrry) | i18n & reference content track |
 
+## ⚡ SOLO MODE (current)
+
+The project runs in solo mode: lead (@k4ssymzhomart) + engineering agent; the contributor tracks are absorbed. The live plan is [docs/SOLO-BACKLOG.md](docs/SOLO-BACKLOG.md) (packets P1–P10 per [docs/11-SOLO-AGENT-PROMPT.md](docs/11-SOLO-AGENT-PROMPT.md)); GitHub issues remain as passive backlog reference only. Short-lived branches or direct commits, self-merge on green CI, `main` always demoable.
+
 ## Working agreement (non-negotiable)
 
 1. `main` is always demoable. No direct pushes — branch + PR + review by lead.
-1a. **All frontend code (`frontend/**`) and core backend code are owned by @k4ssymzhomart.** Contributor PRs may touch only: `shared/`, `backend/rules/`, `backend/regs/`, `backend/tests/fixtures/`, `backend/eval/`, `backend/templates/drafts/`, `docs/`. CI enforces this.
 2. Branch naming: `feat/<issue-key>-short-name` (e.g. `feat/e2-rules-catalog`).
 3. PR < 400 lines diff. Fill the PR template. Review SLA: 30 min.
 4. No hardcoded UI strings — every label goes through i18n keys; `shared/glossary.csv` is the terminology law.
