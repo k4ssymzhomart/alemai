@@ -19,15 +19,15 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md) laws + [17-NEXT-DIRECTIVE
 
 ## EPIC A — Absorb + Reskin (≈4h) → **HARD STOP: lead approves the look**
 
-- [~] §2 reading done (docs 17→16→15→14/13, skims of 11/QA/backlog); docs 13–18 landed into the repo
+- [x] §2 reading done (docs 17→16→15→14/13, skims of 11/QA/backlog); docs 13–18 landed into the repo
 - [x] SOLO-BACKLOG restructured to epics A–E (this file); README SOLO note verified present
-- [ ] PD1 «Ведомость» per docs/15: Tailwind palette stripped to ink/paper (violations impossible), radius 0 global
-- [ ] Fonts Unbounded / Inter Tight / IBM Plex Mono via next/font (cyrillic-ext); **KZ glyph gate screenshot** (fallback per 15 §2 if Unbounded fails)
-- [ ] ECharts `vedomost` theme: black + decal patterns, dashed plan, dotted CI
-- [ ] Restyle existing Overview + drill screens; Marquee alert ticker (seeded content ok)
-- [ ] Components: VerdictBlock, ExecutionBar (hatch), DeadlineBox, CodeChip, StampMark
-- [ ] Logo slot (`/public/brand/logo.svg` → fallback wordmark IGERIM▮); print stylesheet
-- [ ] AC: two grep gates (15 §10) pasted; glyph-gate screenshot; before/after screenshots; `npm run build` zero errors; beat 1 in new skin
+- [x] PD1 «Ведомость» per docs/15: Tailwind palette stripped to ink/paper (violations impossible), radius 0 global
+- [x] Fonts Unbounded / Inter Tight / IBM Plex Mono via next/font (cyrillic-ext); KZ glyph gate PASSES for all faces incl. ₸ — Unbounded keeps display role
+- [x] ECharts `vedomost` theme: black + decal patterns, dashed plan, hard-shadow tooltips
+- [x] Restyle Overview + drill screens; live Marquee ticker (live metrics + cited regulation constants)
+- [x] Components: VerdictBlock, ExecutionBar (hatch), DeadlineBox, CodeChip, StampMark (+ /design specimens page)
+- [x] Logo slot (`/public/brand/logo.svg` → fallback wordmark IGERIM▮); print stylesheet (A4, chrome hidden)
+- [x] AC: grep gates PASS (zero rounded-*, zero hex in app/components); glyph-gate screenshot; before/after screenshots; `npm run build` zero errors; beat 1 in new skin
 
 ## EPIC B — Data truth: rescale + manifest (≈3h) → auto-continue if green
 
