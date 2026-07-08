@@ -18,13 +18,18 @@ export function stubExecutionStatus(pct: number): ExecutionStatus {
   return 'on_track';
 }
 
-const STATUS_STYLES: Record<ExecutionStatus, string> = {
-  under: 'bg-amber-50 text-amber-700 ring-amber-200',
-  on_track: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-  over: 'bg-red-50 text-red-700 ring-red-200',
+/**
+ * Severity without color (docs/15 §4): critical = inverted black block,
+ * risk = 45° hatch + 2px border, normal = plain 1px chip. `over` maps to
+ * critical here because overshoot burns the contract fastest.
+ */
+const STATUS_STYLES: Record<ExecutionStatus, { chip: string; glyph: string }> = {
+  under: { chip: 'fill-hatch-light border-2 border-ink text-ink', glyph: '◤' },
+  on_track: { chip: 'border border-ink text-ink', glyph: '' },
+  over: { chip: 'border-4 border-ink bg-ink text-paper', glyph: '▲' },
 };
 
-/** Traffic-light % chip for the lines table (stub thresholds until P6). */
+/** Execution % chip for the lines table (stub thresholds until P6). */
 export default function ExecutionChip({
   pct,
   locale,
@@ -32,13 +37,15 @@ export default function ExecutionChip({
   pct: number;
   locale: NumLocale;
 }) {
+  const { chip, glyph } = STATUS_STYLES[stubExecutionStatus(pct)];
   return (
     <span
       className={clsx(
-        'inline-flex rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ring-1 ring-inset',
-        STATUS_STYLES[stubExecutionStatus(pct)],
+        'inline-flex items-center gap-1 px-2 py-0.5 font-mono text-xs font-semibold tabular-nums',
+        chip,
       )}
     >
+      {glyph ? <span aria-hidden>{glyph}</span> : null}
       {fmtPct(pct, locale)}
     </span>
   );

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import ExecutionChip from '@/components/overview/ExecutionChip';
 import RiskBadge from '@/components/overview/RiskBadge';
+import ExecutionBar from '@/components/vedomost/ExecutionBar';
 import { fmtDate, fmtTenge, type NumLocale } from '@/lib/format';
 import type { ContractLine } from '@/lib/types';
 
@@ -14,7 +15,10 @@ interface LinesTableProps {
   year: number;
 }
 
-/** Contract lines table (QA Beat 1 columns); row click → drill-down (C2). */
+/**
+ * Contract lines ledger (QA Beat 1 columns + ExecutionBar per docs/15 §9);
+ * row click → drill-down (C2); row hover = full invert — stamp, not fade.
+ */
 export default function LinesTable({ lines, year }: LinesTableProps) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
@@ -29,12 +33,14 @@ export default function LinesTable({ lines, year }: LinesTableProps) {
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-wide text-slate-500">
+          <tr className="border-b-2 border-ink text-left font-mono text-caption uppercase text-ink/70">
             <th className="px-3 py-2 font-medium">{t('overview.table.line')}</th>
-            <th className="px-3 py-2 font-medium">{t('overview.table.care_type')}</th>
             <th className="px-3 py-2 font-medium">{t('overview.table.source')}</th>
             <th className="px-3 py-2 text-right font-medium">{t('overview.table.plan')}</th>
             <th className="px-3 py-2 text-right font-medium">{t('overview.table.fact')}</th>
+            <th className="w-40 px-3 py-2 font-medium">
+              {t('overview.table.execution_bar')}
+            </th>
             <th className="px-3 py-2 text-right font-medium">
               {t('overview.table.execution_pct')}
             </th>
@@ -49,34 +55,42 @@ export default function LinesTable({ lines, year }: LinesTableProps) {
             <tr
               key={line.line_key}
               tabIndex={0}
+              aria-label={line.service_group || t(`care_type.${line.care_type}`)}
               onClick={() => open(line)}
               onKeyDown={(event) => {
-                if (event.key === 'Enter') open(line);
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  open(line);
+                }
               }}
-              className="cursor-pointer border-b border-slate-100 transition-colors last:border-0 hover:bg-accent-50/60 focus:bg-accent-50/60 focus:outline-none"
+              className="hover-stamp group cursor-pointer border-b border-ink/[.12] last:border-b-2 last:border-ink hover:bg-ink hover:text-paper focus:bg-ink focus:text-paper focus:outline-none"
             >
-              <td className="max-w-xs px-3 py-2 font-medium text-slate-800">
+              <td className="max-w-xs px-3 py-2.5 font-medium">
                 {line.service_group || t(`care_type.${line.care_type}`)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2 text-slate-600">
-                {t(`care_type.${line.care_type}`)}
-              </td>
-              <td className="whitespace-nowrap px-3 py-2 text-slate-600">
+              <td className="whitespace-nowrap px-3 py-2.5">
                 {t(`funding.${line.funding_source}`)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-slate-800">
+              <td className="whitespace-nowrap px-3 py-2.5 text-right font-mono tabular-nums">
                 {fmtTenge(line.plan_amount_year)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2 text-right tabular-nums text-slate-800">
+              <td className="whitespace-nowrap px-3 py-2.5 text-right font-mono tabular-nums">
                 {fmtTenge(line.fact_amount_ytd)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2 text-right">
+              <td className="px-3 py-2.5 group-hover:invert group-focus:invert">
+                <ExecutionBar
+                  planYear={line.plan_amount_year}
+                  factYtd={line.fact_amount_ytd}
+                  planYtd={line.plan_amount_ytd}
+                />
+              </td>
+              <td className="whitespace-nowrap px-3 py-2.5 text-right group-hover:invert group-focus:invert">
                 <ExecutionChip pct={line.execution_pct_ytd} locale={locale} />
               </td>
-              <td className="whitespace-nowrap px-3 py-2">
+              <td className="whitespace-nowrap px-3 py-2.5 group-hover:invert group-focus:invert">
                 <RiskBadge riskClass={line.risk_class} />
               </td>
-              <td className="whitespace-nowrap px-3 py-2 tabular-nums text-slate-500">
+              <td className="whitespace-nowrap px-3 py-2.5 font-mono tabular-nums">
                 {line.burn_out_date ? fmtDate(line.burn_out_date) : '—'}
               </td>
             </tr>

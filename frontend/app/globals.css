@@ -2,19 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
+/* «Ведомость» tokens (docs/15 §3). The ONLY hex values in the frontend live
+   here and in tailwind.config.ts / lib/chartTheme.ts. */
 :root {
-  --accent: #0e7c66;
+  --ink: #000;
+  --paper: #fff;
+  --ink-70: rgba(0, 0, 0, 0.7);
+  --ink-40: rgba(0, 0, 0, 0.4);
+  --ink-12: rgba(0, 0, 0, 0.12);
+  --shadow-hard: 4px 4px 0 0 var(--ink);
+  --shadow-hard-sm: 2px 2px 0 0 var(--ink);
+  --radius: 0;
+  --space-unit: 8px;
 }
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply bg-paper font-ui text-ink antialiased;
   }
 
-  /* Data-dense look: lining, tabular figures for every number by default. */
+  /* Numbers: lining + tabular everywhere by default. */
   html {
     font-feature-settings:
       'tnum' 1,
       'lnum' 1;
+  }
+
+  /* Focus = 2px offset black outline (docs/15 §10), never a soft ring. */
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--ink);
+    color: var(--paper);
+  }
+}
+
+@layer utilities {
+  /* Severity pattern fills (docs/15 §4) — pure black on white, no hues. */
+  .fill-hatch {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--ink) 0,
+      var(--ink) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+  .fill-hatch-light {
+    background-image: repeating-linear-gradient(
+      45deg,
+      var(--ink-12) 0,
+      var(--ink-12) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+  }
+  .fill-dots {
+    background-image: radial-gradient(var(--ink) 1px, transparent 1px);
+    background-size: 7px 7px;
+  }
+  .fill-dots-faint {
+    background-image: radial-gradient(var(--ink-12) 1px, transparent 1px);
+    background-size: 8px 8px;
+  }
+
+  /* Stamp-like hover inversion: 120ms steps(2) — a stamp, not a fade. */
+  .hover-stamp {
+    transition:
+      background-color 120ms steps(2, end),
+      color 120ms steps(2, end);
+  }
+}
+
+/* Alert ticker («БЕГУЩАЯ СТРОКА», docs/15 §5): duplicated track scrolls
+   left, pauses on hover, disabled for reduced motion. */
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.ticker-track {
+  animation: ticker-scroll 36s linear infinite;
+}
+.ticker:hover .ticker-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none;
+  }
+  .animate-pulse {
+    animation: none;
+  }
+}
+
+/* Print (docs/15 §6): hide chrome, screens print as A4 documents.
+   print-color-adjust keeps inverted blocks, bar fills and pattern
+   backgrounds — the severity system itself — on paper. */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-hidden {
+    display: none !important;
+  }
+  body {
+    background: var(--paper);
+  }
+  main {
+    padding: 0 !important;
+  }
+  @page {
+    size: A4;
+    margin: 14mm;
   }
 }

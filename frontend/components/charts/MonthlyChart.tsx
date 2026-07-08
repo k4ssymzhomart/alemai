@@ -5,9 +5,12 @@ import { useTranslation } from 'react-i18next';
 
 import EChart from '@/components/charts/EChart';
 import {
+  INK,
+  INK_40,
+  PAPER,
   baseChartOption,
-  chartColors,
   chartLegend,
+  decals,
   monthAxis,
   tengeAxis,
   tengeTooltip,
@@ -16,9 +19,9 @@ import { fmtPeriod, type NumLocale } from '@/lib/format';
 import type { MonthlyRow } from '@/lib/types';
 
 /**
- * Monthly plan-vs-fact bars (C2): plan = light gray, fact = teal, rejected
- * (снятия) stacked as a small red segment on top of fact. The "болжам (P6)"
- * legend entry is a disabled placeholder — no forecast data is faked.
+ * Monthly plan-vs-fact bars (C2), «vedomost»: plan = white bar with ink
+ * border, fact = solid ink, rejected (снятия) = hatch decal stacked on fact.
+ * The "болжам (P6)" legend entry stays a disabled placeholder — no fake data.
  */
 export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
   const { t, i18n } = useTranslation();
@@ -34,7 +37,12 @@ export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
     return {
       ...baseChartOption(),
       legend: chartLegend(
-        [planName, factName, rejectedName, forecastName],
+        [
+          { name: planName, icon: 'rect' },
+          { name: factName, icon: 'rect' },
+          { name: rejectedName, icon: 'rect' },
+          forecastName,
+        ],
         [forecastName],
       ),
       tooltip: tengeTooltip(titles),
@@ -46,7 +54,7 @@ export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
           type: 'bar',
           data: months.map((m) => m.plan_amount),
           barMaxWidth: 18,
-          itemStyle: { color: chartColors.plan, borderRadius: [3, 3, 0, 0] },
+          itemStyle: { color: PAPER, borderColor: INK, borderWidth: 1 },
         },
         {
           name: factName,
@@ -54,7 +62,7 @@ export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
           stack: 'fact',
           data: months.map((m) => m.fact_amount),
           barMaxWidth: 18,
-          itemStyle: { color: chartColors.fact },
+          itemStyle: { color: INK },
         },
         {
           name: rejectedName,
@@ -63,8 +71,10 @@ export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
           data: months.map((m) => m.rejected_amount),
           barMaxWidth: 18,
           itemStyle: {
-            color: chartColors.rejected,
-            borderRadius: [3, 3, 0, 0],
+            color: PAPER,
+            borderColor: INK,
+            borderWidth: 1,
+            decal: decals.hatch,
           },
         },
         {
@@ -72,8 +82,8 @@ export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
           name: forecastName,
           type: 'line',
           data: [],
-          lineStyle: { type: 'dashed', color: chartColors.forecastPlaceholder },
-          itemStyle: { color: chartColors.forecastPlaceholder },
+          lineStyle: { type: 'dashed', color: INK_40 },
+          itemStyle: { color: INK_40 },
         },
       ],
     };
