@@ -67,8 +67,18 @@ export interface ContractLine {
   rejected_amount_ytd: number;
   execution_pct_ytd: number;
   forecast_amount_year: number | null;
+  forecast_gap: number | null;
   risk_class: RiskClass | null;
   burn_out_date: string | null;
+  /** Seeded bilingual text (Epic C F2 read-side); null until the API exposes it. */
+  forecast_explanation: LocalizedText | null;
+  recommendation: LocalizedText | null;
+}
+
+/** {ru, kk} text seeded server-side (forecasts.explanation / risk.recommendation). */
+export interface LocalizedText {
+  ru: string;
+  kk: string;
 }
 
 export interface LinesResponse {

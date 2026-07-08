@@ -119,5 +119,29 @@
     "screening": "Screening programmes",
     "ambulance": "Ambulance",
     "hosp": "Inpatient hospital"
+  },
+  "passport": {
+    "who_label": "This line",
+    "sec_verdict": "Verdict",
+    "sec_why": "Why",
+    "sec_action": "What to do",
+    "sec_data": "Data",
+    "how_computed": "how computed",
+    "no_action": "No action needed — line on track.",
+    "gap_label": "Forecast gap",
+    "explain_pending": "Explanation computing."
+  },
+  "verdict": {
+    "critical_over": "RISK: over-execution",
+    "over": "Over-execution risk",
+    "critical_under": "RISK: critical under-execution",
+    "under": "Under-execution risk",
+    "on_track": "On track — no risk",
+    "pending": "Risk assessment computing",
+    "burn_suffix": "volume runs out {{date}}",
+    "gap_suffix": "~{{gap}} by year-end"
+  },
+  "action": {
+    "generate": "Generate document"
   }
 }
