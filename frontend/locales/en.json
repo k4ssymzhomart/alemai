@@ -37,7 +37,9 @@
     "label": "Alert ticker",
     "objection_rule": "Objection window — 5 working days · silence = automatic write-off (paras 26–27, Monitoring Rules)",
     "eps_deadline": "EPS: personified data due within 3 working days after the reporting period (para 69, Payment Rules)",
-    "burn_out": "{{line}}: volume runs out {{date}}"
+    "burn_out": "{{line}}: volume runs out {{date}}",
+    "objection": "Objection: {{case}} — {{days}} working days left",
+    "reconcile": "Reconcile: {{n}} claims missing from the registry"
   },
   "deadline": {
     "days_left": "working days left: {{count}}",
@@ -143,5 +145,38 @@
   },
   "action": {
     "generate": "Generate document"
+  },
+  "prebilling": {
+    "run_check": "Check registry",
+    "registry": "November 2025 registry",
+    "who": "Pre-billing check — reporting period",
+    "verdict_block": "BLOCKERS: {{count}} positions · {{amount}} at risk",
+    "verdict_clean": "No blockers — registry clean",
+    "sec_findings": "By rule",
+    "claims_scanned": "{{n}} claims scanned",
+    "export": "Export exceptions (XLSX)",
+    "stamp_removed": "REMOVED",
+    "at_risk": "at risk"
+  },
+  "sev": {
+    "block": "Blocker",
+    "warn": "Review",
+    "yellow": "Yellow · 0 ₸",
+    "info": "Info"
+  },
+  "objections": {
+    "title": "Objections",
+    "lead": "Potential defects from ИСФ — objection window",
+    "silence": "Silence = automatic write-off (para 27)",
+    "at_stake": "At stake",
+    "case": "Case",
+    "construct": "Draft objection",
+    "citation": "para 26, Monitoring Rules",
+    "total_defects": "{{count}} defects"
+  },
+  "reconcile": {
+    "lead": "Three-way reconciliation: MIS ↔ bill ↔ payment",
+    "rows": "{{n}} rows",
+    "highlight": "Delivered but not billed — missed revenue"
   }
 }

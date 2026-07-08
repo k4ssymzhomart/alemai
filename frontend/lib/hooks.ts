@@ -17,6 +17,12 @@ import type {
   LinesQuery,
   LinesResponse,
   OverviewMetrics,
+  PrebillingResult,
+  ReconcileBuckets,
+  ReconcileRows,
+  RuleRunResult,
+  RunFindings,
+  ObjectionsResult,
 } from '@/lib/types';
 
 export const API_MOCK = process.env.NEXT_PUBLIC_API_MOCK === '1';
@@ -107,6 +113,72 @@ export function useLineMonthly(
             { params: { year }, signal },
           ),
     [lineKey, year],
+  );
+  return useFetch(fetcher);
+}
+
+// ─── Epic C: pre-billing / reconcile / objections ──────────────────────────
+
+/**
+ * Pre-billing check: POST a rules run over the scope, then GET its findings.
+ * Chained in one fetcher so the screen binds to a single { run, findings }.
+ */
+export function usePrebilling(scope: string): FetchState<PrebillingResult> {
+  const fetcher = useCallback(
+    async (signal: AbortSignal): Promise<PrebillingResult> => {
+      const run = await api.post<RuleRunResult>(
+        '/rules/run',
+        { scope },
+        { signal },
+      );
+      const findings = await api.get<RunFindings>(
+        `/rules/runs/${run.run_id}/findings`,
+        { params: { group_by: 'rule' }, signal },
+      );
+      return { run, findings };
+    },
+    [scope],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /reconcile/buckets?year= */
+export function useReconcile(year: number): FetchState<ReconcileBuckets> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) =>
+      api.get<ReconcileBuckets>('/reconcile/buckets', {
+        params: { year },
+        signal,
+      }),
+    [year],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /objections — the DF-track defect list with working-day deadlines. */
+export function useObjections(): FetchState<ObjectionsResult> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) => api.get<ObjectionsResult>('/objections', { signal }),
+    [],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /reconcile/bucket/{n}/rows — drill-down rows for one bucket. */
+export function useReconcileRows(
+  bucketNo: number,
+  year: number,
+  enabled: boolean,
+): FetchState<ReconcileRows> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) =>
+      enabled
+        ? api.get<ReconcileRows>(`/reconcile/bucket/${bucketNo}/rows`, {
+            params: { year, limit: 20 },
+            signal,
+          })
+        : Promise.resolve({ bucket_no: bucketNo, rows: [] }),
+    [bucketNo, year, enabled],
   );
   return useFetch(fetcher);
 }

@@ -27,6 +27,13 @@ export function fmtTenge(n: number): string {
   return `${sign}${groupDigits(String(Math.abs(rounded)))}${NBSP}₸`;
 }
 
+/** 20955 → "20 955" (integer, space thousands, no unit). */
+export function fmtNumber(n: number): string {
+  const rounded = Math.round(n);
+  const sign = rounded < 0 ? '−' : '';
+  return `${sign}${groupDigits(String(Math.abs(rounded)))}`;
+}
+
 /** 61.38 → "61,4 %" for kk/ru, "61.4 %" for en (always 1 decimal). */
 export function fmtPct(x: number, locale: NumLocale = 'kk'): string {
   const rounded = Math.round(x * 10) / 10;
