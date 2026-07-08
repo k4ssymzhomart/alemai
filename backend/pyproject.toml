@@ -18,4 +18,5 @@ pythonpath = ["."]
 markers = [
     "smoke: fast API smoke tests that must pass without a database",
     "integration: end-to-end tests against a live PostgreSQL (auto-skipped when unreachable)",
+    "rules_golden: rules-engine golden tests — each storyline caught with expected count/₸",
 ]
