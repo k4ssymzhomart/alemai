@@ -2,9 +2,12 @@
 """Validate every backend/rules/*.yaml against the catalog contract (docs/06 §7).
 
 Checks per file: top level is a list of rule mappings. Per rule: code matches
-R\\d\\d and is unique across all files; severity in {block, warn, info}; scope,
-origin, message_ru, message_kk are non-empty strings; message_ru differs from
-message_kk; params, when present, is a mapping.
+R\\d\\d and is unique across all files; severity in {block, warn, info, yellow};
+scope, origin, message_ru, message_kk are non-empty strings; message_ru differs
+from message_kk; params, when present, is a mapping.
+
+«yellow» = ЕКД codes 2.0/7.0 that fix without a снятие (0 ₸, ред. №19) —
+docs/16 C3; a first-class severity since Epic C.
 
 Exit 0 and print "OK: N rules" on success; exit 1 with one line per error.
 """
@@ -17,7 +20,7 @@ import yaml
 
 RULES_DIR = Path(__file__).resolve().parents[1] / "rules"
 CODE_RE = re.compile(r"^R\d\d$")
-SEVERITIES = {"block", "warn", "info"}
+SEVERITIES = {"block", "warn", "info", "yellow"}
 REQUIRED_STR_FIELDS = ("code", "severity", "scope", "origin", "message_ru", "message_kk")
 
 
