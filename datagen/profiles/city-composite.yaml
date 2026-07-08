@@ -1,0 +1,37 @@
+# ============================================================================
+# datagen profile: city-composite  (for the city panel — KU-1, docs/17 P9)
+# ----------------------------------------------------------------------------
+# 14 clinics of Astana of varied scale (31k–120k attached). This is a LIGHT
+# profile: `python generate.py --profile city-composite` emits SUMMARY rows only
+# (city_clinics.csv + manifest), NOT 14× full claim sets — the city panel needs
+# per-clinic normalized metrics (снятия / 1000 прикреплённых), not raw claims.
+# Marked clearly as aggregate demo data. Deterministic given seed.
+#
+# Per-clinic contract ≈ attached × ~38 700 ₸/чел/год (from gp14-real's ~1.2 млрд
+# на 31k). снятия-rate and недовыставление-rate вary per clinic (демо spread).
+# №14 is present with its real 31 000 attached so it cross-links to gp14-real.
+# ============================================================================
+
+mode: city_composite
+
+city:
+  per_capita_annual: 38700          # ₸/чел/год contract (≈ 1.2 млрд / 31k)
+  # снятия / 1000 прикреплённых and недовыставление % are the normalized city
+  # metrics; base rates below get a small deterministic per-clinic jitter.
+  base_snyatiya_per_1000: 42        # ₸-weighted снятия per 1000 attached (демо anchor)
+  base_underbilling_pct: 0.008      # доля недовыставления от контракта (демо anchor)
+  clinics:
+    - {name_ru: "Городская поликлиника №1",  attached: 118000}
+    - {name_ru: "Городская поликлиника №2",  attached: 96000}
+    - {name_ru: "Городская поликлиника №3",  attached: 104000}
+    - {name_ru: "Городская поликлиника №4",  attached: 72000}
+    - {name_ru: "Городская поликлиника №5",  attached: 88000}
+    - {name_ru: "Городская поликлиника №6",  attached: 61000}
+    - {name_ru: "Городская поликлиника №7",  attached: 120000}
+    - {name_ru: "Городская поликлиника №8",  attached: 54000}
+    - {name_ru: "Городская поликлиника №9",  attached: 79000}
+    - {name_ru: "Городская поликлиника №10", attached: 67000}
+    - {name_ru: "Городская поликлиника №11", attached: 92000}
+    - {name_ru: "Городская поликлиника №12", attached: 48000}
+    - {name_ru: "Городская поликлиника №13", attached: 83000}
+    - {name_ru: "Городская поликлиника №14", attached: 31000}   # реальная ГП№14
