@@ -37,7 +37,12 @@ export default function MonthlyChart({ months }: { months: MonthlyRow[] }) {
     return {
       ...baseChartOption(),
       legend: chartLegend(
-        [planName, factName, rejectedName, forecastName],
+        [
+          { name: planName, icon: 'rect' },
+          { name: factName, icon: 'rect' },
+          { name: rejectedName, icon: 'rect' },
+          forecastName,
+        ],
         [forecastName],
       ),
       tooltip: tengeTooltip(titles),

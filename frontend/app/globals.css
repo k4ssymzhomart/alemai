@@ -97,10 +97,19 @@
   .ticker-track {
     animation: none;
   }
+  .animate-pulse {
+    animation: none;
+  }
 }
 
-/* Print (docs/15 §6): hide chrome, screens print as A4 documents. */
+/* Print (docs/15 §6): hide chrome, screens print as A4 documents.
+   print-color-adjust keeps inverted blocks, bar fills and pattern
+   backgrounds — the severity system itself — on paper. */
 @media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   .print-hidden {
     display: none !important;
   }

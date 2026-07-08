@@ -52,11 +52,18 @@ export const decals = {
   },
 } as const;
 
+/** steps(4) — the §6 dot-matrix draw-in. */
+const steps4 = (k: number) => Math.ceil(k * 4) / 4;
+
 export function baseChartOption(): Record<string, unknown> {
   return {
+    // Pin the palette so a series without explicit itemStyle can never fall
+    // back to ECharts' default hues (docs/15 §11: violations impossible).
+    color: [INK],
     animationDuration: ANIMATION_MS,
     animationDurationUpdate: ANIMATION_MS,
-    animationEasing: 'linear',
+    animationEasing: steps4,
+    animationEasingUpdate: steps4,
     textStyle: { fontFamily: chartFontFamily, color: INK_70 },
     grid: { left: 8, right: 8, top: 44, bottom: 4, containLabel: true },
   };
@@ -91,13 +98,17 @@ export function tengeAxis(locale: NumLocale): Record<string, unknown> {
   };
 }
 
+/** Legend entry: bar series pass icon 'rect' (default 'roundRect' is off-spec). */
+export type LegendEntry = string | { name: string; icon?: string };
+
 /**
  * Legend row; names in `disabled` render deselected — used for the
  * "болжам (P6)" placeholder (no data behind it until P6). Legend markers
- * inherit each series' decal, so patterns (not hues) tell them apart.
+ * inherit each series' decal/line style, so patterns (not hues) tell them
+ * apart; bar entries must pass icon 'rect' to kill the rounded default.
  */
 export function chartLegend(
-  names: string[],
+  entries: LegendEntry[],
   disabled: string[] = [],
 ): Record<string, unknown> {
   const selected: Record<string, boolean> = {};
@@ -107,7 +118,7 @@ export function chartLegend(
     left: 0,
     itemWidth: 16,
     itemHeight: 10,
-    data: names,
+    data: entries,
     selected,
     inactiveColor: INK_40,
     inactiveBorderColor: INK_40,
@@ -132,7 +143,13 @@ export function tengeTooltip(
 ): Record<string, unknown> {
   return {
     trigger: 'axis',
-    axisPointer: { type: axisPointer },
+    // Style the pointer explicitly — ECharts defaults are blue-gray hues.
+    axisPointer: {
+      type: axisPointer,
+      lineStyle: { color: INK, width: 1, type: 'dashed' },
+      shadowStyle: { color: INK_12 },
+    },
+    transitionDuration: 0,
     backgroundColor: PAPER,
     borderColor: INK,
     borderWidth: 1,

@@ -22,7 +22,7 @@ export default function RoleSwitcher() {
       <select
         value={role}
         onChange={(event) => setRole(event.target.value as Role)}
-        className="bg-paper font-mono text-xs font-medium text-ink outline-none"
+        className="bg-paper font-mono text-xs font-medium text-ink"
       >
         {ROLES.map((value) => (
           <option key={value} value={value}>

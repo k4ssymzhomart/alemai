@@ -97,8 +97,14 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
           </p>
         </div>
       ) : (
-        <div className="fill-dots-faint border border-ink px-6 py-10 text-center text-sm text-ink/70">
-          {t('drilldown.not_found', { key: lineKey })}
+        <div className="fill-dots-faint flex flex-col items-center gap-4 border border-ink px-6 py-10 text-center text-sm text-ink/70">
+          <p>{t('drilldown.not_found', { key: lineKey })}</p>
+          <Link
+            href="/overview"
+            className="hover-stamp border-2 border-ink bg-paper px-4 py-1.5 text-sm font-semibold uppercase text-ink shadow-hard-sm hover:bg-ink hover:text-paper"
+          >
+            {t('common.go_overview')}
+          </Link>
         </div>
       )}
 

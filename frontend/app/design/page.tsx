@@ -28,7 +28,9 @@ const FACES: Array<{ label: string; className: string }> = [
 function isoInDays(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  // Local date parts — toISOString would shift across the UTC boundary.
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
 export default function DesignQaPage() {

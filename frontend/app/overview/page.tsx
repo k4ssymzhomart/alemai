@@ -4,6 +4,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
+import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import KpiTile from '@/components/overview/KpiTile';
 import LinesTable from '@/components/overview/LinesTable';
@@ -60,7 +61,7 @@ export default function OverviewPage() {
           <select
             value={year}
             onChange={(event) => setYear(Number(event.target.value))}
-            className="border border-ink bg-paper px-2 py-1.5 font-mono text-xs font-medium text-ink outline-none"
+            className="border border-ink bg-paper px-2 py-1.5 font-mono text-xs font-medium text-ink"
           >
             {YEARS.map((y) => (
               <option key={y} value={y}>
@@ -148,7 +149,7 @@ export default function OverviewPage() {
                 setCareType(event.target.value as CareType | 'all')
               }
               aria-label={t('overview.table.care_type')}
-              className="border border-ink bg-paper px-2 py-1.5 text-xs font-medium text-ink outline-none"
+              className="border border-ink bg-paper px-2 py-1.5 text-xs font-medium text-ink"
             >
               <option value="all">{t('common.all')}</option>
               {CARE_TYPE_FILTERS.map((value) => (
@@ -173,9 +174,9 @@ export default function OverviewPage() {
         ) : lines.data && lines.data.items.length > 0 ? (
           <LinesTable lines={lines.data.items} year={year} />
         ) : (
-          <p className="px-4 py-10 text-center text-sm text-ink/70">
-            {t('common.no_data')}
-          </p>
+          <div className="p-4">
+            <EmptyState messageKey="common.no_data" />
+          </div>
         )}
       </section>
     </div>

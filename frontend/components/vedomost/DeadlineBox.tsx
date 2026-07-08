@@ -3,8 +3,17 @@
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
+/** Parse "YYYY-MM-DD" as a LOCAL date — new Date(iso) would read it as UTC
+ *  midnight and shift the deadline a day early for viewers west of UTC. */
+export function parseLocalDate(iso: string): Date {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
+}
+
 /**
- * Working days from today (exclusive) to deadline (inclusive), Mon–Fri.
+ * Working days remaining in [today, deadline] inclusive, Mon–Fri: the
+ * deadline day itself is still actionable, so on that day the box reads
+ * «остался 1 раб. день», and «мерзім өтті» appears only once it has passed.
  * KZ public holidays are NOT subtracted yet — Epic C wires the holiday
  * calendar when the DF-track lands; until then this errs on the safe
  * (earlier-alarm) side.
@@ -17,10 +26,10 @@ export function workingDaysUntil(deadline: Date, from: Date = new Date()): numbe
     deadline.getDate(),
   );
   let count = 0;
-  while (day < end) {
-    day.setDate(day.getDate() + 1);
+  while (day <= end) {
     const dow = day.getDay();
     if (dow !== 0 && dow !== 6) count += 1;
+    day.setDate(day.getDate() + 1);
   }
   return count;
 }
@@ -43,7 +52,7 @@ export default function DeadlineBox({
   label?: string;
 }) {
   const { t } = useTranslation();
-  const days = workingDaysUntil(new Date(deadline));
+  const days = workingDaysUntil(parseLocalDate(deadline));
   const critical = days <= 2;
 
   return (

@@ -32,7 +32,8 @@ export default function Ticker() {
     return out;
   }, [overview.data, t, locale]);
 
-  const line = items.join('  ▮  ');
+  // Trailing separator keeps the loop seam continuous between track copies.
+  const line = `${items.join('  ▮  ')}  ▮  `;
 
   return (
     <div
@@ -41,10 +42,8 @@ export default function Ticker() {
     >
       <div className="ticker-track flex w-max whitespace-nowrap py-1.5 font-mono text-caption uppercase">
         {/* Track duplicated for a seamless loop. */}
-        <span className="px-4">{line}</span>
-        <span className="px-4" aria-hidden>
-          {line}
-        </span>
+        <span className="pl-4">{line}</span>
+        <span aria-hidden>{line}</span>
       </div>
     </div>
   );
