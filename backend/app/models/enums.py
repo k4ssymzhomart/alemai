@@ -57,9 +57,10 @@ class ImportKind(enum.StrEnum):
 
 
 class RuleSeverity(enum.StrEnum):
-    block = "block"
-    warn = "warn"
+    block = "block"  # exclude from the счёт-реестр (would be rejected pre-billing)
+    warn = "warn"  # review — probable defect, not an automatic block
     info = "info"
+    yellow = "yellow"  # ЕКД 2.0/7.0 — фиксируется без снятия (0 ₸), a soft flag
 
 
 class FindingStatus(enum.StrEnum):

@@ -67,8 +67,18 @@ export interface ContractLine {
   rejected_amount_ytd: number;
   execution_pct_ytd: number;
   forecast_amount_year: number | null;
+  forecast_gap: number | null;
   risk_class: RiskClass | null;
   burn_out_date: string | null;
+  /** Seeded bilingual text (Epic C F2 read-side); null until the API exposes it. */
+  forecast_explanation: LocalizedText | null;
+  recommendation: LocalizedText | null;
+}
+
+/** {ru, kk} text seeded server-side (forecasts.explanation / risk.recommendation). */
+export interface LocalizedText {
+  ru: string;
+  kk: string;
 }
 
 export interface LinesResponse {
@@ -105,4 +115,115 @@ export interface LinesQuery {
   funding_source?: FundingSource;
   care_type?: CareType;
   contract_id?: string;
+}
+
+// ─── Epic C: rules / pre-billing / reconcile / objections ──────────────────
+
+export type FindingSeverity = 'block' | 'warn' | 'info' | 'yellow';
+
+export interface RuleFindingGroup {
+  rule_code: string;
+  severity: FindingSeverity;
+  count: number;
+  amount_at_risk: number;
+}
+
+export interface RuleFinding {
+  id: string;
+  run_id: string;
+  rule_code: string;
+  claim_id: string | null;
+  amount_at_risk: number;
+  status: string;
+  details: {
+    ekd_code?: string;
+    yellow?: boolean;
+    severity?: FindingSeverity;
+    care_type?: string;
+    message_kk?: string;
+    message_ru?: string;
+    evidence?: Record<string, unknown>;
+  } | null;
+}
+
+export interface RuleRunTotals {
+  scope: string;
+  claims_scanned: number;
+  total_findings: number;
+  total_amount_at_risk: number;
+  block_positions: number;
+  block_amount: number;
+  duration_ms: number;
+  by_rule: Record<
+    string,
+    { count: number; amount_at_risk: number; severity: FindingSeverity; ekd_code?: string }
+  >;
+}
+
+export interface RuleRunResult {
+  run_id: string;
+  scope: string;
+  status: string;
+  totals: RuleRunTotals;
+}
+
+export interface RunFindings {
+  run_id: string;
+  group_by: string | null;
+  groups: RuleFindingGroup[];
+  findings: RuleFinding[];
+}
+
+/** Combined pre-billing result: the run (verdict + by_rule) + its findings. */
+export interface PrebillingResult {
+  run: RuleRunResult;
+  findings: RunFindings;
+}
+
+export interface ReconcileBucket {
+  bucket_no: number;
+  code: string;
+  title_kk: string;
+  title_ru: string;
+  rows_count: number;
+  total_amount: number;
+}
+
+export interface ReconcileBuckets {
+  buckets: ReconcileBucket[];
+}
+
+export interface Objection {
+  case_ref: string;
+  ekd_code: string;
+  ekd_name_ru: string;
+  ekd_name_kk: string;
+  significance: string;
+  yellow: boolean;
+  amount_at_stake: number;
+  deadline_working_days: number;
+  /** ISO date "YYYY-MM-DD". */
+  deadline_date: string;
+}
+
+export interface ObjectionsResult {
+  demo_today: string;
+  defect_count: number;
+  total_amount_at_stake: number;
+  items: Objection[];
+}
+
+export interface ReconcileRow {
+  claim_id: string;
+  patient_id: string;
+  service_code: string;
+  service_name: string;
+  date_start: string;
+  amount: number;
+  detail: string;
+}
+
+export interface ReconcileRows {
+  bucket_no: number;
+  rows: ReconcileRow[];
 }

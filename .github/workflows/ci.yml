@@ -58,11 +58,14 @@ jobs:
       - name: rules catalog validation
         run: |
           if [ -f scripts/validate_rules.py ]; then python scripts/validate_rules.py; fi
-      - name: seed sample dataset (migrations + datagen + COPY + MV refresh)
-        run: python -m app.seed --sample
+      - name: seed dataset (migrations + datagen + COPY + MV refresh)
+        # Full gp14-real profile: the rules golden tests assert exact storyline
+        # counts (46/168 600 etc.) that only hold at full scale; --sample gives
+        # a different base slice and would fail the 8/8 golden assertions.
+        run: python -m app.seed
       - name: seed integrity — DB vs manifest vs API
         run: python scripts/assert_seed_integrity.py /tmp/igerim_seed/manifest.json
-      - name: pytest (smoke + unit + integration)
+      - name: pytest (smoke + unit + integration + rules_golden)
         run: pytest -q
 
   frontend:

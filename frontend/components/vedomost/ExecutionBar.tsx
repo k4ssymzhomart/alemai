@@ -1,9 +1,11 @@
 'use client';
 
 /**
- * ExecutionBar (Epic A.2): a thin plan/fact/forecast bar. Solid ink = fact
- * (data mark), hairline forecast segment, faint remainder, plan-to-date mark
- * = 2px ink tick. Kept slim so 11 stacked rows stay calm, not heavy.
+ * ExecutionBar (Epic C · F5): one glance = ahead or behind.
+ *   track  — 6px, ink/10 background = the full annual plan
+ *   fill   — solid ink = fact YTD
+ *   marker — 1px ink vertical tick = «сегодня должно быть» (YTD-expected plan)
+ *   dots   — hatch extension fact→forecast when a year-end forecast exists
  */
 export default function ExecutionBar({
   planYear,
@@ -24,22 +26,25 @@ export default function ExecutionBar({
   const tickPct = planYtd != null ? clamp((planYtd / planYear) * 100) : null;
 
   return (
-    <div className="relative h-1.5 w-full min-w-24 border border-ink/25 bg-paper">
+    <div className="relative h-1.5 w-full min-w-24 bg-ink/10">
+      {/* dotted extension fact → forecast */}
       {forecastPct != null && forecastPct > factPct ? (
         <div
-          className="fill-hatch absolute inset-y-0 left-0"
-          style={{ width: `${forecastPct}%` }}
+          className="fill-hatch absolute inset-y-0"
+          style={{ left: `${factPct}%`, width: `${forecastPct - factPct}%` }}
           aria-hidden
         />
       ) : null}
+      {/* solid fact segment */}
       <div
         className="absolute inset-y-0 left-0 bg-ink"
         style={{ width: `${factPct}%` }}
         aria-hidden
       />
+      {/* YTD-expected marker */}
       {tickPct != null ? (
         <div
-          className="absolute -inset-y-1 w-0.5 bg-ink"
+          className="absolute -inset-y-1 w-px bg-ink"
           style={{ left: `${tickPct}%` }}
           aria-hidden
         />
