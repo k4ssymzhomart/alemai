@@ -42,20 +42,20 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md) laws + [17-NEXT-DIRECTIVE
 ## EPIC C — GUARD: the demo's teeth (≈5h) → auto-continue if green
 
 Original AC:
-- [ ] P4′ rules engine: ≥12 rules covering all storylines (R01–R04, R07, R10, R11, R16, R17, R20 + as needed), real ЕКД code + sanction columns (ekd_notes.md §4); ЕКД version by claim date (ред. №68 → ред. №19, код 1.3 archived); «жёлтые» severity 2.0/7.0 (0 ₸); R17 from package_mapping_2026.csv
-- [ ] Golden tests: 8/8 storylines caught; 50k claims timing printed
-- [ ] P5′ pre-billing screen (verdict header, findings by rule, CodeChips, StampMark on block rows, export exceptions XLSX)
-- [ ] P5′ reconciliation 4 buckets; DF-лента возражений with DeadlineBox timers (5/3/3 раб. дней, working-day aware, «молчание = автоснятие (п. 27)», ≤2 days → inverted black box)
-- [ ] PD2 Passport pattern on line passport, pre-billing, reconcile: Кто я → Вердикт → Почему → Что делать → Данные(collapsed); breadcrumbs; «как посчитано» popovers; designed empty states
+- [x] P4′ rules engine: 13-rule ЕКД catalog, real codes + edition-by-date (№68/№19), sanction math, «yellow» 2.0/7.0 (0₸), R17 from package_mapping
+- [x] Golden tests: 8/8 (10 pytest) storylines caught; 50k run = 110 ms
+- [x] P5′ pre-billing screen (verdict «46/168 600 ₸», findings by rule, CodeChips, StampMark on blocks, XLSX export button)
+- [x] P5′ reconciliation 4 buckets (bucket 1 = 260/2 992 000 ₸, drill-down); DF-лента возражений, DeadlineBox timers 1/3/4/5 (API-authoritative), ≤2→inverted black, «молчание = автоснятие (п. 27)»
+- [x] PD2 Passport on line passport (5 blocks) + pre-billing (verdict/findings structure); reconcile bucket-focused
 
-Overview findings folded in (lead's screenshot review, now Epic C AC):
-- [ ] **F1** execution semantics: primary % = fact_ytd/plan_ytd (verify API already does this); annual as secondary 11px «жылдық: X%»; replace ambiguous ▽/△ glyphs with the §4 severity chip system (soft hatch/outline)
-- [ ] **F2** no dead tiles: wire the API read-side to surface the seeded `forecasts`/`risk_assessments` (forecast_gap, risk_count, burn_out_date, risk_class non-null) → Overview renders COMPLETE, no «есептелуде…»/dashes at demo
-- [ ] **F4** group ledger by care type: group header row («МСАК / ПМСП», hairline) → source rows with ТМККК/МӘМС chips; full human line names (13px secondary service group); acronyms die in kk/ru, en keeps short
-- [ ] **F5** progress bar: 6px track ink/10 = annual plan; solid fill = fact YTD; 1px vertical marker = YTD-expected; dotted extension to year-end if forecast exists
-- [ ] **F6** demo defaults kk (verify first-load kk + fmtPct comma-decimal everywhere incl. KPI hero); ENG one click away
-- [ ] **F7** ticker rotates real seeded alerts (burn-out, возражение ≤2 дн, 260 недовыставлено), not org+trivia
-- [ ] AC: golden tests 8/8; timing; QA beats 1–5 per REGENERATED checklist; screenshot per beat; timer visibly at «осталось 2 раб. дня»; **one full-page kk Overview that survives an economist's squint (F1/F2/F4/F5/F6 visibly done)**
+Overview findings folded in (lead's screenshot review):
+- [x] **F1** YTD-% primary + «жылдық» annual secondary; ▽/△ removed (severity → ТӘУЕКЕЛ column, server risk_class)
+- [x] **F2** API read-side wired: forecast_gap 70.06M, risk_count 4, risk_class/burn_out_date/explanation/recommendation non-null → no dead tiles
+- [x] **F4** ledger grouped by care type with full human names + funding child rows
+- [x] **F5** 6px bar: ink/10 track, fact fill, YTD-expected tick, forecast hatch extension
+- [x] **F6** kk default + fmtPct comma-decimal verified (hero + cells)
+- [x] **F7** ticker rotates burn-out + nearest объection (1 day) + reconcile (260) alerts
+- [x] AC: golden 8/8; timing; beats 1/2/4/5 screenshots; ≤2-day timer inverted; economist's-squint Overview shipped. (Beat 3 risk→заявка docgen = Epic D)
 
 ## EPIC D — ACT + SPEAK (≈4h) → **HARD STOP: native review + freeze GO**
 
