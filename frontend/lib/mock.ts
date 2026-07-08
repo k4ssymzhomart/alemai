@@ -175,8 +175,11 @@ function buildLine(seed: LineSeed, index: number): BuiltLine {
     rejected_amount_ytd: sum(ytd.map((r) => r.rejected_amount)),
     execution_pct_ytd: planYtd > 0 ? round1((factYtd / planYtd) * 100) : 0,
     forecast_amount_year: null,
+    forecast_gap: null,
     risk_class: null,
     burn_out_date: null,
+    forecast_explanation: null,
+    recommendation: null,
   };
   return { line, months };
 }
