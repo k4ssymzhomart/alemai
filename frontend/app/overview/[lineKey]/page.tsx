@@ -55,7 +55,7 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
   const backLink = (
     <Link
       href="/overview"
-      className="hover-stamp inline-flex items-center gap-1.5 border border-ink bg-paper px-2 py-1 font-mono text-caption font-medium uppercase text-ink hover:bg-ink hover:text-paper"
+      className="inline-flex items-center gap-1.5 text-secondary text-ink/60 transition-colors duration-150 hover:text-ink"
     >
       <span aria-hidden>←</span>
       {t('drilldown.back')}
@@ -72,7 +72,7 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {backLink}
 
       {lines.loading ? (
@@ -82,11 +82,11 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
         </div>
       ) : line ? (
         <div>
-          <h1 className="font-display text-h1 font-medium uppercase tracking-tight text-ink">
+          <h1 className="font-display text-h1 text-ink">
             {line.service_group || t(`care_type.${line.care_type}`)}
           </h1>
           {/* Breadcrumb-style meta line (full breadcrumbs land with PD2). */}
-          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-caption uppercase text-ink/70">
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 label-micro">
             <span>{t(`care_type.${line.care_type}`)}</span>
             <span aria-hidden>/</span>
             <span>{t(`funding.${line.funding_source}`)}</span>
@@ -97,11 +97,14 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
           </p>
         </div>
       ) : (
-        <div className="fill-dots-faint flex flex-col items-center gap-4 border border-ink px-6 py-10 text-center text-sm text-ink/70">
-          <p>{t('drilldown.not_found', { key: lineKey })}</p>
+        <div className="relative flex flex-col items-center gap-5 border border-ink/15 px-6 py-16 text-center">
+          <div className="fill-dots-faint pointer-events-none absolute inset-0" aria-hidden />
+          <p className="relative text-body text-ink/60">
+            {t('drilldown.not_found', { key: lineKey })}
+          </p>
           <Link
             href="/overview"
-            className="hover-stamp border-2 border-ink bg-paper px-4 py-1.5 text-sm font-semibold uppercase text-ink shadow-hard-sm hover:bg-ink hover:text-paper"
+            className="relative bg-ink px-4 py-2 text-secondary font-medium text-paper transition-opacity duration-150 hover:opacity-80"
           >
             {t('common.go_overview')}
           </Link>
@@ -109,7 +112,7 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
       )}
 
       {line ? (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
           <KpiTile
             label={t('drilldown.plan_year')}
             value={fmtTenge(line.plan_amount_year)}
@@ -139,23 +142,23 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
       {monthly.error ? (
         <ErrorState detail={monthly.error} onRetry={monthly.retry} />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
-          <section className="border-2 border-ink bg-paper p-4">
-            <h2 className="mb-3 font-display text-h2 font-medium uppercase text-ink">
+        <div className="grid gap-6 xl:grid-cols-2">
+          <section className="border border-ink/15 bg-paper p-5">
+            <h2 className="mb-4 font-display text-h3 text-ink">
               {t('drilldown.monthly_title')}
             </h2>
             {monthly.loading || !monthly.data ? (
-              <div className="fill-dots-faint h-80 animate-pulse" />
+              <div className="fill-dots-faint h-72 animate-pulse" />
             ) : (
               <MonthlyChart months={monthly.data.months} />
             )}
           </section>
-          <section className="border-2 border-ink bg-paper p-4">
-            <h2 className="mb-3 font-display text-h2 font-medium uppercase text-ink">
+          <section className="border border-ink/15 bg-paper p-5">
+            <h2 className="mb-4 font-display text-h3 text-ink">
               {t('drilldown.cumulative_title')}
             </h2>
             {monthly.loading || !monthly.data ? (
-              <div className="fill-dots-faint h-80 animate-pulse" />
+              <div className="fill-dots-faint h-72 animate-pulse" />
             ) : (
               <CumulativeChart months={monthly.data.months} />
             )}

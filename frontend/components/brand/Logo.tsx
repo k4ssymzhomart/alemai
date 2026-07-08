@@ -3,18 +3,16 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Swappable logo slot (docs/15 §8): shows the wordmark IGERIM▮ (Unbounded
- * 800, tight tracking, terminal block as mark) until /brand/logo.svg loads —
- * a hidden probe <img> flips the state, so a missing file never flashes a
- * broken-image icon. Uploads are grayscale-forced to stay monochrome.
+ * Swappable logo slot (docs/15 §8, renamed Epic A.2): shows the wordmark
+ * «Qalam» (lowercase, Literata display, sentence case, thin rule under) until
+ * /brand/logo.svg loads. A hidden probe <img> flips the state, re-checked on
+ * mount so a cached drop-in never misses; uploads are grayscale-forced.
  * Dropping a file into frontend/public/brand/logo.svg swaps it, zero code.
  */
-export default function Logo({ height = 28 }: { height?: number }) {
+export default function Logo({ height = 22 }: { height?: number }) {
   const [fileExists, setFileExists] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // onLoad can fire before hydration attaches the handler (cached file) —
-  // re-check the probe's state on mount so the drop-in never misses.
   useEffect(() => {
     const img = imgRef.current;
     if (img?.complete && img.naturalWidth > 0) setFileExists(true);
@@ -26,7 +24,7 @@ export default function Logo({ height = 28 }: { height?: number }) {
       <img
         ref={imgRef}
         src="/brand/logo.svg"
-        alt="IGERIM"
+        alt="Qalam"
         style={
           fileExists
             ? { height, filter: 'grayscale(1) contrast(9)' }
@@ -36,10 +34,10 @@ export default function Logo({ height = 28 }: { height?: number }) {
       />
       {!fileExists ? (
         <span
-          className="font-display font-extrabold uppercase leading-none tracking-tight text-ink"
-          style={{ fontSize: height * 0.72 }}
+          className="font-display leading-none text-ink"
+          style={{ fontSize: height, fontWeight: 600 }}
         >
-          IGERIM<span aria-hidden>▮</span>
+          Qalam
         </span>
       ) : null}
     </>

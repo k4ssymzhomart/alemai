@@ -1,9 +1,10 @@
-# IGERIM (Игерім)
+# QALAM (Қалам) · ранее Igerim
 
 **Клиникалық тарапта ГОБМП/ОСМС шарттарының орындалуын зияткерлік мониторингтеу.**
 Intelligent clinic-side monitoring of ГОБМП/ОСМС contract execution — Task №07, Health AI Hackathon, AI WEEK Astana 2026.
+Product name as of 09.07.2026: **QALAM** (қалам — перо, инструмент, которым подписывают документы). Docs 00–18 still say «Igerim»; same product.
 
-> «Igerim — қаражат жоғалғанға дейін көреді.»
+> «Qalam — қаражат жоғалғанға дейін көреді.»
 > «Igerim — видит риск до того, как он стал потерей.»
 
 ## Five pillars

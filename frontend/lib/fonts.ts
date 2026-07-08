@@ -1,23 +1,25 @@
 /**
- * «Ведомость» type stack (docs/15 §2), self-hosted at build via next/font:
- *   display  — Unbounded (page titles, verdicts, hero labels)
- *   ui/body  — Inter Tight
- *   mono     — IBM Plex Mono (ALL numbers, ₸, dates, timers, codes)
- * cyrillic-ext is the kk glyph carrier — the /design glyph gate (15 §2) is
- * the blocking check that Ә Ғ Қ Ң Ө Ұ Ү Һ І render in every face.
+ * QALAM applied type stack (Epic A.2, stack 2 — lead's gate pick):
+ *   display — Manrope (headings, verdicts, sentence-case)
+ *   ui/body — Inter
+ *   mono    — IBM Plex Mono (ALL numbers, ₸, dates, timers, codes)
+ * Swapping the display face is a one-line change here. The kk glyph gate
+ * (/design) is the blocking check that Ә Ғ Қ Ң Ө Ұ Ү Һ І render without a
+ * fallback weight/width jump; if Manrope misbehaves, fall back to stack 3
+ * (PT Serif + Golos Text).
  */
-import { IBM_Plex_Mono, Inter_Tight, Unbounded } from 'next/font/google';
+import { IBM_Plex_Mono, Inter, Manrope } from 'next/font/google';
 
-export const fontDisplay = Unbounded({
-  subsets: ['latin', 'cyrillic', 'cyrillic-ext'],
-  weight: ['500', '800'],
+export const fontDisplay = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['500', '600', '700'],
   variable: '--font-display',
   display: 'swap',
 });
 
-export const fontUi = Inter_Tight({
+export const fontUi = Inter({
   subsets: ['latin', 'cyrillic', 'cyrillic-ext'],
-  weight: ['400', '500', '700'],
+  weight: ['400', '500'],
   variable: '--font-ui',
   display: 'swap',
 });

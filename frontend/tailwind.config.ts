@@ -1,11 +1,14 @@
 import type { Config } from 'tailwindcss';
 
 /**
- * Design system «Ведомость» (docs/15): #000/#FFF ONLY. The full default
- * Tailwind palette is REPLACED (not extended) so a color violation is a
- * class that does not exist — impossible, not just forbidden. Optical grays
- * are black at fixed opacities via the `ink/NN` opacity modifier.
- * border-radius is 0 everywhere: `rounded-none` is the only rounded-* class.
+ * QALAM design system (Epic A.2 — «премиальный годовой отчёт»). Still strict
+ * monochrome: the full default Tailwind palette is REPLACED so a color
+ * violation is a class that does not exist. Optical grays are black at fixed
+ * opacities via the `ink/NN` modifier. border-radius stays 0.
+ *
+ * Weight diet vs the old «ведомость»: no 4px bars, no offset hard shadows,
+ * hairline default rules, ONE black element per screen. Hierarchy comes from
+ * the serif/sans/mono type roles and whitespace, not from mass.
  */
 const config: Config = {
   content: [
@@ -25,24 +28,32 @@ const config: Config = {
       none: '0',
     },
     boxShadow: {
-      // Offset block shadows, no blur (docs/15 §3) — the only shadows allowed.
-      hard: '4px 4px 0 0 #000000',
-      'hard-sm': '2px 2px 0 0 #000000',
+      // Depth, when truly needed, is a single hairline drop — never an offset block.
+      soft: '0 1px 0 rgba(0,0,0,0.1)',
       none: 'none',
     },
     extend: {
       fontFamily: {
-        display: ['var(--font-display)', 'var(--font-ui)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'Georgia', 'serif'],
         ui: ['var(--font-ui)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-mono)', 'JetBrains Mono', 'monospace'],
       },
       fontSize: {
-        // Type scale px (docs/15 §2): 64/40/28/20/16/14/12.
-        hero: ['64px', { lineHeight: '1.05', fontWeight: '600' }],
-        verdict: ['40px', { lineHeight: '1.1' }],
+        // Premium diet (Epic A.2): replaces the old 64/40 scale.
+        micro: ['11px', { lineHeight: '1.3', letterSpacing: '0.08em' }],
+        secondary: ['13px', { lineHeight: '1.4' }],
+        body: ['15px', { lineHeight: '1.6' }],
+        h3: ['18px', { lineHeight: '1.4' }],
+        h2: ['22px', { lineHeight: '1.3' }],
         h1: ['28px', { lineHeight: '1.2' }],
-        h2: ['20px', { lineHeight: '1.3' }],
-        caption: ['12px', { lineHeight: '1.3', letterSpacing: '0.08em' }],
+        // Hero numbers: mono 400, calm — not 64, not bold.
+        hero: ['38px', { lineHeight: '1.1', fontWeight: '400' }],
+      },
+      maxWidth: {
+        content: '1200px',
+      },
+      spacing: {
+        row: '44px',
       },
     },
   },

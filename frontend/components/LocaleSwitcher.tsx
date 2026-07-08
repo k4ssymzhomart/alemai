@@ -11,7 +11,7 @@ const LABELS: Record<Locale, string> = {
   en: 'ENG',
 };
 
-/** Locale switcher: segmented mono control, active segment inverted. */
+/** Locale switcher (Epic A.2): quiet segmented control, active = subtle fill. */
 export default function LocaleSwitcher() {
   const { t, i18n } = useTranslation();
   const current = (i18n.resolvedLanguage ?? i18n.language) as Locale;
@@ -27,7 +27,7 @@ export default function LocaleSwitcher() {
     <div
       role="group"
       aria-label={t('common.language_label')}
-      className="flex border border-ink"
+      className="flex border border-ink/15"
     >
       {locales.map((locale) => (
         <button
@@ -36,10 +36,10 @@ export default function LocaleSwitcher() {
           onClick={() => handleChange(locale)}
           aria-pressed={current === locale}
           className={clsx(
-            'hover-stamp flex-1 px-2 py-1 font-mono text-xs font-semibold',
+            'px-2 py-1 font-mono text-micro transition-colors duration-150',
             current === locale
               ? 'bg-ink text-paper'
-              : 'bg-paper text-ink hover:bg-ink hover:text-paper',
+              : 'text-ink/60 hover:bg-ink/[.03] hover:text-ink',
           )}
         >
           {LABELS[locale]}
