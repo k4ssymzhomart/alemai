@@ -2,7 +2,8 @@
   "app": {
     "title": "Qalam",
     "tagline": "Financial autopilot for contract execution",
-    "org": "City Polyclinic #14 · demo"
+    "org": "City Polyclinic #14 · demo",
+    "scope_city": "Astana · 14 clinics · demo"
   },
   "nav": {
     "overview": "Overview",
@@ -178,5 +179,26 @@
     "lead": "Three-way reconciliation: MIS ↔ bill ↔ payment",
     "rows": "{{n}} rows",
     "highlight": "Delivered but not billed — missed revenue"
+  },
+  "settings": {
+    "title": "Settings",
+    "sec_about": "About",
+    "sec_thresholds": "Risk thresholds",
+    "sec_refs": "Reference data",
+    "sec_stub": "This section is coming later",
+    "app_version": "App version",
+    "ref_ekd": "ЕКД (Annex 1, Monitoring Rules)",
+    "ref_tarif": "Tariff catalogue",
+    "ref_pkg": "2026 package mapping",
+    "th_under": "Under-execution, %",
+    "th_over": "Over-execution, %",
+    "th_burnout": "Burn-out alert, days",
+    "th_materiality": "Materiality, ₸",
+    "save": "Save",
+    "saved": "Saved",
+    "org_row": "Organization",
+    "other_org": "Org details, attachment, districts",
+    "other_rules": "Rule catalogue toggles + params",
+    "other_users": "Roles & scope matrix"
   }
 }
