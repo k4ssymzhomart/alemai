@@ -11,6 +11,7 @@ from app.api import (
     forecasts,
     imports,
     metrics,
+    objections,
     reconcile,
     reports,
     risks,
@@ -23,6 +24,7 @@ api_router.include_router(contracts.router)
 api_router.include_router(metrics.router)
 api_router.include_router(reconcile.router)
 api_router.include_router(rules.router)
+api_router.include_router(objections.router)
 api_router.include_router(forecasts.router)
 api_router.include_router(risks.router)
 api_router.include_router(alerts.router)
