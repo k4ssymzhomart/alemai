@@ -18,7 +18,16 @@
   "common": {
     "loading": "Loading…",
     "empty": "No data yet",
-    "demo_data_note": "demo data, calibrated against open statistics"
+    "demo_data_note": "demo data, calibrated against open statistics",
+    "error": "Failed to load data",
+    "retry": "Retry",
+    "no_data": "No data",
+    "all": "All",
+    "plan": "Plan",
+    "fact": "Fact",
+    "year": "Year",
+    "source": "Funding source",
+    "computed_pending": "computing…"
   },
   "roles": {
     "label": "Role",
@@ -26,5 +35,64 @@
     "statistician": "Dana — Statistician",
     "head": "Yerlan — Director",
     "curator": "Marat — Curator"
+  },
+  "overview": {
+    "title": "Contract execution overview",
+    "as_of": "Data as of {{period}}",
+    "kpi": {
+      "execution_ytd": "Execution (YTD)",
+      "plan_fact_ytd": "Plan / fact (YTD)",
+      "removed_mtd": "Removed from payment (MTD)",
+      "forecast_gap": "Forecast gap",
+      "risk_count": "Risk count"
+    },
+    "table": {
+      "title": "Contract lines",
+      "line": "Line",
+      "care_type": "Care type",
+      "source": "Source",
+      "plan": "Plan (year)",
+      "fact": "Fact (YTD)",
+      "execution_pct": "Execution, %",
+      "risk": "Risk",
+      "burn_out_date": "Burn-out date"
+    }
+  },
+  "drilldown": {
+    "back": "Back to overview",
+    "not_found": "Line not found: {{key}}",
+    "monthly_title": "Monthly plan vs fact",
+    "cumulative_title": "Cumulative curve",
+    "plan_year": "Annual plan",
+    "fact_ytd": "Fact (YTD)",
+    "rejected_ytd": "Removed (YTD)"
+  },
+  "chart": {
+    "rejected": "Removed from payment",
+    "cumulative_plan": "Cumulative plan",
+    "cumulative_fact": "Cumulative fact",
+    "forecast_p6": "Forecast (P6)"
+  },
+  "funding": {
+    "gobmp": "GOBMP",
+    "osms": "OSMS"
+  },
+  "care_type": {
+    "pmsp": "PHC",
+    "kdu": "CDS",
+    "day_hosp": "Day hospital",
+    "hosp": "Inpatient hospital",
+    "dent": "Dental care",
+    "screening": "Screenings",
+    "ambulance": "Ambulance"
+  },
+  "risk": {
+    "class": {
+      "critical_under": "Critical under-execution",
+      "under": "Under-execution risk",
+      "on_track": "On track",
+      "over": "Over-execution risk",
+      "critical_over": "Critical over-execution"
+    }
   }
 }

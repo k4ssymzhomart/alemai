@@ -4,21 +4,24 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md). This file replaces issue
 
 **Status legend:** `[ ]` todo · `[~]` in progress · `[x]` done (AC output exists)
 
-## P1 — Data spine
-- [ ] Alembic wired; initial migration for all 21 tables (+pgvector extension)
-- [ ] `mv_line_execution` materialized view + refresh hook after seed/imports
-- [ ] `make seed` = datagen → Postgres loader, idempotent, <5 min, writes control-sums manifest
-- [ ] Real `/metrics/overview`, `/metrics/lines`, `/metrics/line/{key}/monthly` from the view
-- [ ] `scripts/assert_seed_integrity.py` green (API totals == datagen control sums)
-- [ ] Smoke tests extended; CI green with Postgres service
+## P1 — Data spine ✅ (2026-07-08)
+- [x] Alembic wired; initial migration 0001 for all 21 tables (+pgvector, +service_group_map aux, composite indexes)
+- [x] `mv_line_execution` materialized view (FULL OUTER JOIN plan×fact) + refresh hook
+- [x] `make seed` = datagen → COPY loader: full 497,917 claims in ~15s in-container, idempotent, manifest-verified
+- [x] Real `/metrics/overview`, `/metrics/lines`, `/metrics/line/{key}/monthly` from the view
+- [x] `scripts/assert_seed_integrity.py`: PASS — 81 checks, 0 mismatches (in-container + host)
+- [x] Tests 37 passed (integration auto-skip without DB); CI backend job runs pgvector service + seed + integrity
+- Note: host ports remapped (db 55432, api 8800) — 5432/8000 occupied by another local project; in-container unchanged
 
-## P2 — Beat 1 clickable
-- [ ] Overview C1 on live metrics (hero KPIs + lines table, kk default)
-- [ ] Drill-down C2 (monthly bars, cumulative)
-- [ ] Traffic-light risk badges (stub thresholds until P6)
-- [ ] `next build` zero type errors; beat-1 screenshot in report
+## P2 — Beat 1 clickable ✅ (2026-07-08)
+- [x] Overview C1 on live metrics (hero KPIs + lines table + filters, kk default) — verified in browser vs API numbers
+- [x] Drill-down C2 (monthly plan/fact/rejected bars, cumulative curves, forecast placeholder honest)
+- [x] Traffic-light execution chips (stub thresholds isolated in ExecutionChip.tsx, TODO(P6))
+- [x] `next build` zero type errors; 70 i18n keys ×3 locales; NEXT_PUBLIC_API_MOCK=1 contingency mode
+- NEEDS-NATIVE-REVIEW kk list collected → goes to lead in batch 1 (after P7)
 
 ## P3 — 7 storylines + QA automation
+- [ ] **Recalibrate datagen execution profiles** — P1 finding: claims fact ≈ 8–16% of plan (internally consistent, but implausible); baseline lines must read ~85–105% and overview ≈61% before storylines are planted on top
 - [ ] Storyline 1: МРТ 118% from 2026-03 → burn-out 14.10.2026, 12.4 млн ₸
 - [ ] Storyline 2: стоматология 71% → gap 9.8 млн ₸
 - [ ] Storyline 3: creative doctor (templates, ~30% weekend, 80+ day spikes)

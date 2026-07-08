@@ -4,7 +4,7 @@
  */
 
 export const API_BASE: string =
-  process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000/api/v1';
+  process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8800/api/v1';
 
 export type QueryParams = Record<
   string,
