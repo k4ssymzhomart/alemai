@@ -35,9 +35,9 @@ export function workingDaysUntil(deadline: Date, from: Date = new Date()): numbe
 }
 
 /**
- * DeadlineBox (docs/15 §5): mono countdown in a bordered box with a legal
+ * DeadlineBox (Epic A.2): mono countdown in a hairline card with a legal
  * citation caption («п. 26 Правил мониторинга»). ≤2 working days → the box
- * inverts to a solid black block — the loudest thing on a B&W screen.
+ * inverts to solid black — the one allowed heavy mark, the demo's drama.
  */
 export default function DeadlineBox({
   deadline,
@@ -58,19 +58,30 @@ export default function DeadlineBox({
   return (
     <div
       className={clsx(
-        'inline-block border-2 border-ink px-3 py-2',
-        critical ? 'bg-ink text-paper' : 'bg-paper text-ink',
+        'inline-block px-4 py-3',
+        critical
+          ? 'border border-ink bg-ink text-paper'
+          : 'border border-ink/15 text-ink',
       )}
     >
       {label ? (
-        <p className="text-caption font-medium uppercase opacity-70">{label}</p>
+        <p className={clsx('label-micro', critical && 'text-paper/70')}>
+          {label}
+        </p>
       ) : null}
-      <p className="font-mono text-xl font-semibold tabular-nums">
+      <p className="mt-1 font-mono text-h2 tabular-nums">
         {days > 0
           ? t('deadline.days_left', { count: days })
           : t('deadline.expired')}
       </p>
-      <p className="font-mono text-caption uppercase opacity-70">{citation}</p>
+      <p
+        className={clsx(
+          'mt-1 font-mono text-micro uppercase',
+          critical ? 'text-paper/70' : 'text-ink/60',
+        )}
+      >
+        {citation}
+      </p>
     </div>
   );
 }

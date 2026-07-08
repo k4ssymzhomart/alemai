@@ -8,7 +8,7 @@ import { fontClassNames } from '@/lib/fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'IGERIM',
+  title: 'Qalam',
   description:
     'Шартты игерудің қаржылық автопилоты — clinic-side control loop for ГОБМП/ОСМС contracts.',
 };

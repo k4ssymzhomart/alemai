@@ -16,8 +16,9 @@ interface LinesTableProps {
 }
 
 /**
- * Contract lines ledger (QA Beat 1 columns + ExecutionBar per docs/15 §9);
- * row click → drill-down (C2); row hover = full invert — stamp, not fade.
+ * Contract lines ledger (Epic A.2): hairline dividers, roomy 44px rows, micro
+ * caps headers; row hover = faint wash + underlined primary cell (no invert);
+ * row click → drill-down (C2).
  */
 export default function LinesTable({ lines, year }: LinesTableProps) {
   const { t, i18n } = useTranslation();
@@ -31,21 +32,21 @@ export default function LinesTable({ lines, year }: LinesTableProps) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-sm">
+      <table className="w-full border-collapse text-secondary">
         <thead>
-          <tr className="border-b-2 border-ink text-left font-mono text-caption uppercase text-ink/70">
-            <th className="px-3 py-2 font-medium">{t('overview.table.line')}</th>
-            <th className="px-3 py-2 font-medium">{t('overview.table.source')}</th>
-            <th className="px-3 py-2 text-right font-medium">{t('overview.table.plan')}</th>
-            <th className="px-3 py-2 text-right font-medium">{t('overview.table.fact')}</th>
-            <th className="w-40 px-3 py-2 font-medium">
+          <tr className="border-b border-ink/15 text-left label-micro">
+            <th className="px-3 py-2 font-normal">{t('overview.table.line')}</th>
+            <th className="px-3 py-2 font-normal">{t('overview.table.source')}</th>
+            <th className="px-3 py-2 text-right font-normal">{t('overview.table.plan')}</th>
+            <th className="px-3 py-2 text-right font-normal">{t('overview.table.fact')}</th>
+            <th className="w-40 px-3 py-2 font-normal">
               {t('overview.table.execution_bar')}
             </th>
-            <th className="px-3 py-2 text-right font-medium">
+            <th className="px-3 py-2 text-right font-normal">
               {t('overview.table.execution_pct')}
             </th>
-            <th className="px-3 py-2 font-medium">{t('overview.table.risk')}</th>
-            <th className="px-3 py-2 font-medium">
+            <th className="px-3 py-2 font-normal">{t('overview.table.risk')}</th>
+            <th className="px-3 py-2 font-normal">
               {t('overview.table.burn_out_date')}
             </th>
           </tr>
@@ -63,34 +64,34 @@ export default function LinesTable({ lines, year }: LinesTableProps) {
                   open(line);
                 }
               }}
-              className="hover-stamp group cursor-pointer border-b border-ink/[.12] last:border-b-2 last:border-ink hover:bg-ink hover:text-paper focus:bg-ink focus:text-paper focus:outline-none"
+              className="group h-row cursor-pointer border-b border-ink/[.08] transition-colors duration-150 last:border-0 hover:bg-ink/[.03] focus:bg-ink/[.03] focus:outline-none"
             >
-              <td className="max-w-xs px-3 py-2.5 font-medium">
+              <td className="max-w-xs px-3 font-medium text-ink group-hover:underline group-focus:underline">
                 {line.service_group || t(`care_type.${line.care_type}`)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5">
+              <td className="whitespace-nowrap px-3 text-ink/70">
                 {t(`funding.${line.funding_source}`)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-right font-mono tabular-nums">
+              <td className="whitespace-nowrap px-3 text-right font-mono tabular-nums text-ink/70">
                 {fmtTenge(line.plan_amount_year)}
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-right font-mono tabular-nums">
+              <td className="whitespace-nowrap px-3 text-right font-mono tabular-nums text-ink">
                 {fmtTenge(line.fact_amount_ytd)}
               </td>
-              <td className="px-3 py-2.5 group-hover:invert group-focus:invert">
+              <td className="px-3">
                 <ExecutionBar
                   planYear={line.plan_amount_year}
                   factYtd={line.fact_amount_ytd}
                   planYtd={line.plan_amount_ytd}
                 />
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 text-right group-hover:invert group-focus:invert">
+              <td className="whitespace-nowrap px-3 text-right">
                 <ExecutionChip pct={line.execution_pct_ytd} locale={locale} />
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 group-hover:invert group-focus:invert">
+              <td className="whitespace-nowrap px-3">
                 <RiskBadge riskClass={line.risk_class} />
               </td>
-              <td className="whitespace-nowrap px-3 py-2.5 font-mono tabular-nums">
+              <td className="whitespace-nowrap px-3 font-mono tabular-nums text-ink/60">
                 {line.burn_out_date ? fmtDate(line.burn_out_date) : '—'}
               </td>
             </tr>
