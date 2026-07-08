@@ -28,6 +28,9 @@ class RuleRunStarted(APIModel):
     run_id: uuid.UUID
     scope: str
     status: str = "started"
+    totals: dict[str, Any] | None = Field(
+        default=None, description="run summary: counts, ₸, block_positions/block_amount, by_rule"
+    )
 
 
 class FindingOut(APIModel):
