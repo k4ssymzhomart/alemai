@@ -1,18 +1,17 @@
 # ============================================================================
-# IGERIM synthetic data generator — configuration
-# Source of truth: docs/06-DATA-ANALYTICS.md §4
+# IGERIM synthetic data generator — BASE configuration (shared across profiles)
+# Source of truth: docs/06-DATA-ANALYTICS.md §4 + docs/17-NEXT-DIRECTIVE.md EPIC B
 # Conventions (docs/05 §4): money = integer ₸ (no decimals), months = "YYYY-MM",
 # ids = uuid (deterministic from seed), all times UTC.
+#
+# Scale-specific settings (organization size, contract ₸, department mix,
+# execution_profile) live in datagen/profiles/<profile>.yaml and are merged over
+# this base by --profile (DEFAULT: gp14-real). Every planted storyline number
+# lives in datagen/storylines.yaml (the single source of truth), not here.
 # ============================================================================
 
 seed: 42
-
-organization:
-  name_kk: "№14 қалалық емхана (демо)"
-  name_ru: "Городская поликлиника №14 (демо)"
-  type: polyclinic
-  attached_population: 130000
-  sample_population: 5000        # patients generated in --sample mode
+default_profile: gp14-real
 
 period:
   start: "2024-07"               # inclusive
@@ -23,55 +22,20 @@ reform:
   # The generator applies the post-2026 split to the 2026 contract year.
   unified_package_switch_date: "2026-01-01"
 
-contract:
-  annual_target_amount: 5200000000     # ₸ per contract year (≈ 5.2 bn)
-  care_type_split:                     # shares of annual_target_amount; sum = 1.0
-    pmsp: 0.55                         # ПМСП (подушевой)
-    kdu: 0.20                          # КДУ
-    day_hosp: 0.10                     # дневной стационар
-    dent: 0.05                         # стоматология
-    screening: 0.06                    # скрининги
-    other: 0.04                        # прочее — emitted as care_type "ambulance" (неотложная помощь)
-  funding_source_split:                # share of each line by source; per era
-    pre_2026:
-      pmsp:      {gobmp: 0.40, osms: 0.60}
-      kdu:       {gobmp: 0.30, osms: 0.70}
-      day_hosp:  {gobmp: 0.25, osms: 0.75}
-      dent:      {gobmp: 0.35, osms: 0.65}
-      screening: {gobmp: 1.00, osms: 0.00}
-      other:     {gobmp: 0.70, osms: 0.30}
-    post_2026:                         # Единый пакет: weight shifts toward ОСМС
-      pmsp:      {gobmp: 0.30, osms: 0.70}
-      kdu:       {gobmp: 0.15, osms: 0.85}
-      day_hosp:  {gobmp: 0.15, osms: 0.85}
-      dent:      {gobmp: 0.30, osms: 0.70}
-      screening: {gobmp: 1.00, osms: 0.00}
-      other:     {gobmp: 0.60, osms: 0.40}
-
 claims:
-  target_rows: 500000                  # over the whole 24-month period (NFR, docs/04 §4)
-  sample_target_rows: 1000             # used in --sample mode (claims volume only)
-  care_type_row_share:                 # share of claim ROWS (not ₸); sum = 1.0
-    pmsp: 0.58
-    kdu: 0.24
-    screening: 0.08
-    dent: 0.05
-    day_hosp: 0.02
-    other: 0.03
-  execution_profile:                   # fact volume ≈ Poisson(plan_qty × profile)
-    pmsp: 1.00
-    kdu: 1.03
-    day_hosp: 0.97
-    dent: 0.90
-    screening: 0.95
-    other: 1.00
+  # plan_qty is DERIVED from plan_amount ÷ representative tariff (see generate.py),
+  # so a line executes at ≈ its execution_profile. No separate row target needed.
+  sample_population: 2000              # default patient sample in --sample mode
+  sample_volume_scale: 0.03            # claim-volume multiplier in --sample mode (~fast run)
+  paid_lag_months: 1                   # accepted claims older than this become "paid"
+  referral_coverage_kdu: 0.96          # rest stay referral-less (future R07 material)
+  weekend_visit_weight: 0.06           # relative probability of a base claim on Sat/Sun
   status_distribution:                 # docs/06 §4: 97% accepted / 1.5% rejected / 1.5% pending
     accepted: 0.97
     rejected: 0.015
     submitted: 0.015                   # "pending" — submitted, adjudication not finished
-  paid_lag_months: 1                   # accepted claims older than this become "paid"
-  referral_coverage_kdu: 0.96          # rest stay referral-less (future R07 material)
-  weekend_visit_weight: 0.06           # relative probability of a claim on Sat/Sun
+  # NB: mis_only is NOT in the base distribution — it is planted only by
+  # storyline 6 (under_billing), so mis_only count is exactly the planted count.
 
 seasonality:                           # multiplicative index [Jan..Dec]; docs/06 §4
   pmsp:      [1.25, 1.25, 1.05, 1.00, 1.00, 0.95, 0.90, 0.80, 1.00, 1.05, 1.10, 1.25]   # winter ОРВИ peak, August dip
@@ -104,26 +68,11 @@ population:                            # KZ census pyramid approximation
     - {age_min: 75, age_max: 79, weight: 0.015}
     - {age_min: 80, age_max: 94, weight: 0.020}
 
-departments:                           # 14 depts, counts sum to 120 doctors
-  - {name: "Терапия",                    specialty: "терапевт",                        count: 18, care_types: [pmsp, ambulance]}
-  - {name: "ВОП",                        specialty: "врач общей практики",             count: 22, care_types: [pmsp, ambulance, screening]}
-  - {name: "Педиатрия",                  specialty: "педиатр",                         count: 16, care_types: [pmsp]}
-  - {name: "Кардиология",                specialty: "кардиолог",                       count: 6,  care_types: [kdu]}
-  - {name: "Неврология",                 specialty: "невролог",                        count: 6,  care_types: [kdu]}
-  - {name: "Эндокринология",             specialty: "эндокринолог",                    count: 5,  care_types: [kdu]}
-  - {name: "Хирургия",                   specialty: "хирург",                          count: 6,  care_types: [kdu]}
-  - {name: "Офтальмология",              specialty: "офтальмолог",                     count: 5,  care_types: [kdu]}
-  - {name: "Оториноларингология",        specialty: "оториноларинголог",               count: 5,  care_types: [kdu]}
-  - {name: "Акушерство-гинекология",     specialty: "акушер-гинеколог",                count: 7,  care_types: [kdu, screening]}
-  - {name: "Стоматология",               specialty: "стоматолог",                      count: 8,  care_types: [dent]}
-  - {name: "Лучевая диагностика",        specialty: "рентгенолог",                     count: 6,  care_types: [kdu, screening]}
-  - {name: "Функциональная диагностика", specialty: "врач функциональной диагностики", count: 5,  care_types: [kdu, screening]}
-  - {name: "Дневной стационар",          specialty: "терапевт дневного стационара",    count: 5,  care_types: [day_hosp]}
-
 # Мини-тарификатор: 40 услуг. tariff = integer ₸. weight = relative sampling
 # weight inside its care type. Optional sex / age_min / age_max constrain the
 # eligible patient pool (keeps base data clean of accidental R02/R03 findings —
-# violations are planted only by storylines).
+# violations are planted only by storylines). Tariffs anchored to приказ
+# № ҚР ДСМ-170/2020 order-of-magnitude (docs/research/tariffs_notes.md — versioned).
 tariffs:
   # --- ПМСП (9) ---
   - {code: S001, name_ru: "Приём терапевта",                          care_type: pmsp,      tariff: 2100,  weight: 30}
@@ -172,71 +121,5 @@ tariffs:
   # --- Прочее / неотложная помощь (1) ---
   - {code: S040, name_ru: "Вызов неотложной помощи на дому",          care_type: other,     tariff: 5200,  weight: 1}
 
-# ----------------------------------------------------------------------------
-# Planted storylines (docs/06 §4) — demo fixtures AND golden-test fixtures.
-# All disabled for now: planter functions in generate.py raise
-# NotImplementedError until implemented. Numbers below are the acceptance
-# targets from docs/06 §4 and §10.
-# ----------------------------------------------------------------------------
-storylines:
-  - key: mri_over_execution              # storyline 1
-    enabled: false
-    description_ru: "КДУ/МРТ идёт на 118% месячного плана с марта 2026 → burn-out ≈ 14.10.2026"
-    params:
-      care_type: kdu
-      service_code: S010
-      monthly_run_rate: 1.18
-      start_month: "2026-03"
-      expected_burn_out_date: "2026-10-14"
-      expected_recoverable_amount: 12400000   # ₸ at корректировка
-
-  - key: dent_under_execution            # storyline 2
-    enabled: false
-    description_ru: "Стоматология на 71% run-rate (отток кадров) → недоосвоение ≈ 9.8 млн ₸"
-    params:
-      care_type: dent
-      run_rate: 0.71
-      expected_year_end_gap: 9800000          # ₸
-
-  - key: creative_doctor                 # storyline 3
-    enabled: false
-    description_ru: "Один терапевт: шаблонные пакеты, 30% услуг в выходные, до 80+ визитов/день в конце месяца"
-    params:
-      specialty: "терапевт"
-      template_package_min_patients: 5
-      weekend_service_share: 0.30
-      month_end_day_visits: 80
-
-  - key: posthumous_services             # storyline 4
-    enabled: false
-    description_ru: "2 пациента с датой смерти, 3 услуги после неё → R01 ловит 100%"
-    params:
-      patients_with_death_date: 2
-      claims_after_death: 3
-
-  - key: sex_age_mismatch_batch          # storyline 5
-    enabled: false
-    description_ru: "31 маммография мужчинам + 12 скринингов вне возраста в ноябрьском реестре"
-    params:
-      registry_period: "2025-11"
-      male_mammography_claims: 31
-      underage_screening_claims: 12
-      expected_verdict_positions: 143
-      expected_amount_at_risk: 8400000        # ₸
-
-  - key: under_billing                   # storyline 6
-    enabled: false
-    description_ru: "260 завершённых случаев МИС (≈4.2 млн ₸) не попали в счёт-реестр → сверка, bucket 1"
-    params:
-      mis_only_cases: 260
-      expected_amount: 4200000                # ₸
-
-  - key: reform_mis_billing              # storyline 7
-    enabled: false
-    description_ru: "180 диабет-случаев в янв–фев 2026 выставлены на ГОБМП вместо ОСМС → R17"
-    params:
-      claims: 180
-      months: ["2026-01", "2026-02"]
-      icd10_prefixes: ["E10", "E11"]
-      billed_source: gobmp
-      correct_source: osms
+# Storylines live in datagen/storylines.yaml (single source of truth).
+# --profile picks the scale; storylines are the same fixtures at every scale.

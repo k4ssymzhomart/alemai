@@ -1,0 +1,146 @@
+# ============================================================================
+# datagen/storylines.yaml — SINGLE SOURCE OF TRUTH for every planted number
+# ----------------------------------------------------------------------------
+# Consumed by: datagen/generate.py (planters), backend/scripts/assert_storylines.py
+# (asserts each number against the live DB post-seed) and
+# backend/scripts/gen_qa_checklist.py (regenerates docs/QA-CHECKLIST.md).
+# NEVER hand-edit the derived numbers in QA-CHECKLIST — regenerate from here.
+#
+# Scale: gp14-real (31,000 attached, ~1.2 млрд ₸/год contract). All ₸ recomputed
+# honestly from the new scale — NOT blindly divided from the 5.2-млрд era.
+# Money = integer ₸. Counts are absolute (defect counts, not ₸) and kept as
+# documented. Deterministic given seed=42.
+#
+# Provenance tags: CONFIRMED = grounded in docs/research; DEMO = synthetic fixture.
+# ============================================================================
+
+# Demo "today" — the anchor for objection-window working-day deadlines (S8).
+demo_today: "2026-07-09"
+
+storylines:
+  # --------------------------------------------------------------------------
+  - key: mri_over_execution              # storyline 1  — beat 2/3 (МРТ drill + заявка)
+    enabled: true
+    care_type: kdu
+    service_group: "МРТ"
+    service_code: S010
+    description_ru: "КДУ/МРТ идёт на 118% месячного плана с марта 2026 → burn-out ≈ 14.10.2026"
+    params:
+      monthly_run_rate: 1.18             # fact ≈ 118% of monthly МРТ plan from start_month
+      start_month: "2026-03"
+      # Burn-out date is rate-shaped / scale-free — KEPT from prior calibration.
+      # It is a forecast projection (Epic C forecast engine recomputes it), NOT a
+      # generated DB fact. assert_storylines checks the run-rate mechanism in the DB.
+      expected_burn_out_date: "2026-10-14"
+      # Recoverable ₸ at корректировка = projected 2026 МРТ over-plan spend, computed
+      # by the generator as mrt_2026_annual_plan × 0.15 (Mar–Dec at +18%). Nominal
+      # below; assert_storylines checks the DB-derived value within ±6%.
+      expected_recoverable_amount: 5670000   # ₸  (was 12.4 млн at 5.2-млрд scale)
+      recoverable_factor: 0.15
+
+  # --------------------------------------------------------------------------
+  - key: dent_under_execution            # storyline 2  — недоосвоение
+    enabled: true
+    care_type: dent
+    description_ru: "Стоматология на 71% run-rate (отток кадров) → недоосвоение ≈ 17.4 млн ₸ к концу года"
+    params:
+      run_rate: 0.71                     # 2026 dent YTD fact/plan ≈ 0.71 (thinned from healthy baseline)
+      run_rate_tol: 0.06
+      # year-end gap = dent 2026 annual plan × (1 − run_rate) = 60 млн × 0.29
+      expected_year_end_gap: 17400000    # ₸  (was 9.8 млн at 5.2-млрд scale)
+
+  # --------------------------------------------------------------------------
+  - key: creative_doctor                 # storyline 3  — аномалия нагрузки
+    enabled: true
+    care_type: pmsp
+    description_ru: "Один терапевт: шаблонные пакеты, услуги в выходные, всплеск до 80 визитов/день в конце месяца"
+    params:
+      specialty: "терапевт"
+      burst_month: "2026-04"
+      peak_day_visits: 80                # >= 80 claims on the last working day of burst_month
+      weekend_claims: 30                 # >= 30 claims on Sat/Sun in burst_month
+      template_claims_total: 140         # total planted claims for the flagged doctor
+
+  # --------------------------------------------------------------------------
+  - key: posthumous_services             # storyline 4  — услуги после смерти (R01)
+    enabled: true
+    care_type: pmsp
+    description_ru: "2 пациента с датой смерти, 3 услуги после неё → 100% ловится"
+    params:
+      registry_period: "2025-11"
+      patients_with_death_date: 2
+      claims_after_death: 3
+      service_code: S001                 # приём терапевта, tariff 2100
+      expected_amount: 6300              # ₸ = 3 × 2100
+
+  # --------------------------------------------------------------------------
+  - key: sex_age_mismatch_batch          # storyline 5  — ноябрьский реестр (R02/R03)
+    enabled: true
+    description_ru: "31 маммография мужчинам + 12 скринингов вне возраста в ноябрьском реестре 2025"
+    params:
+      registry_period: "2025-11"
+      male_mammography_claims: 31        # S029 маммография на пациентов-мужчин 40–70
+      male_mammography_code: S029
+      male_mammography_amount: 139500    # ₸ = 31 × 4500
+      underage_screening_claims: 12      # скрининг S031 на пациентов < 40 лет
+      underage_screening_code: S031
+      underage_screening_amount: 22800   # ₸ = 12 × 1900
+      # beat-4 verdict aggregate on the 2025-11 registry = planted potential defects
+      # in that period (S5 batch 43 + S4 posthumous 3). Amount = предъявлено by them.
+      registry_verdict_positions: 46
+      registry_amount_at_risk: 168600    # ₸ = 139500 + 22800 + 6300
+
+  # --------------------------------------------------------------------------
+  - key: under_billing                   # storyline 6  — оказано, но не выставлено (сверка, bucket 1)
+    enabled: true
+    description_ru: "260 завершённых случаев МИС не попали в счёт-реестр → сверка, bucket «оказано, но не выставлено»"
+    params:
+      mis_only_cases: 260
+      # deterministic mix: 240 × ФГДС (8900) + 20 × дневной стационар неврология (42800)
+      expected_amount: 2992000           # ₸  (was 4.2 млн at 5.2-млрд scale)
+
+  # --------------------------------------------------------------------------
+  - key: reform_mis_billing              # storyline 7  — реформа 2026 (R17)
+    enabled: true
+    description_ru: "180 диабет-случаев в янв–фев 2026 выставлены на ГОБМП вместо ОСМС (ЗПДН) → R17"
+    params:
+      claims: 180
+      months: ["2026-01", "2026-02"]
+      icd10: "E11.9"
+      service_code: S018                 # приём эндокринолога, tariff 3400
+      billed_source: gobmp
+      correct_source: osms
+      expected_amount: 612000            # ₸ = 180 × 3400
+
+  # --------------------------------------------------------------------------
+  - key: objection_window                # storyline 8 (NEW) — DF-timers / возражения
+    enabled: true
+    description_ru: "4 потенциальных дефекта из ИСФ-выгрузки с окнами возражения 1/3/4/5 раб. дней"
+    # Real ЕКД codes (ред. №19 от 27.02.2026) + working-day rule (Правила мониторинга
+    # ҚР ДСМ-321/2020, пп. 26–27: возражение 5 раб. дней, молчание = автоснятие).
+    # Deadlines are computed by the generator from demo_today, skipping Sat/Sun
+    # (KZ holidays ignored, same as the datagen working_days helper). CONFIRMED codes.
+    defects:
+      - case_ref: "IGR-2026-000114-1"
+        ekd_code: "5.1"
+        ekd_name_ru: "Включение в счёт-реестр неподтверждённого случая (снятие 300%)"
+        amount_at_stake: 55500           # ₸ = 3 × 18500 (МРТ, кратность 300%)
+        deadline_working_days: 1
+      - case_ref: "IGR-2026-000114-2"
+        ekd_code: "3.1"
+        ekd_name_ru: "Необоснованное увеличение количества услуг"
+        amount_at_stake: 8400
+        deadline_working_days: 3
+      - case_ref: "IGR-2026-000114-3"
+        ekd_code: "1.2"
+        ekd_name_ru: "Необоснованное направление/оказание КДУ"
+        amount_at_stake: 3400
+        deadline_working_days: 4
+      - case_ref: "IGR-2026-000114-4"
+        ekd_code: "2.0"
+        ekd_name_ru: "Дефекты оформления меддокументации (незначительное, 0 ₸, фиксируется)"
+        amount_at_stake: 0
+        deadline_working_days: 5
+    params:
+      total_amount_at_stake: 67300       # ₸ = 55500 + 8400 + 3400 + 0
+      defect_count: 4

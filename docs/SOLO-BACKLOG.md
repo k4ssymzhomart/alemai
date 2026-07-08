@@ -31,21 +31,31 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md) laws + [17-NEXT-DIRECTIVE
 
 ## EPIC B — Data truth: rescale + manifest (≈3h) → auto-continue if green
 
-- [ ] (a) Datagen profile system: `gp14-real` DEFAULT (31,000 прикреплённых, 20 участков, ~1.2 bn ₸/yr, КПН 1,700 ₸/чел/мес, отделения per research/clinic14_facts.md §4) + `city-composite` (14 clinics 31k–120k)
-- [ ] (b) `datagen/storylines.yaml` = single source of all planted numbers — 7 storylines rescaled to gp14 (keep burn-out 14.10.2026; recompute all ₸) + storyline 8: возражения (4 потенциальных дефекта, deadlines in 1/3/4/5 раб. дней)
-- [ ] (c) `assert_storylines.py` asserts every manifest number post-seed
-- [ ] (d) Regenerate docs/QA-CHECKLIST.md from the manifest by script (old 143/8.4/12.4 numbers die here)
-- [ ] (e) Export columns aligned to research/schet_reestr_columns.csv + damumed format (INFERRED marked in adapter preset)
-- [ ] AC: `make seed` (gp14-real) + assert_storylines PASS pasted; regenerated QA-CHECKLIST committed; overview ≈61% mid-year; canonical numbers table in report
+- [x] (a) Datagen profile system: `gp14-real` DEFAULT (31,000 прикреплённых, 20 участков, ~1.2 bn ₸/yr, КПН 1,710 ₸/чел/мес, отделения per research/clinic14_facts.md §4) + `city-composite` (14 clinics 31k–120k, summary rows)
+- [x] (b) `datagen/storylines.yaml` = single source of all planted numbers — 7 storylines rescaled to gp14 (kept burn-out 14.10.2026; recomputed all ₸) + storyline 8: возражения (4 потенциальных дефекта, deadlines 1/3/4/5 раб. дней)
+- [x] (c) `backend/scripts/assert_storylines.py` asserts every storyline number post-seed (28 checks PASS)
+- [x] (d) Regenerate docs/QA-CHECKLIST.md from the manifest by script (`gen_qa_checklist.py`; old 143/8.4/12.4 numbers dead)
+- [x] (e) Export columns aligned to research/schet_reestr_columns.csv + damumed format (INFERRED marked in `export_preset_schet_reestr.csv`)
+- [x] F3 (number naturalness): plan line-year → 100k, month → 1k, sum exact. F2: forecasts + risk_assessments seeded (no dead tiles).
+- [x] AC: `make seed` (gp14-real) + assert_storylines PASS; QA-CHECKLIST regenerated; overview 60.8% mid-year; assert_seed_integrity 86/86
 
 ## EPIC C — GUARD: the demo's teeth (≈5h) → auto-continue if green
 
+Original AC:
 - [ ] P4′ rules engine: ≥12 rules covering all storylines (R01–R04, R07, R10, R11, R16, R17, R20 + as needed), real ЕКД code + sanction columns (ekd_notes.md §4); ЕКД version by claim date (ред. №68 → ред. №19, код 1.3 archived); «жёлтые» severity 2.0/7.0 (0 ₸); R17 from package_mapping_2026.csv
 - [ ] Golden tests: 8/8 storylines caught; 50k claims timing printed
 - [ ] P5′ pre-billing screen (verdict header, findings by rule, CodeChips, StampMark on block rows, export exceptions XLSX)
 - [ ] P5′ reconciliation 4 buckets; DF-лента возражений with DeadlineBox timers (5/3/3 раб. дней, working-day aware, «молчание = автоснятие (п. 27)», ≤2 days → inverted black box)
 - [ ] PD2 Passport pattern on line passport, pre-billing, reconcile: Кто я → Вердикт → Почему → Что делать → Данные(collapsed); breadcrumbs; «как посчитано» popovers; designed empty states
-- [ ] AC: golden tests 8/8; timing; QA beats 1–5 per REGENERATED checklist; screenshot per beat; timer visibly at «осталось 2 раб. дня»
+
+Overview findings folded in (lead's screenshot review, now Epic C AC):
+- [ ] **F1** execution semantics: primary % = fact_ytd/plan_ytd (verify API already does this); annual as secondary 11px «жылдық: X%»; replace ambiguous ▽/△ glyphs with the §4 severity chip system (soft hatch/outline)
+- [ ] **F2** no dead tiles: wire the API read-side to surface the seeded `forecasts`/`risk_assessments` (forecast_gap, risk_count, burn_out_date, risk_class non-null) → Overview renders COMPLETE, no «есептелуде…»/dashes at demo
+- [ ] **F4** group ledger by care type: group header row («МСАК / ПМСП», hairline) → source rows with ТМККК/МӘМС chips; full human line names (13px secondary service group); acronyms die in kk/ru, en keeps short
+- [ ] **F5** progress bar: 6px track ink/10 = annual plan; solid fill = fact YTD; 1px vertical marker = YTD-expected; dotted extension to year-end if forecast exists
+- [ ] **F6** demo defaults kk (verify first-load kk + fmtPct comma-decimal everywhere incl. KPI hero); ENG one click away
+- [ ] **F7** ticker rotates real seeded alerts (burn-out, возражение ≤2 дн, 260 недовыставлено), not org+trivia
+- [ ] AC: golden tests 8/8; timing; QA beats 1–5 per REGENERATED checklist; screenshot per beat; timer visibly at «осталось 2 раб. дня»; **one full-page kk Overview that survives an economist's squint (F1/F2/F4/F5/F6 visibly done)**
 
 ## EPIC D — ACT + SPEAK (≈4h) → **HARD STOP: native review + freeze GO**
 
