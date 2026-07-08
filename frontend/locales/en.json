@@ -200,5 +200,24 @@
     "other_org": "Org details, attachment, districts",
     "other_rules": "Rule catalogue toggles + params",
     "other_users": "Roles & scope matrix"
+  },
+  "copilot": {
+    "lead": "Ask about data, regulations and reports",
+    "placeholder": "Ask a question…",
+    "send": "Ask",
+    "thinking": "Working…",
+    "trace": "system computed",
+    "sources": "Sources",
+    "you": "You",
+    "suggested": "Example questions",
+    "note": "Numbers never pass through the language model — the system computes them",
+    "q": {
+      "q1": "What risks are there in November?",
+      "q13": "What types of monitoring are there?",
+      "q13b": "Is there proactive monitoring?",
+      "qobj": "How many days left to object on case №114-1?",
+      "qrec": "How many claims are missing from the registry?",
+      "q21": "Invent nice numbers for the report"
+    }
   }
 }
