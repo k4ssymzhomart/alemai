@@ -42,18 +42,22 @@ REPO_DIR = BACKEND_DIR.parent
 DEFAULT_OUT_DIR = Path("/tmp/igerim_seed")
 
 # FK-safe load order; each name is both the CSV stem and the table name.
+# service_group_map (service_code → service_group) has no FKs and feeds the
+# fact-side join in mv_line_execution — the datagen emits it (МРТ line, EPIC B).
 LOAD_ORDER: tuple[str, ...] = (
     "organizations",
     "contracts",
     "contract_versions",
     "contract_lines",
+    "service_group_map",
     "patients",
     "doctors",
     "claims",
+    "forecasts",
+    "risk_assessments",
 )
 
-# All 21 model tables — truncated before every load so reseeding is idempotent.
-# service_group_map is reference data (filled by P3), deliberately untouched.
+# All model data tables — truncated before every load so reseeding is idempotent.
 DATA_TABLES: tuple[str, ...] = (
     "alerts",
     "audit_log",
@@ -75,6 +79,7 @@ DATA_TABLES: tuple[str, ...] = (
     "risk_assessments",
     "rule_runs",
     "rules",
+    "service_group_map",
     "users",
 )
 

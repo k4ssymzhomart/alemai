@@ -1,0 +1,85 @@
+# ============================================================================
+# datagen profile: gp14-real (DEFAULT)
+# ----------------------------------------------------------------------------
+# Real ГКП на ПХВ «Городская поликлиника №14» акимата г. Астаны, calibrated to
+# open statistics (docs/research/clinic14_facts.md, calibration_stats.md):
+#   - 31,000 прикреплённых, 20 участков (4 терапевт. + 2 педиатр. + 14 ВОП)
+#   - контракт ≈ 1.2 млрд ₸/год ; ПМСП подушевой ≈ КПН 1 700 ₸/чел/мес (окт. 2025)
+#   - реальная структура отделений №14 (гепатоцентр, реабилитация, КДО,
+#     стоматология, дневной стационар, акушерство-гинекология, МЦЗ, …)
+# Merged over datagen/config.yaml (base). money = integer ₸.
+# ============================================================================
+
+organization:
+  name_kk: "№14 қалалық емхана (демо)"
+  name_ru: "Городская поликлиника №14 (демо)"
+  type: polyclinic
+  attached_population: 31000       # CONFIRMED — clinic14_facts.md §3
+  sample_population: 2000          # patients generated in --sample mode
+
+contract:
+  # ~1.2 млрд ₸/год. ПМСП доля даёт 636 млн → 636e6/31000/12 = 1 710 ₸/чел/мес
+  # ≈ реальный КПН 1 675–1 700 ₸ (окт. 2025). See calibration_stats.md §1–2.
+  annual_target_amount: 1200000000
+  mrt_service_group_share: 0.15    # доля МРТ (S010) внутри КДУ по ₸ (storyline 1 line)
+  care_type_split:                 # shares of annual_target_amount; sum = 1.0
+    pmsp: 0.53                     # ПМСП подушевой → ≈ КПН 1 710 ₸/чел/мес
+    kdu: 0.21                      # КДУ (в т.ч. МРТ service_group)
+    day_hosp: 0.10                 # дневной стационар
+    dent: 0.05                     # стоматология
+    screening: 0.06                # скрининги
+    other: 0.05                    # прочее (неотложная помощь)
+  funding_source_split:            # share of each line by source; per era
+    pre_2026:
+      pmsp:      {gobmp: 0.40, osms: 0.60}
+      kdu:       {gobmp: 0.30, osms: 0.70}
+      day_hosp:  {gobmp: 0.25, osms: 0.75}
+      dent:      {gobmp: 0.35, osms: 0.65}
+      screening: {gobmp: 1.00, osms: 0.00}
+      other:     {gobmp: 0.70, osms: 0.30}
+    post_2026:                     # Единый пакет 2026: вес смещается к ОСМС
+      pmsp:      {gobmp: 0.30, osms: 0.70}
+      kdu:       {gobmp: 0.15, osms: 0.85}
+      day_hosp:  {gobmp: 0.15, osms: 0.85}
+      dent:      {gobmp: 0.30, osms: 0.70}
+      screening: {gobmp: 1.00, osms: 0.00}
+      other:     {gobmp: 0.60, osms: 0.40}
+
+# execution_profile = target fact/plan per care type (fact ≈ Poisson(plan_qty ×
+# profile), plan_qty derived from plan_amount ÷ representative tariff so a line
+# executes at ≈ its profile). CALIBRATION (docs/17 EPIC B headline AC):
+#   - ПМСП runs LOW (0.38): подушевой capitation оплачивается полностью, но
+#     задокументированный fee-for-service объём услуг ≈ 38% → тянет overview вниз.
+#   - fee-for-service specialities read a healthy 85–105% (baseline lines AC).
+#   - dent healthy baseline 0.90; storyline 2 thins it to 0.71 run-rate.
+# Overview mid-year (as-of 2026-06) lands ≈61% — verified live post-seed.
+execution_profile:
+  pmsp: 0.38
+  kdu: 0.92
+  day_hosp: 0.96
+  dent: 0.90
+  screening: 0.92
+  other: 0.90
+
+# Real №14 department mix (clinic14_facts.md §3–4). counts ≈ 20 участков + specs
+# (scaled to 31k population). care_types gate which services a dept can bill.
+departments:
+  # --- участковая служба ПМСП: 20 участков ---
+  - {name: "Терапия (участковая)",         specialty: "терапевт",                        count: 4,  care_types: [pmsp, ambulance]}
+  - {name: "Педиатрия (участковая)",       specialty: "педиатр",                         count: 2,  care_types: [pmsp]}
+  - {name: "Врачи общей практики",         specialty: "врач общей практики",             count: 14, care_types: [pmsp, ambulance, screening]}
+  # --- КДО / специализированный приём ---
+  - {name: "Кардиология (КДО)",            specialty: "кардиолог",                       count: 1,  care_types: [kdu]}
+  - {name: "Неврология (КДО)",             specialty: "невролог",                        count: 1,  care_types: [kdu]}
+  - {name: "Эндокринология (КДО)",         specialty: "эндокринолог",                    count: 1,  care_types: [kdu]}
+  - {name: "Хирургическое отделение",      specialty: "хирург",                          count: 1,  care_types: [kdu]}
+  - {name: "Офтальмология (КДО)",          specialty: "офтальмолог",                     count: 1,  care_types: [kdu]}
+  - {name: "Оториноларингология (КДО)",    specialty: "оториноларинголог",               count: 1,  care_types: [kdu]}
+  - {name: "Акушерско-гинекологическое отделение", specialty: "акушер-гинеколог",        count: 2,  care_types: [kdu, screening]}
+  - {name: "Лучевая и функциональная диагностика (КДО)", specialty: "врач лучевой диагностики", count: 2, care_types: [kdu, screening]}
+  - {name: "Гепатологический центр",       specialty: "гепатолог",                       count: 1,  care_types: [kdu]}
+  - {name: "Отделение реабилитации и восстановительного лечения", specialty: "врач реабилитолог", count: 1, care_types: [kdu]}
+  # --- прочие отделения №14 ---
+  - {name: "Стоматологическая помощь",     specialty: "стоматолог",                      count: 2,  care_types: [dent]}
+  - {name: "Дневной стационар",            specialty: "терапевт дневного стационара",    count: 2,  care_types: [day_hosp]}
+  - {name: "Молодёжный центр здоровья",    specialty: "врач МЦЗ",                        count: 1,  care_types: [pmsp, screening]}
