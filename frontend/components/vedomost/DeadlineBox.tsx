@@ -43,6 +43,7 @@ export default function DeadlineBox({
   deadline,
   citation,
   label,
+  daysLeft,
 }: {
   /** ISO date, e.g. "2026-07-13". */
   deadline: string;
@@ -50,9 +51,15 @@ export default function DeadlineBox({
   citation: string;
   /** What the deadline is for (already localized). */
   label?: string;
+  /**
+   * Authoritative working-days-left from the server (its calendar knows the
+   * demo «today» + KZ holidays). When provided it wins over the local
+   * recompute so the UI matches the backend's «осталось N раб. дней» exactly.
+   */
+  daysLeft?: number;
 }) {
   const { t } = useTranslation();
-  const days = workingDaysUntil(parseLocalDate(deadline));
+  const days = daysLeft ?? workingDaysUntil(parseLocalDate(deadline));
   const critical = days <= 2;
 
   return (
