@@ -11,7 +11,7 @@ const LABELS: Record<Locale, string> = {
   en: 'ENG',
 };
 
-/** Locale switcher stub: in-memory language change, no persistence yet. */
+/** Locale switcher: segmented mono control, active segment inverted. */
 export default function LocaleSwitcher() {
   const { i18n } = useTranslation();
   const current = (i18n.resolvedLanguage ?? i18n.language) as Locale;
@@ -24,11 +24,7 @@ export default function LocaleSwitcher() {
   };
 
   return (
-    <div
-      role="group"
-      aria-label="Language"
-      className="flex rounded-md border border-slate-200 bg-slate-50 p-0.5"
-    >
+    <div role="group" aria-label="Language" className="flex border border-ink">
       {locales.map((locale) => (
         <button
           key={locale}
@@ -36,10 +32,10 @@ export default function LocaleSwitcher() {
           onClick={() => handleChange(locale)}
           aria-pressed={current === locale}
           className={clsx(
-            'flex-1 rounded px-2 py-1 text-xs font-semibold transition-colors',
+            'hover-stamp flex-1 px-2 py-1 font-mono text-xs font-semibold',
             current === locale
-              ? 'bg-accent text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-900',
+              ? 'bg-ink text-paper'
+              : 'bg-paper text-ink hover:bg-ink hover:text-paper',
           )}
         >
           {LABELS[locale]}

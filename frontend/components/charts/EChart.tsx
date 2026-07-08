@@ -10,7 +10,7 @@ const ReactECharts = dynamic(() => import('echarts-for-react'), {
   loading: () => (
     <div
       style={{ height: CHART_HEIGHT }}
-      className="animate-pulse rounded-md bg-slate-100"
+      className="fill-dots-faint animate-pulse"
     />
   ),
 });

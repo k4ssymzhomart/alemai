@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "IGERIM",
-    "tagline": "Financial autopilot for contract execution"
+    "tagline": "Financial autopilot for contract execution",
+    "org": "City Polyclinic #14 · demo"
   },
   "nav": {
     "overview": "Overview",
@@ -27,7 +28,18 @@
     "fact": "Fact",
     "year": "Year",
     "source": "Funding source",
-    "computed_pending": "computing…"
+    "computed_pending": "computing…",
+    "demo_badge": "demo data",
+    "go_overview": "Go to overview"
+  },
+  "ticker": {
+    "label": "Alert ticker",
+    "objection_rule": "Objection window — 5 working days · silence = automatic write-off (paras 26–27, Monitoring Rules)",
+    "eps_deadline": "EPS: personified data due within 3 working days after the reporting period (para 69, Payment Rules)"
+  },
+  "deadline": {
+    "days_left": "working days left: {{count}}",
+    "expired": "deadline passed"
   },
   "roles": {
     "label": "Role",
@@ -53,6 +65,7 @@
       "source": "Source",
       "plan": "Plan (year)",
       "fact": "Fact (YTD)",
+      "execution_bar": "Execution progress",
       "execution_pct": "Execution, %",
       "risk": "Risk",
       "burn_out_date": "Burn-out date"
