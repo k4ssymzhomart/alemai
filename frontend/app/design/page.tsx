@@ -23,8 +23,9 @@ const EN = 'Contract execution monitoring — pre-billing firewall';
 const NUMBERS = '12 400 000 ₸  ·  14.10.2026  ·  61,4 %';
 
 const APPLIED_FACES: Array<{ label: string; className: string }> = [
-  { label: 'Literata 600 · display', className: 'font-display font-semibold' },
-  { label: 'Literata 500 · display', className: 'font-display font-medium' },
+  { label: 'Manrope 700 · display', className: 'font-display font-bold' },
+  { label: 'Manrope 600 · display', className: 'font-display font-semibold' },
+  { label: 'Manrope 500 · display', className: 'font-display font-medium' },
   { label: 'Inter 400 · ui/body', className: 'font-ui font-normal' },
   { label: 'Inter 500 · ui/body', className: 'font-ui font-medium' },
   { label: 'IBM Plex Mono 400 · figures', className: 'font-mono font-normal' },
