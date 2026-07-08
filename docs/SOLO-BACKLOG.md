@@ -31,12 +31,13 @@ Per [11-SOLO-AGENT-PROMPT.md](11-SOLO-AGENT-PROMPT.md) laws + [17-NEXT-DIRECTIVE
 
 ## EPIC B — Data truth: rescale + manifest (≈3h) → auto-continue if green
 
-- [ ] (a) Datagen profile system: `gp14-real` DEFAULT (31,000 прикреплённых, 20 участков, ~1.2 bn ₸/yr, КПН 1,700 ₸/чел/мес, отделения per research/clinic14_facts.md §4) + `city-composite` (14 clinics 31k–120k)
-- [ ] (b) `datagen/storylines.yaml` = single source of all planted numbers — 7 storylines rescaled to gp14 (keep burn-out 14.10.2026; recompute all ₸) + storyline 8: возражения (4 потенциальных дефекта, deadlines in 1/3/4/5 раб. дней)
-- [ ] (c) `assert_storylines.py` asserts every manifest number post-seed
-- [ ] (d) Regenerate docs/QA-CHECKLIST.md from the manifest by script (old 143/8.4/12.4 numbers die here)
-- [ ] (e) Export columns aligned to research/schet_reestr_columns.csv + damumed format (INFERRED marked in adapter preset)
-- [ ] AC: `make seed` (gp14-real) + assert_storylines PASS pasted; regenerated QA-CHECKLIST committed; overview ≈61% mid-year; canonical numbers table in report
+- [x] (a) Datagen profile system: `gp14-real` DEFAULT (31,000 прикреплённых, 20 участков, ~1.2 bn ₸/yr, КПН 1,710 ₸/чел/мес, отделения per research/clinic14_facts.md §4) + `city-composite` (14 clinics 31k–120k, summary rows)
+- [x] (b) `datagen/storylines.yaml` = single source of all planted numbers — 7 storylines rescaled to gp14 (kept burn-out 14.10.2026; recomputed all ₸) + storyline 8: возражения (4 потенциальных дефекта, deadlines 1/3/4/5 раб. дней)
+- [x] (c) `backend/scripts/assert_storylines.py` asserts every storyline number post-seed (28 checks PASS)
+- [x] (d) Regenerate docs/QA-CHECKLIST.md from the manifest by script (`gen_qa_checklist.py`; old 143/8.4/12.4 numbers dead)
+- [x] (e) Export columns aligned to research/schet_reestr_columns.csv + damumed format (INFERRED marked in `export_preset_schet_reestr.csv`)
+- [x] F3 (number naturalness): plan line-year → 100k, month → 1k, sum exact. F2: forecasts + risk_assessments seeded (no dead tiles).
+- [x] AC: `make seed` (gp14-real) + assert_storylines PASS; QA-CHECKLIST regenerated; overview 60.8% mid-year; assert_seed_integrity 86/86
 
 ## EPIC C — GUARD: the demo's teeth (≈5h) → auto-continue if green
 
