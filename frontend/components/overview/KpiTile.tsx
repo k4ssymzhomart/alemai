@@ -14,11 +14,12 @@ interface KpiTileProps {
   loading?: boolean;
   /**
    * Computed-pending style: value arrives with P6 (forecast gap, risk count,
-   * burn-out). Renders "есептелуде…" in a dashed tile — never fake numbers.
+   * burn-out). Renders "есептелуде…" in a dotted tile — never fake numbers.
    */
   pending?: boolean;
 }
 
+/** Ledger KPI tile (docs/15): ink border, uppercase caption, mono number. */
 export default function KpiTile({
   label,
   value,
@@ -32,36 +33,38 @@ export default function KpiTile({
   return (
     <div
       className={clsx(
-        'rounded-lg border bg-white px-4 py-3',
-        pending && !loading ? 'border-dashed border-slate-300' : 'border-slate-200',
+        'bg-paper px-4 py-3',
+        pending && !loading
+          ? 'border border-dashed border-ink/40'
+          : big
+            ? 'border-2 border-ink shadow-hard'
+            : 'border border-ink',
       )}
     >
-      <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
-        {label}
-      </p>
+      <p className="text-caption font-medium uppercase text-ink/70">{label}</p>
       {loading ? (
         <div
           className={clsx(
-            'mt-2 animate-pulse rounded bg-slate-100',
-            big ? 'h-8 w-28' : 'h-6 w-24',
+            'fill-dots-faint mt-2 animate-pulse',
+            big ? 'h-10 w-32' : 'h-6 w-24',
           )}
         />
       ) : pending ? (
-        <p className="mt-1.5 text-lg italic leading-7 text-slate-400">
+        <p className="mt-1.5 font-mono text-lg text-ink/40">
           {t('common.computed_pending')}
         </p>
       ) : (
         <p
           className={clsx(
-            'mt-1 font-semibold tabular-nums text-slate-900',
-            big ? 'text-3xl' : 'text-xl',
+            'mt-1 font-mono font-semibold tabular-nums text-ink',
+            big ? 'text-hero' : 'text-xl',
           )}
         >
           {value}
         </p>
       )}
       {sub && !loading && !pending ? (
-        <p className="mt-0.5 text-xs tabular-nums text-slate-500">{sub}</p>
+        <p className="mt-0.5 font-mono text-xs tabular-nums text-ink/70">{sub}</p>
       ) : null}
     </div>
   );

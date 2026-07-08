@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 import AppShell from '@/components/AppShell';
 import I18nProvider from '@/components/I18nProvider';
+import { fontClassNames } from '@/lib/fonts';
 
 import './globals.css';
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="kk">
+    <html lang="kk" className={fontClassNames}>
       <body>
         <I18nProvider>
           <AppShell>{children}</AppShell>

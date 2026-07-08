@@ -1,37 +1,63 @@
 /**
- * Shared ECharts theme (docs/04 §2 design language): plan = light gray bars,
- * fact = accent teal (the money earned), rejected = muted red, cumulative
- * curves in the same hues. Thin axes, no gridline clutter, ₸-formatted
- * compact ticks, full fmtTenge in tooltips, animations ≤ 300 ms.
+ * ECharts theme «vedomost» (docs/15 §7): #000 only. Series are distinguished
+ * by DECAL PATTERNS (solid / 45° hatch / dots / crosshatch), never by hue.
+ * Plan = dashed 2px black; fact = solid; rejected = hatch; forecast (P6) =
+ * white with dashed border + dotted CI. Gridlines ink-12, labels Plex Mono,
+ * tooltips white with 1px black border + hard shadow, draw-in ≤200ms with
+ * steps easing — dot-matrix printer feel.
  */
 
 import { fmtTenge, fmtTengeCompact, type NumLocale } from '@/lib/format';
 
-export const chartColors = {
-  plan: '#cbd5e1',
-  fact: '#0e7c66',
-  rejected: '#b3261e',
-  cumulativePlan: '#94a3b8',
-  cumulativeFact: '#0e7c66',
-  forecastPlaceholder: '#94a3b8',
-  axisLine: '#e2e8f0',
-  splitLine: '#eef2f6',
-  label: '#64748b',
-} as const;
+export const INK = '#000';
+export const PAPER = '#fff';
+export const INK_70 = 'rgba(0,0,0,0.7)';
+export const INK_40 = 'rgba(0,0,0,0.4)';
+export const INK_12 = 'rgba(0,0,0,0.12)';
 
-/** Canvas cannot inherit CSS fonts — mirror the app's system sans stack. */
-export const chartFontFamily =
-  'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+/** Canvas cannot inherit CSS vars — resolve the mono stack explicitly. */
+export const chartFontFamily = '"IBM Plex Mono", "JetBrains Mono", monospace';
 
 export const CHART_HEIGHT = 320;
-/** Keep ≤ 300 ms (docs/04 §2: no long animations). */
-export const ANIMATION_MS = 250;
+/** Mechanical motion budget (docs/15 §6): ≤200ms. */
+export const ANIMATION_MS = 200;
+
+/** Decal patterns for monochrome series distinction (docs/15 §7). */
+export const decals = {
+  hatch: {
+    symbol: 'rect',
+    dashArrayX: [1, 0],
+    dashArrayY: [2, 4],
+    rotation: Math.PI / 4,
+    color: INK,
+    symbolSize: 1,
+  },
+  dots: {
+    symbol: 'circle',
+    dashArrayX: [
+      [6, 6],
+      [0, 6, 6, 0],
+    ],
+    dashArrayY: [6, 0],
+    symbolSize: 0.5,
+    color: INK,
+  },
+  crosshatch: {
+    symbol: 'rect',
+    dashArrayX: [1, 0],
+    dashArrayY: [1, 3],
+    rotation: -Math.PI / 4,
+    color: INK,
+    symbolSize: 1,
+  },
+} as const;
 
 export function baseChartOption(): Record<string, unknown> {
   return {
     animationDuration: ANIMATION_MS,
     animationDurationUpdate: ANIMATION_MS,
-    textStyle: { fontFamily: chartFontFamily, color: chartColors.label },
+    animationEasing: 'linear',
+    textStyle: { fontFamily: chartFontFamily, color: INK_70 },
     grid: { left: 8, right: 8, top: 44, bottom: 4, containLabel: true },
   };
 }
@@ -40,12 +66,12 @@ export function monthAxis(labels: string[]): Record<string, unknown> {
   return {
     type: 'category',
     data: labels,
-    axisLine: { lineStyle: { color: chartColors.axisLine } },
+    axisLine: { lineStyle: { color: INK, width: 1 } },
     axisTick: { show: false },
     axisLabel: {
-      color: chartColors.label,
+      color: INK_70,
       fontFamily: chartFontFamily,
-      fontSize: 11,
+      fontSize: 12,
     },
   };
 }
@@ -55,19 +81,20 @@ export function tengeAxis(locale: NumLocale): Record<string, unknown> {
     type: 'value',
     axisLine: { show: false },
     axisTick: { show: false },
-    splitLine: { lineStyle: { color: chartColors.splitLine } },
+    splitLine: { lineStyle: { color: INK_12 } },
     axisLabel: {
-      color: chartColors.label,
+      color: INK_70,
       fontFamily: chartFontFamily,
-      fontSize: 11,
+      fontSize: 12,
       formatter: (value: number) => fmtTengeCompact(value, locale),
     },
   };
 }
 
 /**
- * Legend row; names listed in `disabled` render deselected/grayed — used for
- * the "болжам (P6)" placeholder entry (no data behind it until P6).
+ * Legend row; names in `disabled` render deselected — used for the
+ * "болжам (P6)" placeholder (no data behind it until P6). Legend markers
+ * inherit each series' decal, so patterns (not hues) tell them apart.
  */
 export function chartLegend(
   names: string[],
@@ -78,13 +105,14 @@ export function chartLegend(
   return {
     top: 0,
     left: 0,
-    itemWidth: 14,
-    itemHeight: 8,
-    icon: 'roundRect',
+    itemWidth: 16,
+    itemHeight: 10,
     data: names,
     selected,
+    inactiveColor: INK_40,
+    inactiveBorderColor: INK_40,
     textStyle: {
-      color: chartColors.label,
+      color: INK_70,
       fontFamily: chartFontFamily,
       fontSize: 11,
     },
@@ -93,12 +121,11 @@ export function chartLegend(
 
 interface TooltipParam {
   seriesName?: string;
-  marker?: string;
   value?: unknown;
   dataIndex?: number;
 }
 
-/** Axis tooltip with full fmtTenge values; titles[i] = "MM.YYYY" per month. */
+/** Document-style tooltip: paper bg, 1px ink border, hard shadow, mono. */
 export function tengeTooltip(
   titles: string[],
   axisPointer: 'shadow' | 'line' = 'shadow',
@@ -106,8 +133,12 @@ export function tengeTooltip(
   return {
     trigger: 'axis',
     axisPointer: { type: axisPointer },
-    borderColor: chartColors.axisLine,
-    textStyle: { fontFamily: chartFontFamily, fontSize: 12, color: '#0f172a' },
+    backgroundColor: PAPER,
+    borderColor: INK,
+    borderWidth: 1,
+    borderRadius: 0,
+    extraCssText: 'box-shadow: 4px 4px 0 0 #000;',
+    textStyle: { fontFamily: chartFontFamily, fontSize: 12, color: INK },
     formatter: (params: TooltipParam | TooltipParam[]) => {
       const items = Array.isArray(params) ? params : [params];
       if (items.length === 0) return '';
@@ -115,10 +146,9 @@ export function tengeTooltip(
       const rows = items
         .filter((p) => typeof p.value === 'number')
         .map(
-          (p) =>
-            `${p.marker ?? ''}${p.seriesName ?? ''}: <b>${fmtTenge(p.value as number)}</b>`,
+          (p) => `${p.seriesName ?? ''}: <b>${fmtTenge(p.value as number)}</b>`,
         );
-      return `<div style="color:#64748b;margin-bottom:2px">${titles[index] ?? ''}</div>${rows.join('<br/>')}`;
+      return `<div style="color:rgba(0,0,0,0.4);margin-bottom:2px">${titles[index] ?? ''}</div>${rows.join('<br/>')}`;
     },
   };
 }

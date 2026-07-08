@@ -3,7 +3,6 @@
 import { Suspense, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 import ErrorState from '@/components/ErrorState';
@@ -17,7 +16,8 @@ const DEFAULT_YEAR = 2026;
 
 /**
  * Screen 1 drill-down (C2): line header + monthly plan/fact bars +
- * cumulative curves. Forecast band & burn-out stay computed-pending until P6.
+ * cumulative curves. Forecast band & burn-out stay computed-pending until
+ * P6; the full Passport IA (Кто я → Вердикт → …) lands with PD2 in Epic C.
  */
 export default function LineDrilldownPage({
   params,
@@ -55,9 +55,9 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
   const backLink = (
     <Link
       href="/overview"
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-accent-700 transition-colors hover:text-accent-800"
+      className="hover-stamp inline-flex items-center gap-1.5 border border-ink bg-paper px-2 py-1 font-mono text-caption font-medium uppercase text-ink hover:bg-ink hover:text-paper"
     >
-      <ArrowLeft className="h-4 w-4" aria-hidden />
+      <span aria-hidden>←</span>
       {t('drilldown.back')}
     </Link>
   );
@@ -77,26 +77,27 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
 
       {lines.loading ? (
         <div className="space-y-2">
-          <div className="h-8 w-72 animate-pulse rounded bg-slate-100" />
-          <div className="h-4 w-96 animate-pulse rounded bg-slate-100" />
+          <div className="fill-dots-faint h-8 w-72 animate-pulse" />
+          <div className="fill-dots-faint h-4 w-96 animate-pulse" />
         </div>
       ) : line ? (
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+          <h1 className="font-display text-h1 font-medium uppercase tracking-tight text-ink">
             {line.service_group || t(`care_type.${line.care_type}`)}
           </h1>
-          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-500">
+          {/* Breadcrumb-style meta line (full breadcrumbs land with PD2). */}
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-caption uppercase text-ink/70">
             <span>{t(`care_type.${line.care_type}`)}</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden>/</span>
             <span>{t(`funding.${line.funding_source}`)}</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden>/</span>
             <span className="tabular-nums">{line.contract_id}</span>
-            <span aria-hidden>·</span>
+            <span aria-hidden>/</span>
             <span className="tabular-nums">{year}</span>
           </p>
         </div>
       ) : (
-        <div className="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
+        <div className="fill-dots-faint border border-ink px-6 py-10 text-center text-sm text-ink/70">
           {t('drilldown.not_found', { key: lineKey })}
         </div>
       )}
@@ -133,22 +134,22 @@ function LineDrilldown({ lineKey }: { lineKey: string }) {
         <ErrorState detail={monthly.error} onRetry={monthly.retry} />
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          <section className="rounded-lg border border-slate-200 bg-white p-4">
-            <h2 className="mb-3 text-sm font-semibold text-slate-900">
+          <section className="border-2 border-ink bg-paper p-4">
+            <h2 className="mb-3 font-display text-h2 font-medium uppercase text-ink">
               {t('drilldown.monthly_title')}
             </h2>
             {monthly.loading || !monthly.data ? (
-              <div className="h-80 animate-pulse rounded-md bg-slate-100" />
+              <div className="fill-dots-faint h-80 animate-pulse" />
             ) : (
               <MonthlyChart months={monthly.data.months} />
             )}
           </section>
-          <section className="rounded-lg border border-slate-200 bg-white p-4">
-            <h2 className="mb-3 text-sm font-semibold text-slate-900">
+          <section className="border-2 border-ink bg-paper p-4">
+            <h2 className="mb-3 font-display text-h2 font-medium uppercase text-ink">
               {t('drilldown.cumulative_title')}
             </h2>
             {monthly.loading || !monthly.data ? (
-              <div className="h-80 animate-pulse rounded-md bg-slate-100" />
+              <div className="fill-dots-faint h-80 animate-pulse" />
             ) : (
               <CumulativeChart months={monthly.data.months} />
             )}

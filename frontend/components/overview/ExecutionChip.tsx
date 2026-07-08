@@ -18,13 +18,18 @@ export function stubExecutionStatus(pct: number): ExecutionStatus {
   return 'on_track';
 }
 
+/**
+ * Severity without color (docs/15 §4): critical = inverted black block,
+ * risk = 45° hatch + 2px border, normal = plain 1px chip. `over` maps to
+ * critical here because overshoot burns the contract fastest.
+ */
 const STATUS_STYLES: Record<ExecutionStatus, string> = {
-  under: 'bg-amber-50 text-amber-700 ring-amber-200',
-  on_track: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
-  over: 'bg-red-50 text-red-700 ring-red-200',
+  under: 'fill-hatch-light border-2 border-ink text-ink',
+  on_track: 'border border-ink text-ink',
+  over: 'border-2 border-ink bg-ink text-paper',
 };
 
-/** Traffic-light % chip for the lines table (stub thresholds until P6). */
+/** Execution % chip for the lines table (stub thresholds until P6). */
 export default function ExecutionChip({
   pct,
   locale,
@@ -35,7 +40,7 @@ export default function ExecutionChip({
   return (
     <span
       className={clsx(
-        'inline-flex rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums ring-1 ring-inset',
+        'inline-flex px-2 py-0.5 font-mono text-xs font-semibold tabular-nums',
         STATUS_STYLES[stubExecutionStatus(pct)],
       )}
     >
