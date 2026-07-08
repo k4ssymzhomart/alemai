@@ -1,75 +1,90 @@
 # datagen — IGERIM synthetic data generator
 
-Skeleton implementation of **docs/06-DATA-ANALYTICS.md §4**: a deterministic
-(seed=42) generator for a Поликлиника №14-like organization with 130k attached
-patients, 120 doctors across 14 departments, contract years 2024–2026 built
-backwards from the ≈5.2 bn ₸ annual target, and ~500k claims over 24 months
-(2024-07 … 2026-06).
+Deterministic (seed=42) generator for **docs/06-DATA-ANALYTICS.md §4** with a
+**profile system** (docs/17 EPIC B). The default profile `gp14-real` models the
+real ГКП на ПХВ «Городская поликлиника №14» акимата г. Астаны at its actual
+scale: **31,000 прикреплённых**, ~20 участков + specialists, contract years
+2024–2026 built backwards from a **≈1.2 млрд ₸** annual target (ПМСП подушевой
+≈ КПН 1,710 ₸/чел/мес — calibrated to the real октябрь-2025 norm), and ~508k
+claims over 24 months (2024-07 … 2026-06).
 
 ## Run
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
 pip install -r datagen/requirements.txt
 
-# quick smoke run: ~1k claims, 5k patients
-python datagen/generate.py --sample
+# DEFAULT profile gp14-real (31k, ~1.2 млрд ₸)
+python datagen/generate.py                       # full run
+python datagen/generate.py --sample              # quick smoke run
 
-# full run: ~500k claims, 130k patients (takes a bit longer)
-python datagen/generate.py
+# city panel: 14 clinics 31k–120k, SUMMARY rows only (снятия/1000 прикреплённых)
+python datagen/generate.py --profile city-composite
 
-# custom config / output dir
-python datagen/generate.py --config datagen/config.yaml --out /tmp/igerim-data
+# custom paths
+python datagen/generate.py --profile gp14-real \
+    --config datagen/config.yaml --storylines datagen/storylines.yaml --out /tmp/igerim-data
 ```
 
+`make seed` (`docker compose exec api python -m app.seed`) runs the default
+`gp14-real` profile in-container, then COPYs into Postgres and refreshes the MV.
 Default output directory: `datagen/output/` (gitignored).
+
+## Configuration layout
+
+| File | Role |
+|---|---|
+| `config.yaml` | **base** (shared): seed, period, reform switch, seasonality, population pyramid, mini-тарификатор (40 услуг), claim params, `default_profile` |
+| `profiles/gp14-real.yaml` | **DEFAULT**: organization (31k), contract (1.2 млрд ₸ + splits), real №14 department mix, `execution_profile` (the calibration) |
+| `profiles/city-composite.yaml` | 14-clinic city panel (light — summary rows only) |
+| `storylines.yaml` | **single source of truth** for every planted number (8 storylines). `assert_storylines.py` + `gen_qa_checklist.py` read from it |
+
+`--profile` deep-merges the chosen profile over `config.yaml`.
+
+## Calibration (docs/17 EPIC B, the headline)
+
+`plan_qty` is **derived** from `plan_amount ÷ representative tariff` per line, so
+fact ≈ `Poisson(plan_qty × execution_profile)` makes a line execute at ≈ its
+`execution_profile`. This reconciles plan-vs-fact so:
+
+- **ПМСП runs low (~37%)** — подушевой capitation is paid in full, but the
+  fee-for-service documented объём covers only ~38% of it (the big two lines).
+- **fee-for-service specialities read a healthy 85–105%** (baseline lines).
+- **МРТ 108%** (storyline 1 over-exec), **стоматология 71%** (storyline 2).
+- mid-year (as-of 2026-06) **overview execution ≈ 61%** — verified live.
+
+**F3 (number naturalness):** line-year plans round to 100 000 ₸, months to
+1 000 ₸ (residual pushed to the largest month so 12 months sum exactly). Fact
+amounts stay ragged (real qty×tariff sums).
 
 ## Outputs (CSV, schema per docs/05 §4)
 
-| File | Contents |
-|---|---|
-| `organizations.csv` | 1 org (id, name_kk, name_ru, type, attached_population) |
-| `contracts.csv` | 1 contract per calendar year (2024, 2025, 2026) |
-| `contract_lines.csv` | care_type × funding_source × month plan lines, full 12 months per contract year; monthly split = working days × seasonality profile |
-| `patients.csv` | sex-age pyramid population; ids = salted SHA-256 hashes |
-| `doctors.csv` | 120 doctors, masked names, 14 departments |
-| `claims.csv` | claim volumes ~ Poisson(plan_qty × execution profile); tariffs from the 40-service mini-тарификатор; statuses 97/1.5/1.5; paid lag 1 month; 96% КДУ referral coverage |
+`organizations`, `contracts`, `contract_versions`, `contract_lines`,
+`service_group_map` (S010→МРТ, feeds the MV fact-join), `patients`, `doctors`,
+`claims`, **`forecasts`** + **`risk_assessments`** (F2 precompute — one per 2026
+line grain, so the Overview renders complete with no dead tiles), plus
+`manifest.json` (control sums + a `storylines` block) and
+`export_preset_schet_reestr.csv` / `claims_export_sample.csv` (счёт-реестр column
+mapping, INFERRED columns marked — docs/17 EPIC B (f)).
 
-All money values are integer ₸; ids are uuid (deterministic from the seed);
-months are `YYYY-MM`; dates are ISO `YYYY-MM-DD` (UTC).
+All money = integer ₸; ids = uuid (deterministic); months `YYYY-MM`; dates ISO.
 
-## Config (`config.yaml`)
+## Storylines (all 8 enabled)
 
-Everything tunable lives there: seed, period, annual contract target and
-care-type split (ПМСП 55% / КДУ 20% / дн. стационар 10% / стоматология 5% /
-скрининги 6% / прочее 4%), funding-source splits pre/post the 2026 Единый
-пакет switch (01.01.2026), seasonality profiles, claim volume targets,
-status distribution, referral coverage, the mini-тарификатор and the
-7 planted storylines.
+Defined in `storylines.yaml`, planted by `plant_storyline_1..8` in `generate.py`,
+and asserted post-seed by `backend/scripts/assert_storylines.py` (28 checks):
 
-## Storylines (disabled)
+1. **mri_over_execution** — МРТ (service_group) at 118% run-rate from 2026-03; burn-out 14.10.2026; возместимо ≈5.67 млн ₸.
+2. **dent_under_execution** — стоматология thinned to 71% YTD run-rate; год-конец gap ≈17.4 млн ₸.
+3. **creative_doctor** — one терапевт, 80 визитов на пик-день + 30 выходных.
+4. **posthumous_services** — 2 умерших + 3 услуги после смерти (patients reserved so the count stays exact).
+5. **sex_age_mismatch_batch** — реестр 11.2025: 31 маммография мужчинам + 12 скринингов вне возраста.
+6. **under_billing** — 260 mis_only случаев (≈2.99 млн ₸) вне счёт-реестра.
+7. **reform_mis_billing** — 180 диабет-E11 на ГОБМП вместо ОСМС (ЗПДН).
+8. **objection_window** — 4 потенциальных дефекта из ИСФ с окнами возражения 1/3/4/5 раб. дней (data-only, in the manifest for the DeadlineBox).
 
-The 7 demo/golden-test storylines from docs/06 §4 are configured in
-`config.yaml` under `storylines:` with `enabled: false`. Their planter
-functions (`plant_storyline_1..7` in `generate.py`) currently raise
-`NotImplementedError`; flipping a storyline to `enabled: true` before they
-are implemented fails loudly by design. Implementation lands separately
-(`storylines.py` per docs/05 §3 or directly in the planters).
+## Known simplifications (intentional)
 
-## Known skeleton simplifications (intentional, documented)
-
-- **Working days** = Mon–Fri; KZ public holidays are ignored for now.
-- **`--sample` mode** scales only the claims volume (and patient count);
-  `contract_lines` keep full-scale plans, so plan-vs-fact ratios in a sample
-  run are not meaningful — it is a smoke run.
-- **ICD-10 codes** are plausible hardcoded per-care-type lists in
-  `generate.py` (`ICD10_BY_CARE_TYPE`) until reference CSVs land in
-  `shared/ref/`.
-- **ПМСП money semantics**: ПМСП is paid per capita; claim `amount` values
-  for ПМСП visits are notional service prices, and ₸-level reconciliation of
-  fact vs plan is a later calibration pass, not a skeleton guarantee.
-- **Rejected claims** carry no ЕКД defect codes yet — those arrive with the
-  fund-statement generation / storylines work.
-- Base data is generated **clean** of rule violations (sex/age constraints,
-  attachment, insurance are respected while sampling patients) so golden
-  tests catch only planted findings.
+- **Working days** = Mon–Fri; KZ public holidays ignored (also for objection-deadline math).
+- **`--sample`** scales claim volume (`sample_volume_scale`) + patient count; `contract_lines` keep full plans, so a sample run is a smoke test, not a calibrated one.
+- **ICD-10** are plausible hardcoded per-care-type lists (`ICD10_BY_CARE_TYPE`); diabetes E10*/E11* are excluded from base lists so base data stays clean of accidental R17 (planted only by storyline 7).
+- Base data is generated **clean** of rule violations (sex/age/attachment/insurance respected) so the rules engine catches only planted findings.
