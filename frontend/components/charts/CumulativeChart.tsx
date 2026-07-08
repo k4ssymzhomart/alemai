@@ -47,7 +47,7 @@ export default function CumulativeChart({ months }: { months: MonthlyRow[] }) {
           type: 'line',
           data: months.map((m) => m.cumulative_plan_amount),
           symbol: 'none',
-          lineStyle: { width: 2, type: 'dashed', color: INK },
+          lineStyle: { width: 1, type: 'dashed', color: INK },
           itemStyle: { color: INK },
         },
         {
@@ -55,9 +55,9 @@ export default function CumulativeChart({ months }: { months: MonthlyRow[] }) {
           type: 'line',
           data: months.map((m) => m.cumulative_fact_amount),
           symbol: 'none',
-          lineStyle: { width: 2.5, color: INK },
+          lineStyle: { width: 2, color: INK },
           itemStyle: { color: INK },
-          areaStyle: { color: 'rgba(0, 0, 0, 0.06)' },
+          areaStyle: { color: 'rgba(0, 0, 0, 0.04)' },
         },
         {
           // Placeholder series only — forecast band arrives in P6.

@@ -8,25 +8,25 @@ interface ErrorStateProps {
   onRetry: () => void;
 }
 
-/** Honest error card: hatched frame, localized message, mono detail, retry. */
+/** Honest error card (Epic A.2): hairline frame, calm label, mono detail. */
 export default function ErrorState({ detail, onRetry }: ErrorStateProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="border-2 border-ink">
-      <div className="fill-hatch-light border-b-2 border-ink px-4 py-1.5 font-mono text-caption uppercase">
-        ! {t('common.error')}
+    <div className="border border-ink/15">
+      <div className="border-b border-ink/15 px-4 py-2 label-micro">
+        {t('common.error')}
       </div>
-      <div className="flex flex-col items-center justify-center gap-3 px-6 py-10 text-center">
+      <div className="flex flex-col items-center justify-center gap-4 px-6 py-10 text-center">
         {detail ? (
-          <p className="max-w-xl break-all font-mono text-xs text-ink/40">
+          <p className="max-w-xl break-all font-mono text-secondary text-ink/40">
             {detail}
           </p>
         ) : null}
         <button
           type="button"
           onClick={onRetry}
-          className="hover-stamp border-2 border-ink bg-ink px-4 py-1.5 text-sm font-semibold uppercase text-paper hover:bg-paper hover:text-ink"
+          className="border border-ink/40 px-4 py-2 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03]"
         >
           {t('common.retry')}
         </button>

@@ -1,5 +1,7 @@
 # IGERIM — HACKATHON DOC PACK · INDEX
 
+> **Product name as of 09.07.2026: QALAM** (ранее Igerim). `qalam = қалам, перо` — инструмент, которым подписывают документы. All `IGERIM` references in docs 01–18 refer to the same product; only brand surfaces (UI wordmark, favicon, README) were renamed in Epic A.2. Case-holder framing = MedHub ecosystem.
+
 **Task 07 · Health AI Hackathon, AI WEEK Astana 2026 · Team: Kassymzhomart (LEAD) · folrwix (BE) · rasssppberrry (FE)**
 Product: **IGERIM (Игерім)** — clinic-side intelligent monitoring of ГОБМП/ОСМС contract execution.
 Status: hackathon LIVE. Start at 08-EXECUTION §2 (first 90 minutes). Everything else supports it.

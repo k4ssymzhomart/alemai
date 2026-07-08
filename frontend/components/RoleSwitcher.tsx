@@ -8,21 +8,18 @@ const ROLES = ['economist', 'statistician', 'head', 'curator'] as const;
 
 export type Role = (typeof ROLES)[number];
 
-/** Role switcher stub: local state only, no RBAC wiring yet. */
+/** Role switcher (Epic A.2): quiet hairline select. */
 export default function RoleSwitcher() {
   const { t } = useTranslation();
   const [role, setRole] = useState<Role>('economist');
 
   return (
-    <label className="flex items-center gap-2 border border-ink bg-paper px-2 py-1">
-      <span className="font-mono text-caption uppercase text-ink/40" aria-hidden>
-        ✍
-      </span>
+    <label className="flex items-center gap-2 border border-ink/15 px-2 py-1">
       <span className="sr-only">{t('roles.label')}</span>
       <select
         value={role}
         onChange={(event) => setRole(event.target.value as Role)}
-        className="bg-paper font-mono text-xs font-medium text-ink"
+        className="bg-paper font-mono text-micro normal-case tracking-normal text-ink/70"
       >
         {ROLES.map((value) => (
           <option key={value} value={value}>

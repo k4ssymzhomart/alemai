@@ -19,7 +19,7 @@ interface KpiTileProps {
   pending?: boolean;
 }
 
-/** Ledger KPI tile (docs/15): ink border, uppercase caption, mono number. */
+/** KPI tile (Epic A.2): hairline card, micro caption, calm mono figure. */
 export default function KpiTile({
   label,
   value,
@@ -33,38 +33,38 @@ export default function KpiTile({
   return (
     <div
       className={clsx(
-        'bg-paper px-4 py-3',
+        'bg-paper px-5 py-4',
         pending && !loading
-          ? 'border border-dashed border-ink/40'
-          : big
-            ? 'border-2 border-ink shadow-hard'
-            : 'border border-ink',
+          ? 'border border-dashed border-ink/30'
+          : 'border border-ink/15',
       )}
     >
-      <p className="text-caption font-medium uppercase text-ink/70">{label}</p>
+      <p className="label-micro">{label}</p>
       {loading ? (
         <div
           className={clsx(
-            'fill-dots-faint mt-2 animate-pulse',
+            'fill-dots-faint mt-3 animate-pulse',
             big ? 'h-10 w-32' : 'h-6 w-24',
           )}
         />
       ) : pending ? (
-        <p className="mt-1.5 font-mono text-lg text-ink/40">
+        <p className="mt-2 font-mono text-h3 text-ink/40">
           {t('common.computed_pending')}
         </p>
       ) : (
         <p
           className={clsx(
-            'mt-1 font-mono font-semibold tabular-nums text-ink',
-            big ? 'text-hero' : 'text-xl',
+            'mt-2 font-mono tabular-nums text-ink',
+            big ? 'text-hero' : 'text-h2',
           )}
         >
           {value}
         </p>
       )}
       {sub && !loading && !pending ? (
-        <p className="mt-0.5 font-mono text-xs tabular-nums text-ink/70">{sub}</p>
+        <p className="mt-1 font-mono text-secondary tabular-nums text-ink/60">
+          {sub}
+        </p>
       ) : null}
     </div>
   );
