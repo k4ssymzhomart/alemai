@@ -1,39 +1,101 @@
-"""Rules engine endpoints (docs/05 §5). Includes PATCH /findings/{id}."""
+"""Rules engine endpoints (docs/05 §5). Real run + findings; PATCH /findings/{id}."""
 
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Query
+import sqlalchemy as sa
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 
+from app.db import get_db
 from app.models.enums import FindingStatus
-from app.schemas.rules import FindingOut, FindingPatch, RuleRunIn, RuleRunStarted, RunFindingsOut
+from app.models.rules import Finding, Rule
+from app.schemas.rules import (
+    FindingGroupOut,
+    FindingOut,
+    FindingPatch,
+    RuleRunIn,
+    RuleRunStarted,
+    RunFindingsOut,
+)
+from app.services.rules_engine import engine
 
 router = APIRouter(tags=["rules"])
 
+DbDep = Annotated[Session, Depends(get_db)]
 GroupByQuery = Annotated[str | None, Query(description="e.g. 'rule'")]
+LimitQuery = Annotated[int, Query(ge=1, le=5000, description="max findings returned")]
 
 
 @router.post("/rules/run", response_model=RuleRunStarted, status_code=202)
-def run_rules(body: RuleRunIn) -> RuleRunStarted:
-    """Start a rules run over the given scope. Stub: returns a run id, no work."""
-    return RuleRunStarted(run_id=uuid.uuid4(), scope=body.scope, status="started")
+def run_rules(body: RuleRunIn, db: DbDep) -> RuleRunStarted:
+    """Run the ЕКД catalog over the scope, persist findings, return the summary.
+
+    Synchronous (fast at demo scale): findings are committed before the response
+    so a follow-up GET .../findings returns them. Scope: 'all' | 'period:YYYY-MM'
+    | 'year:YYYY' | 'import:<uuid>'.
+    """
+    result = engine.run(db, scope=body.scope)
+    db.commit()
+    return RuleRunStarted(
+        run_id=result.run_id,
+        scope=result.scope,
+        status="completed",
+        totals=result.totals_json(),
+    )
 
 
 @router.get("/rules/runs/{run_id}/findings", response_model=RunFindingsOut)
-def get_run_findings(run_id: uuid.UUID, group_by: GroupByQuery = None) -> RunFindingsOut:
-    """Findings of a run, optionally grouped by rule."""
-    return RunFindingsOut(run_id=run_id, group_by=group_by, groups=[], findings=[])
+def get_run_findings(
+    run_id: uuid.UUID, db: DbDep, group_by: GroupByQuery = None, limit: LimitQuery = 200
+) -> RunFindingsOut:
+    """Findings of a run: always the per-rule groups; ``findings`` capped at ``limit``."""
+    severity_by_code = {
+        code: severity
+        for code, severity in db.execute(sa.select(Rule.code, Rule.severity)).all()
+    }
+    grouped = db.execute(
+        sa.select(
+            Finding.rule_code,
+            sa.func.count().label("count"),
+            sa.func.coalesce(sa.func.sum(Finding.amount_at_risk), 0).label("amount"),
+        )
+        .where(Finding.run_id == run_id)
+        .group_by(Finding.rule_code)
+        .order_by(Finding.rule_code)
+    ).all()
+    groups = [
+        FindingGroupOut(
+            rule_code=g.rule_code,
+            severity=severity_by_code.get(g.rule_code),
+            count=int(g.count),
+            amount_at_risk=int(g.amount),
+        )
+        for g in grouped
+    ]
+    findings = [
+        FindingOut.model_validate(f)
+        for f in db.execute(
+            sa.select(Finding)
+            .where(Finding.run_id == run_id)
+            .order_by(Finding.rule_code, Finding.amount_at_risk.desc())
+            .limit(limit)
+        ).scalars()
+    ]
+    return RunFindingsOut(run_id=run_id, group_by=group_by, groups=groups, findings=findings)
 
 
 @router.patch("/findings/{finding_id}", response_model=FindingOut)
-def patch_finding(finding_id: uuid.UUID, body: FindingPatch) -> FindingOut:
-    """Exclude a finding from the registry or dismiss it. Stub: echoes new status."""
-    return FindingOut(
-        id=finding_id,
-        run_id=uuid.uuid4(),
-        rule_code="R00",
-        claim_id=None,
-        amount_at_risk=0,
-        details={"comment": body.comment} if body.comment else None,
-        status=FindingStatus(body.status),
-    )
+def patch_finding(finding_id: uuid.UUID, body: FindingPatch, db: DbDep) -> FindingOut:
+    """Exclude a finding from the registry or dismiss it (docs/04 GUARD)."""
+    finding = db.get(Finding, finding_id)
+    if finding is None:
+        raise HTTPException(status_code=404, detail="finding not found")
+    finding.status = FindingStatus(body.status)
+    if body.comment:
+        details = dict(finding.details or {})
+        details["comment"] = body.comment
+        finding.details = details
+    db.commit()
+    db.refresh(finding)
+    return FindingOut.model_validate(finding)

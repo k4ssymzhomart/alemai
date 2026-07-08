@@ -12,11 +12,16 @@ accepted+paid (already folded into the MV ``fact_*`` columns);
 
 from __future__ import annotations
 
+import datetime
+import json
 import uuid
 from dataclasses import dataclass
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
+
+from app.models.analytics import Forecast, RiskAssessment
+from app.models.enums import RiskClass
 
 # ---------------------------------------------------------------------------
 # line_key helpers (contract C1):
@@ -154,6 +159,10 @@ class OverviewData:
     rejected_amount_mtd: int
     execution_pct_ytd: float
     lines_total: int
+    # P6/F2 read-side — null when Epic B seeded no forecast/risk rows for the year.
+    forecast_amount_year: int | None = None
+    forecast_gap: int | None = None  # plan_amount_year - forecast_amount_year
+    risk_count: int | None = None  # lines whose risk_class is not on_track
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,6 +181,24 @@ class LineData:
     billed_amount_ytd: int
     rejected_amount_ytd: int
     execution_pct_ytd: float
+    # P6/F2 read-side (per-line forecast + risk grain, seeded by Epic B).
+    forecast_amount_year: int | None = None
+    forecast_gap: int | None = None  # plan_amount_year - forecast_amount_year
+    forecast_explanation: dict[str, str] | None = None  # {ru, kk} — Passport «Почему»
+    risk_class: RiskClass | None = None
+    burn_out_date: datetime.date | None = None
+    recommendation: dict[str, str] | None = None  # {ru, kk} — Passport «Что делать»
+
+
+@dataclass(frozen=True, slots=True)
+class LineProjection:
+    """Seeded forecast + risk for one line grain (P6/F2 read-side)."""
+
+    forecast_amount_year: int | None = None
+    forecast_explanation: dict[str, str] | None = None
+    risk_class: RiskClass | None = None
+    burn_out_date: datetime.date | None = None
+    recommendation: dict[str, str] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,6 +218,75 @@ class MonthData:
 # ---------------------------------------------------------------------------
 # Queries
 # ---------------------------------------------------------------------------
+
+
+def _parse_bilingual(raw: object) -> dict[str, str] | None:
+    """Coerce a seeded {ru, kk} blob (JSONB dict or JSON-text) into a plain dict.
+
+    ``forecasts.explanation`` is stored as Text holding a JSON object;
+    ``risk_assessments.recommendation`` is JSONB (already a dict). Malformed or
+    plain-string values degrade to ``{"ru": <text>}`` so the frontend never 500s.
+    """
+    if raw is None:
+        return None
+    if isinstance(raw, dict):
+        return {str(k): str(v) for k, v in raw.items()}
+    if isinstance(raw, str):
+        try:
+            parsed = json.loads(raw)
+        except (ValueError, TypeError):
+            return {"ru": raw}
+        if isinstance(parsed, dict):
+            return {str(k): str(v) for k, v in parsed.items()}
+        return {"ru": raw}
+    return None
+
+
+def _grain_key(
+    contract_id: object, care_type: object, funding_source: object, service_group: object
+) -> tuple[str, str, str, str]:
+    """Line grain key normalized to the MV form (service_group '' == none)."""
+    return (str(contract_id), str(care_type), str(funding_source), str(service_group or ""))
+
+
+GrainKey = tuple[str, str, str, str]
+
+
+def line_projections(session: Session, year: int) -> dict[GrainKey, LineProjection]:
+    """Seeded forecast + risk keyed by line grain (P6/F2), latest ``as_of`` wins.
+
+    Forecasts are filtered to the year-end horizon (``YYYY-12``); risk to the
+    same calendar year. Returns ``{}`` when Epic B seeded nothing for the year.
+    """
+    horizon = f"{year}-12"
+    forecast_by_grain: dict[GrainKey, Forecast] = {}
+    for f in session.execute(
+        sa.select(Forecast).where(Forecast.horizon_month == horizon).order_by(Forecast.as_of)
+    ).scalars():
+        key = _grain_key(f.contract_id, f.care_type, f.funding_source, f.service_group)
+        forecast_by_grain[key] = f
+
+    risk_by_grain: dict[GrainKey, RiskAssessment] = {}
+    for r in session.execute(
+        sa.select(RiskAssessment)
+        .where(sa.extract("year", RiskAssessment.as_of) == year)
+        .order_by(RiskAssessment.as_of)
+    ).scalars():
+        key = _grain_key(r.contract_id, r.care_type, r.funding_source, r.service_group)
+        risk_by_grain[key] = r
+
+    projections: dict[GrainKey, LineProjection] = {}
+    for key in set(forecast_by_grain) | set(risk_by_grain):
+        f = forecast_by_grain.get(key)
+        r = risk_by_grain.get(key)
+        projections[key] = LineProjection(
+            forecast_amount_year=int(f.value_amount) if f else None,
+            forecast_explanation=_parse_bilingual(f.explanation) if f else None,
+            risk_class=r.risk_class if r else None,
+            burn_out_date=r.burn_out_date if r else None,
+            recommendation=_parse_bilingual(r.recommendation) if r else None,
+        )
+    return projections
 
 
 def default_year(session: Session) -> int | None:
@@ -241,10 +337,29 @@ def overview(session: Session, year: int) -> OverviewData:
             sa.func.count(sa.distinct(grain)).label("lines_total"),
         ).where(mv.year == year)
     ).one()
+    plan_amount_year = int(row.plan_amount_year)
+    projections = line_projections(session, year)
+    forecast_values = [
+        p.forecast_amount_year for p in projections.values() if p.forecast_amount_year is not None
+    ]
+    forecast_amount_year = sum(forecast_values) if forecast_values else None
+    forecast_gap = (
+        plan_amount_year - forecast_amount_year if forecast_amount_year is not None else None
+    )
+    has_risk = any(p.risk_class is not None for p in projections.values())
+    risk_count = (
+        sum(
+            1
+            for p in projections.values()
+            if p.risk_class is not None and p.risk_class != RiskClass.on_track
+        )
+        if has_risk
+        else None
+    )
     return OverviewData(
         year=year,
         as_of=as_of,
-        plan_amount_year=int(row.plan_amount_year),
+        plan_amount_year=plan_amount_year,
         plan_amount_ytd=int(row.plan_amount_ytd),
         fact_amount_ytd=int(row.fact_amount_ytd),
         billed_amount_ytd=int(row.billed_amount_ytd),
@@ -252,6 +367,9 @@ def overview(session: Session, year: int) -> OverviewData:
         rejected_amount_mtd=int(row.rejected_amount_mtd),
         execution_pct_ytd=execution_pct(int(row.fact_amount_ytd), int(row.plan_amount_ytd)),
         lines_total=int(row.lines_total),
+        forecast_amount_year=forecast_amount_year,
+        forecast_gap=forecast_gap,
+        risk_count=risk_count,
     )
 
 
@@ -303,27 +421,45 @@ def lines(
     if contract_id is not None:
         stmt = stmt.where(mv.contract_id == contract_id)
 
-    items = [
-        LineData(
-            line_key=format_line_key(
-                row.contract_id, row.care_type, row.funding_source, row.service_group
-            ),
-            contract_id=str(row.contract_id),
-            year=year,
-            care_type=row.care_type,
-            funding_source=row.funding_source,
-            service_group=row.service_group,
-            plan_qty_year=int(row.plan_qty_year),
-            plan_amount_year=int(row.plan_amount_year),
-            plan_amount_ytd=int(row.plan_amount_ytd),
-            fact_qty_ytd=int(row.fact_qty_ytd),
-            fact_amount_ytd=int(row.fact_amount_ytd),
-            billed_amount_ytd=int(row.billed_amount_ytd),
-            rejected_amount_ytd=int(row.rejected_amount_ytd),
-            execution_pct_ytd=execution_pct(int(row.fact_amount_ytd), int(row.plan_amount_ytd)),
+    projections = line_projections(session, year)
+    items: list[LineData] = []
+    for row in session.execute(stmt):
+        plan_amount_year = int(row.plan_amount_year)
+        proj = projections.get(
+            _grain_key(row.contract_id, row.care_type, row.funding_source, row.service_group),
+            LineProjection(),
         )
-        for row in session.execute(stmt)
-    ]
+        forecast_gap = (
+            plan_amount_year - proj.forecast_amount_year
+            if proj.forecast_amount_year is not None
+            else None
+        )
+        items.append(
+            LineData(
+                line_key=format_line_key(
+                    row.contract_id, row.care_type, row.funding_source, row.service_group
+                ),
+                contract_id=str(row.contract_id),
+                year=year,
+                care_type=row.care_type,
+                funding_source=row.funding_source,
+                service_group=row.service_group,
+                plan_qty_year=int(row.plan_qty_year),
+                plan_amount_year=plan_amount_year,
+                plan_amount_ytd=int(row.plan_amount_ytd),
+                fact_qty_ytd=int(row.fact_qty_ytd),
+                fact_amount_ytd=int(row.fact_amount_ytd),
+                billed_amount_ytd=int(row.billed_amount_ytd),
+                rejected_amount_ytd=int(row.rejected_amount_ytd),
+                execution_pct_ytd=execution_pct(int(row.fact_amount_ytd), int(row.plan_amount_ytd)),
+                forecast_amount_year=proj.forecast_amount_year,
+                forecast_gap=forecast_gap,
+                forecast_explanation=proj.forecast_explanation,
+                risk_class=proj.risk_class,
+                burn_out_date=proj.burn_out_date,
+                recommendation=proj.recommendation,
+            )
+        )
     return as_of, items
 
 

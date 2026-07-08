@@ -12,3 +12,8 @@ Contract:
 - Performance target: 50k claims < 30s (docs/04 §4); golden tests per rule
   against planted storylines (docs/05 §9).
 """
+
+from app.services.rules_engine.catalog import RuleDef, load_catalog, sync_catalog
+from app.services.rules_engine.engine import RunResult, fetch_claims, run
+
+__all__ = ["RuleDef", "RunResult", "fetch_claims", "load_catalog", "run", "sync_catalog"]

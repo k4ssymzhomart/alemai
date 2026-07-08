@@ -50,8 +50,17 @@ class LineItemOut(APIModel):
     rejected_amount_ytd: int = 0
     execution_pct_ytd: float = 0.0
     forecast_amount_year: int | None = None  # P6
+    forecast_gap: int | None = Field(
+        default=None, description="plan_amount_year - forecast_amount_year"
+    )
+    forecast_explanation: dict[str, str] | None = Field(
+        default=None, description="{ru, kk} — Passport «Почему» (seeded forecasts.explanation)"
+    )
     risk_class: RiskClass | None = None  # P6
     burn_out_date: datetime.date | None = None  # P6
+    recommendation: dict[str, str] | None = Field(
+        default=None, description="{ru, kk} — Passport action (risk_assessments.recommendation)"
+    )
 
 
 class LinesOut(APIModel):

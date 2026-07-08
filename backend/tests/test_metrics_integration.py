@@ -59,10 +59,11 @@ def test_overview_shape_and_consistency(client: TestClient) -> None:
         body["fact_amount_ytd"], body["plan_amount_ytd"]
     )
     assert body["lines_total"] > 0
-    # P6 placeholders stay null (C5).
-    assert body["forecast_amount_year"] is None
-    assert body["forecast_gap"] is None
-    assert body["risk_count"] is None
+    # F2 read-side: forecast/risk are populated for a year Epic B seeded
+    # (default year = latest with claims). Consistency, not a hard-coded number.
+    if body["forecast_amount_year"] is not None:
+        assert body["forecast_gap"] == body["plan_amount_year"] - body["forecast_amount_year"]
+        assert isinstance(body["risk_count"], int) and body["risk_count"] >= 0
 
 
 def test_overview_year_without_data_returns_zeros(client: TestClient) -> None:
@@ -93,11 +94,15 @@ def test_lines_sorted_and_sum_matches_overview(client: TestClient) -> None:
     assert plans == sorted(plans, reverse=True)
     assert sum(item["fact_amount_ytd"] for item in items) == overview["fact_amount_ytd"]
     assert sum(item["plan_amount_year"] for item in items) == overview["plan_amount_year"]
+    valid_risk = {"critical_under", "under_risk", "on_track", "over_risk", "critical_over"}
     for item in items:
         parsed = parse_line_key(item["line_key"])  # every key must be valid C1
         assert str(parsed.contract_id) == item["contract_id"]
         assert item["year"] == year
-        assert item["risk_class"] is None and item["burn_out_date"] is None
+        # F2 read-side: risk_class from a valid enum (or null); forecast_gap consistent.
+        assert item["risk_class"] is None or item["risk_class"] in valid_risk
+        if item["forecast_amount_year"] is not None:
+            assert item["forecast_gap"] == item["plan_amount_year"] - item["forecast_amount_year"]
 
 
 def test_lines_filters_apply(client: TestClient) -> None:

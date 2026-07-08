@@ -3,36 +3,69 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { fmtPct, fmtTenge, type NumLocale } from '@/lib/format';
-import { useOverview } from '@/lib/hooks';
+import { fmtDate, fmtNumber, fmtPct, fmtTenge, type NumLocale } from '@/lib/format';
+import { useLines, useObjections, useOverview, useReconcile } from '@/lib/hooks';
 
 const YEAR = 2026;
 const ROTATE_MS = 5000;
 
 /**
- * Alert wire (Epic A.2): a single quiet line under the header that crossfades
- * through its items — NOT a scrolling marquee. Content = live /metrics numbers
- * + regulatory constants (cited пункты); never a number the system didn't
- * compute. Storyline alerts (burn-out, DF-timers) join in Epics B/C.
+ * Alert wire (Epic C · F7): a single quiet line that crossfades through REAL
+ * risk signals computed from the live seed — burn-out lines, execution, снятия
+ * — plus cited regulatory constants. Never a number the system didn't compute.
+ * Objection/reconcile alerts join when those APIs land (Epic C backend).
  */
 export default function Ticker() {
   const { t, i18n } = useTranslation();
   const locale = (i18n.resolvedLanguage ?? 'kk') as NumLocale;
   const overview = useOverview(YEAR);
+  const lines = useLines({ year: YEAR });
+  const objections = useObjections();
+  const reconcile = useReconcile(YEAR);
   const [idx, setIdx] = useState(0);
 
   const items = useMemo(() => {
     const out: string[] = [];
+    // Burn-out lines first — the sharpest risk (F2 fills burn_out_date).
+    for (const line of lines.data?.items ?? []) {
+      if (line.burn_out_date) {
+        const name = line.service_group || t(`care_type.${line.care_type}`);
+        out.push(
+          t('ticker.burn_out', { line: name, date: fmtDate(line.burn_out_date) }),
+        );
+      }
+    }
+    // Nearest-deadline objection (the DF-timer heartbeat).
+    const soonest = [...(objections.data?.items ?? [])].sort(
+      (a, b) => a.deadline_working_days - b.deadline_working_days,
+    )[0];
+    if (soonest) {
+      out.push(
+        t('ticker.objection', {
+          case: soonest.case_ref,
+          days: soonest.deadline_working_days,
+        }),
+      );
+    }
+    // Missed revenue from reconciliation bucket 1.
+    const b1 = reconcile.data?.buckets.find((b) => b.bucket_no === 1);
+    if (b1 && b1.rows_count > 0) {
+      out.push(t('ticker.reconcile', { n: fmtNumber(b1.rows_count) }));
+    }
     const m = overview.data;
     if (m) {
       out.push(
         `${t('overview.kpi.execution_ytd')} · ${fmtPct(m.execution_pct_ytd, locale)}`,
-        `${t('overview.kpi.removed_mtd')} · ${fmtTenge(m.rejected_amount_mtd)}`,
       );
+      if (m.rejected_amount_mtd > 0) {
+        out.push(
+          `${t('overview.kpi.removed_mtd')} · ${fmtTenge(m.rejected_amount_mtd)}`,
+        );
+      }
     }
     out.push(t('ticker.objection_rule'), t('ticker.eps_deadline'));
     return out;
-  }, [overview.data, t, locale]);
+  }, [lines.data, objections.data, reconcile.data, overview.data, t, locale]);
 
   useEffect(() => {
     if (items.length <= 1) return;
