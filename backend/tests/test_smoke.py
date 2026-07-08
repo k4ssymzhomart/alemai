@@ -15,6 +15,14 @@ pytestmark = pytest.mark.smoke
 
 client = TestClient(app)
 
+# GET routes that read the live database (P1 real metrics) — covered by
+# tests/test_metrics_integration.py instead; smoke stays DB-free by design.
+DB_BACKED_PATHS = {
+    "/api/v1/metrics/overview",
+    "/api/v1/metrics/lines",
+    "/api/v1/metrics/line/{line_key}/monthly",
+}
+
 
 def _sample_value(param_name: str) -> str:
     if param_name.endswith("_id"):
@@ -29,7 +37,7 @@ def _all_get_paths() -> list[str]:
     schema = client.get("/openapi.json").json()
     paths: set[str] = set()
     for path, operations in schema["paths"].items():
-        if "get" in operations:
+        if "get" in operations and path not in DB_BACKED_PATHS:
             paths.add(re.sub(r"\{([^}]+)\}", lambda m: _sample_value(m.group(1)), path))
     return sorted(paths)
 

@@ -30,6 +30,22 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: igerim
+          POSTGRES_PASSWORD: igerim
+          POSTGRES_DB: igerim
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql+psycopg://igerim:igerim@localhost:5432/igerim
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -42,6 +58,12 @@ jobs:
       - name: rules catalog validation
         run: |
           if [ -f scripts/validate_rules.py ]; then python scripts/validate_rules.py; fi
+      - name: seed sample dataset (migrations + datagen + COPY + MV refresh)
+        run: python -m app.seed --sample
+      - name: seed integrity — DB vs manifest vs API
+        run: python scripts/assert_seed_integrity.py /tmp/igerim_seed/manifest.json
+      - name: pytest (smoke + unit + integration)
+        run: pytest -q
 
   frontend:
     runs-on: ubuntu-latest

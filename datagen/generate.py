@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import calendar
 import hashlib
+import json
 import uuid
 from datetime import date, timedelta
 from pathlib import Path
@@ -182,6 +183,21 @@ def build_contracts(
     return pd.DataFrame(rows), year_map
 
 
+def build_contract_versions(year_map: dict[int, tuple[str, str]]) -> pd.DataFrame:
+    """One initial version (amendment_no=0) per contract; A2 amendments come later."""
+    rows = [
+        {
+            "id": version_id,
+            "contract_id": contract_id,
+            "amendment_no": 0,
+            "effective_date": f"{year}-01-01",
+            "note": "initial annex",
+        }
+        for year, (contract_id, version_id) in sorted(year_map.items())
+    ]
+    return pd.DataFrame(rows)
+
+
 def build_contract_lines(
     cfg: dict[str, Any],
     year_map: dict[int, tuple[str, str]],
@@ -223,7 +239,7 @@ def build_contract_lines(
                         "contract_id": contract_id,
                         "care_type": care_type,
                         "funding_source": source,
-                        "service_group": None,
+                        "service_group": "",  # P3 fills groups (МРТ/stomatology storylines)
                         "month": month_key(year, mi + 1),
                         "plan_qty": int(round(annual_qty * weights[mi] * s_share)),
                         "plan_amount": int(round(annual_amount * weights[mi] * s_share)),
@@ -354,7 +370,9 @@ def build_claims(
             pool_cache[key] = np.flatnonzero(mask)
         return pool_cache[key]
 
-    source_file_id = str(uuid.uuid5(uuid.NAMESPACE_URL, "igerim://datagen/claims"))
+    # NULL until claims arrive through a real import (seed loads claims without
+    # an import_files row; a fabricated id would violate the FK on COPY).
+    source_file_id = None
     cols: dict[str, list[Any]] = {name: [] for name in CLAIM_COLUMNS}
     skipped_empty_pool = 0
 
@@ -508,12 +526,67 @@ def apply_storylines(tables: dict[str, pd.DataFrame], cfg: dict[str, Any],
 # output
 # ---------------------------------------------------------------------------
 
-def write_outputs(tables: dict[str, pd.DataFrame], out_dir: Path) -> None:
+# Statuses in fixed order so the manifest is byte-stable for a given seed+mode.
+MANIFEST_STATUS_ORDER: tuple[str, ...] = ("paid", "accepted", "submitted", "rejected", "mis_only")
+
+
+def build_manifest(tables: dict[str, pd.DataFrame], cfg: dict[str, Any], mode: str) -> dict:
+    """Control sums for the seed loader / integrity script (shared contract C3).
+
+    All amounts integer ₸; deterministic given seed+mode (no timestamps).
+    """
+    claims = tables["claims"]
+    lines = tables["contract_lines"]
+
+    by_status: dict[str, dict[str, int]] = {}
+    for status in MANIFEST_STATUS_ORDER:
+        sub = claims[claims["status"] == status]
+        if len(sub):
+            by_status[status] = {"count": int(len(sub)), "amount": int(sub["amount"].sum())}
+
+    claim_year = claims["period"].str[:4]
+    line_year = lines["month"].str[:4]
+    return {
+        "seed": int(cfg["seed"]),
+        "mode": mode,
+        "rows": {name: int(len(df)) for name, df in tables.items()},
+        "claims": {
+            "count": int(len(claims)),
+            "total_amount": int(claims["amount"].sum()),
+            "by_status": by_status,
+            "by_care_type_amount": {
+                str(k): int(v) for k, v in claims.groupby("care_type")["amount"].sum().items()
+            },
+            "by_funding_source_amount": {
+                str(k): int(v)
+                for k, v in claims.groupby("funding_source")["amount"].sum().items()
+            },
+            "by_year_amount": {
+                str(k): int(v) for k, v in claims.groupby(claim_year)["amount"].sum().items()
+            },
+        },
+        "plan": {
+            "by_year_amount": {
+                str(k): int(v) for k, v in lines.groupby(line_year)["plan_amount"].sum().items()
+            },
+            "by_year_qty": {
+                str(k): int(v) for k, v in lines.groupby(line_year)["plan_qty"].sum().items()
+            },
+        },
+    }
+
+
+def write_outputs(tables: dict[str, pd.DataFrame], manifest: dict, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     for name, df in tables.items():
         path = out_dir / f"{name}.csv"
         df.to_csv(path, index=False)
         print(f"wrote {path}: {len(df):,} rows")
+    manifest_path = out_dir / "manifest.json"
+    with manifest_path.open("w", encoding="utf-8") as fh:
+        json.dump(manifest, fh, ensure_ascii=False, indent=2)
+        fh.write("\n")
+    print(f"wrote {manifest_path}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -536,6 +609,7 @@ def main(argv: list[str] | None = None) -> int:
     organizations = build_organizations(cfg, rng)
     org_id = str(organizations.iloc[0]["id"])
     contracts, year_map = build_contracts(cfg, org_id, rng)
+    contract_versions = build_contract_versions(year_map)
     contract_lines = build_contract_lines(cfg, year_map, rng)
     doctors = build_doctors(cfg, org_id, rng)
     patients = build_patients(cfg, rng, args.sample)
@@ -544,6 +618,7 @@ def main(argv: list[str] | None = None) -> int:
     tables: dict[str, pd.DataFrame] = {
         "organizations": organizations,
         "contracts": contracts,
+        "contract_versions": contract_versions,
         "contract_lines": contract_lines,
         "patients": patients,
         "doctors": doctors,
@@ -559,7 +634,7 @@ def main(argv: list[str] | None = None) -> int:
     for year, total in plan_by_year.items():
         print(f"contract year {year}: plan {total:,} ₸")
 
-    write_outputs(tables, args.out)
+    write_outputs(tables, build_manifest(tables, cfg, mode), args.out)
     return 0
 
 

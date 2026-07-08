@@ -15,4 +15,7 @@ select = ["E", "F", "W", "I", "UP", "B"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-markers = ["smoke: fast API smoke tests that must pass without a database"]
+markers = [
+    "smoke: fast API smoke tests that must pass without a database",
+    "integration: end-to-end tests against a live PostgreSQL (auto-skipped when unreachable)",
+]

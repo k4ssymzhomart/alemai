@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: igerim
       POSTGRES_DB: igerim
     ports:
-      - "5432:5432"
+      # host 55432 (5432 is occupied by another local project); in-network stays db:5432
+      - "55432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -20,10 +21,16 @@ services:
   api:
     build: ./backend
     ports:
-      - "8000:8000"
+      # host 8800 (8000 is occupied by another local project); in-container stays :8000
+      - "8800:8000"
     environment:
       DATABASE_URL: postgresql+psycopg://igerim:igerim@db:5432/igerim
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      # read-only mounts: app.seed runs datagen from /datagen (make seed);
+      # /shared exposes glossary.csv and reference data to the backend
+      - ./datagen:/datagen:ro
+      - ./shared:/shared:ro
     depends_on:
       db:
         condition: service_healthy
@@ -33,7 +40,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_BASE: http://localhost:8000/api/v1
+      NEXT_PUBLIC_API_BASE: http://localhost:8800/api/v1
     depends_on:
       - api
 

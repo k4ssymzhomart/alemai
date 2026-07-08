@@ -14,9 +14,9 @@ down:
 logs:
 	docker compose logs -f
 
-## Seed the database inside the api container (falls back honestly until app.seed lands)
+## Seed the database inside the api container (migrations + datagen + COPY + MV refresh)
 seed:
-	docker compose exec api python -m app.seed || echo "seed: app.seed not implemented yet (backend agent will add it)"
+	docker compose exec api python -m app.seed
 
 ## Restore the pg_dump demo snapshot (<60s per docs/05 §7) — wired to POST /admin/demo-reset later
 reset:

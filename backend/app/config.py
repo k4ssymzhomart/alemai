@@ -4,7 +4,7 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-DEFAULT_DATABASE_URL = "postgresql+psycopg://igerim:igerim@localhost:5432/igerim"
+DEFAULT_DATABASE_URL = "postgresql+psycopg://igerim:igerim@localhost:55432/igerim"
 
 
 class Settings(BaseSettings):
