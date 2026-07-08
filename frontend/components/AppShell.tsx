@@ -45,8 +45,9 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 /**
- * «Ведомость» shell (docs/15 §8): header [Logo · org · ticker · role · lang]
- * over a bordered sidebar + document body. All chrome is print-hidden.
+ * QALAM shell (Epic A.2): quiet header [Logo · org · wire · role · lang] over
+ * a hairline-ruled sidebar and an air-rich, max-width document body. Active
+ * nav = 2px left rule + medium weight, no black band. All chrome print-hidden.
  */
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
@@ -54,11 +55,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="print-hidden flex items-center gap-3 border-b-2 border-ink bg-paper px-4 py-2">
+      <header className="print-hidden flex items-center gap-4 border-b border-ink/15 bg-paper px-6 py-3">
         <Link href="/overview" className="flex shrink-0 items-center">
-          <Logo height={28} />
+          <Logo height={22} />
         </Link>
-        <span className="hidden shrink-0 border border-ink px-2 py-1 font-mono text-caption uppercase md:inline-block">
+        <span className="hidden shrink-0 label-micro md:inline-block">
           {t('app.org')}
         </span>
         <Ticker />
@@ -69,8 +70,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <aside className="print-hidden sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r-2 border-ink bg-paper">
-          <nav className="flex-1 overflow-y-auto py-2">
+        <aside className="print-hidden sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-ink/15 bg-paper">
+          <nav className="flex-1 overflow-y-auto py-3">
             {NAV_ITEMS.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -81,32 +82,33 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
                   className={clsx(
-                    'hover-stamp flex items-center gap-2.5 border-b border-ink/[.12] px-4 py-2.5 text-sm font-medium uppercase tracking-wide',
+                    'flex items-center gap-2.5 border-l-2 px-5 py-2 text-secondary transition-colors duration-150',
                     active
-                      ? 'bg-ink text-paper'
-                      : 'text-ink hover:bg-ink hover:text-paper',
+                      ? 'border-ink font-medium text-ink'
+                      : 'border-transparent text-ink/60 hover:bg-ink/[.03] hover:text-ink',
                   )}
                 >
-                  <Icon className="h-4 w-4 shrink-0" strokeWidth={2.25} aria-hidden />
+                  <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
                   {t(item.labelKey)}
                 </Link>
               );
             })}
           </nav>
-          <p className="border-t-2 border-ink px-4 py-3 text-caption uppercase text-ink/40">
+          <p className="border-t border-ink/15 px-5 py-3 text-secondary text-ink/40">
             {t('app.tagline')}
           </p>
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <main className="flex-1 px-6 py-6">{children}</main>
-          {/* NOT print-hidden: printed output must carry the demo-data label
-              (docs/11 §1) — it doubles as the document footer. */}
-          <footer className="flex items-center gap-2 border-t-2 border-ink px-6 py-2.5">
-            <span className="bg-ink px-1.5 py-0.5 font-mono text-caption uppercase text-paper">
+          <main className="mx-auto w-full max-w-content flex-1 px-8 py-8">
+            {children}
+          </main>
+          {/* NOT print-hidden: printed output must carry the demo-data label. */}
+          <footer className="flex items-center gap-2 border-t border-ink/15 px-8 py-3">
+            <span className="label-micro border border-ink/40 px-1.5 py-0.5 text-ink/60">
               {t('common.demo_badge')}
             </span>
-            <span className="text-caption uppercase text-ink/40">
+            <span className="text-secondary text-ink/40">
               {t('common.demo_data_note')}
             </span>
           </footer>

@@ -11,7 +11,7 @@ interface EmptyStateProps {
   actionHref?: string;
 }
 
-/** Designed empty state (docs/15 §9): dot pattern + 1 sentence + 1 action. */
+/** Designed empty state (Epic A.2): faint dot grid + 1 sentence + 1 action. */
 export default function EmptyState({
   messageKey = 'common.empty',
   actionKey = 'common.go_overview',
@@ -20,11 +20,12 @@ export default function EmptyState({
   const { t } = useTranslation();
 
   return (
-    <div className="fill-dots-faint flex flex-col items-center justify-center gap-4 border border-ink px-6 py-16 text-center">
-      <p className="text-sm text-ink/70">{t(messageKey)}</p>
+    <div className="relative flex flex-col items-center justify-center gap-5 border border-ink/15 px-6 py-20 text-center">
+      <div className="fill-dots-faint pointer-events-none absolute inset-0" aria-hidden />
+      <p className="relative text-body text-ink/60">{t(messageKey)}</p>
       <Link
         href={actionHref}
-        className="hover-stamp border-2 border-ink bg-paper px-4 py-1.5 text-sm font-semibold uppercase text-ink shadow-hard-sm hover:bg-ink hover:text-paper"
+        className="relative bg-ink px-4 py-2 text-secondary font-medium text-paper transition-opacity duration-150 hover:opacity-80"
       >
         {t(actionKey)}
       </Link>

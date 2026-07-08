@@ -1,10 +1,8 @@
 /**
- * ECharts theme «vedomost» (docs/15 §7): #000 only. Series are distinguished
- * by DECAL PATTERNS (solid / 45° hatch / dots / crosshatch), never by hue.
- * Plan = dashed 2px black; fact = solid; rejected = hatch; forecast (P6) =
- * white with dashed border + dotted CI. Gridlines ink-12, labels Plex Mono,
- * tooltips white with 1px black border + hard shadow, draw-in ≤200ms with
- * steps easing — dot-matrix printer feel.
+ * ECharts theme «qalam» (Epic A.2): #000 only, weight-diet calm. Series are
+ * distinguished by DECAL PATTERNS (hatch/dots) only where the pattern carries
+ * meaning, never by hue. Hairline gridlines, 11px mono axis labels, tooltips
+ * as quiet hairline cards, 200ms fade draw-in (no stepped dot-matrix motion).
  */
 
 import { fmtTenge, fmtTengeCompact, type NumLocale } from '@/lib/format';
@@ -12,24 +10,25 @@ import { fmtTenge, fmtTengeCompact, type NumLocale } from '@/lib/format';
 export const INK = '#000';
 export const PAPER = '#fff';
 export const INK_70 = 'rgba(0,0,0,0.7)';
+export const INK_60 = 'rgba(0,0,0,0.6)';
 export const INK_40 = 'rgba(0,0,0,0.4)';
-export const INK_12 = 'rgba(0,0,0,0.12)';
+export const INK_LINE = 'rgba(0,0,0,0.1)'; // hairline gridlines
 
 /** Canvas cannot inherit CSS vars — resolve the mono stack explicitly. */
 export const chartFontFamily = '"IBM Plex Mono", "JetBrains Mono", monospace';
 
-export const CHART_HEIGHT = 320;
-/** Mechanical motion budget (docs/15 §6): ≤200ms. */
+export const CHART_HEIGHT = 300;
+/** Calm motion budget (Epic A.2): 200ms fade, no steps easing. */
 export const ANIMATION_MS = 200;
 
-/** Decal patterns for monochrome series distinction (docs/15 §7). */
+/** Decal patterns — used only where a pattern MEANS something (снятия etc.). */
 export const decals = {
   hatch: {
     symbol: 'rect',
     dashArrayX: [1, 0],
     dashArrayY: [2, 4],
     rotation: Math.PI / 4,
-    color: INK,
+    color: INK_60,
     symbolSize: 1,
   },
   dots: {
@@ -40,32 +39,21 @@ export const decals = {
     ],
     dashArrayY: [6, 0],
     symbolSize: 0.5,
-    color: INK,
-  },
-  crosshatch: {
-    symbol: 'rect',
-    dashArrayX: [1, 0],
-    dashArrayY: [1, 3],
-    rotation: -Math.PI / 4,
-    color: INK,
-    symbolSize: 1,
+    color: INK_60,
   },
 } as const;
-
-/** steps(4) — the §6 dot-matrix draw-in. */
-const steps4 = (k: number) => Math.ceil(k * 4) / 4;
 
 export function baseChartOption(): Record<string, unknown> {
   return {
     // Pin the palette so a series without explicit itemStyle can never fall
-    // back to ECharts' default hues (docs/15 §11: violations impossible).
+    // back to ECharts' default hues.
     color: [INK],
     animationDuration: ANIMATION_MS,
     animationDurationUpdate: ANIMATION_MS,
-    animationEasing: steps4,
-    animationEasingUpdate: steps4,
-    textStyle: { fontFamily: chartFontFamily, color: INK_70 },
-    grid: { left: 8, right: 8, top: 44, bottom: 4, containLabel: true },
+    animationEasing: 'cubicOut',
+    animationEasingUpdate: 'cubicOut',
+    textStyle: { fontFamily: chartFontFamily, color: INK_60 },
+    grid: { left: 8, right: 8, top: 40, bottom: 4, containLabel: true },
   };
 }
 
@@ -73,13 +61,9 @@ export function monthAxis(labels: string[]): Record<string, unknown> {
   return {
     type: 'category',
     data: labels,
-    axisLine: { lineStyle: { color: INK, width: 1 } },
+    axisLine: { lineStyle: { color: INK_LINE, width: 1 } },
     axisTick: { show: false },
-    axisLabel: {
-      color: INK_70,
-      fontFamily: chartFontFamily,
-      fontSize: 12,
-    },
+    axisLabel: { color: INK_60, fontFamily: chartFontFamily, fontSize: 11 },
   };
 }
 
@@ -88,11 +72,11 @@ export function tengeAxis(locale: NumLocale): Record<string, unknown> {
     type: 'value',
     axisLine: { show: false },
     axisTick: { show: false },
-    splitLine: { lineStyle: { color: INK_12 } },
+    splitLine: { lineStyle: { color: INK_LINE } },
     axisLabel: {
-      color: INK_70,
+      color: INK_60,
       fontFamily: chartFontFamily,
-      fontSize: 12,
+      fontSize: 11,
       formatter: (value: number) => fmtTengeCompact(value, locale),
     },
   };
@@ -102,10 +86,8 @@ export function tengeAxis(locale: NumLocale): Record<string, unknown> {
 export type LegendEntry = string | { name: string; icon?: string };
 
 /**
- * Legend row; names in `disabled` render deselected — used for the
- * "болжам (P6)" placeholder (no data behind it until P6). Legend markers
- * inherit each series' decal/line style, so patterns (not hues) tell them
- * apart; bar entries must pass icon 'rect' to kill the rounded default.
+ * Quiet legend row; names in `disabled` render deselected (the "болжам (P6)"
+ * placeholder). Markers inherit each series' style — pattern/dash, not hue.
  */
 export function chartLegend(
   entries: LegendEntry[],
@@ -116,17 +98,14 @@ export function chartLegend(
   return {
     top: 0,
     left: 0,
-    itemWidth: 16,
-    itemHeight: 10,
+    itemWidth: 14,
+    itemHeight: 8,
+    itemGap: 16,
     data: entries,
     selected,
     inactiveColor: INK_40,
     inactiveBorderColor: INK_40,
-    textStyle: {
-      color: INK_70,
-      fontFamily: chartFontFamily,
-      fontSize: 11,
-    },
+    textStyle: { color: INK_60, fontFamily: chartFontFamily, fontSize: 11 },
   };
 }
 
@@ -136,25 +115,24 @@ interface TooltipParam {
   dataIndex?: number;
 }
 
-/** Document-style tooltip: paper bg, 1px ink border, hard shadow, mono. */
+/** Quiet tooltip: paper card, hairline frame, mono, no hue pointer. */
 export function tengeTooltip(
   titles: string[],
   axisPointer: 'shadow' | 'line' = 'shadow',
 ): Record<string, unknown> {
   return {
     trigger: 'axis',
-    // Style the pointer explicitly — ECharts defaults are blue-gray hues.
     axisPointer: {
       type: axisPointer,
-      lineStyle: { color: INK, width: 1, type: 'dashed' },
-      shadowStyle: { color: INK_12 },
+      lineStyle: { color: INK_40, width: 1, type: 'dashed' },
+      shadowStyle: { color: 'rgba(0,0,0,0.04)' },
     },
     transitionDuration: 0,
     backgroundColor: PAPER,
     borderColor: INK,
     borderWidth: 1,
     borderRadius: 0,
-    extraCssText: 'box-shadow: 4px 4px 0 0 #000;',
+    extraCssText: 'box-shadow: 0 1px 0 rgba(0,0,0,0.1);',
     textStyle: { fontFamily: chartFontFamily, fontSize: 12, color: INK },
     formatter: (params: TooltipParam | TooltipParam[]) => {
       const items = Array.isArray(params) ? params : [params];

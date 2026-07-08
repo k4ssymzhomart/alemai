@@ -2,23 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-/* «Ведомость» tokens (docs/15 §3). The ONLY hex values in the frontend live
-   here and in tailwind.config.ts / lib/chartTheme.ts. */
+/* QALAM tokens (Epic A.2). The ONLY hex values in the frontend live here,
+   in tailwind.config.ts, lib/chartTheme.ts and app/icon.svg. */
 :root {
   --ink: #000;
   --paper: #fff;
+  --line: rgba(0, 0, 0, 0.15); /* hairline internal rules/dividers */
   --ink-70: rgba(0, 0, 0, 0.7);
+  --ink-60: rgba(0, 0, 0, 0.6);
   --ink-40: rgba(0, 0, 0, 0.4);
-  --ink-12: rgba(0, 0, 0, 0.12);
-  --shadow-hard: 4px 4px 0 0 var(--ink);
-  --shadow-hard-sm: 2px 2px 0 0 var(--ink);
   --radius: 0;
-  --space-unit: 8px;
 }
 
 @layer base {
   body {
-    @apply bg-paper font-ui text-ink antialiased;
+    @apply bg-paper font-ui text-body text-ink antialiased;
   }
 
   /* Numbers: lining + tabular everywhere by default. */
@@ -28,7 +26,7 @@
       'lnum' 1;
   }
 
-  /* Focus = 2px offset black outline (docs/15 §10), never a soft ring. */
+  /* Focus = 2px offset black outline (the one place 2px survives the diet). */
   :focus-visible {
     outline: 2px solid var(--ink);
     outline-offset: 2px;
@@ -41,70 +39,55 @@
 }
 
 @layer utilities {
-  /* Severity pattern fills (docs/15 §4) — pure black on white, no hues. */
+  /* The ONLY uppercase in the product: 11px letterspaced micro-labels. */
+  .label-micro {
+    @apply font-mono text-micro uppercase text-ink/60;
+  }
+
+  /* Severity pattern fills (docs/15 §4, reduced mass): step 4px, ~50% ink. */
   .fill-hatch {
     background-image: repeating-linear-gradient(
       45deg,
       var(--ink) 0,
       var(--ink) 1px,
       transparent 1px,
-      transparent 3px
+      transparent 4px
     );
-  }
-  .fill-hatch-light {
-    background-image: repeating-linear-gradient(
-      45deg,
-      var(--ink-12) 0,
-      var(--ink-12) 2px,
-      transparent 2px,
-      transparent 6px
-    );
-  }
-  .fill-dots {
-    background-image: radial-gradient(var(--ink) 1px, transparent 1px);
-    background-size: 7px 7px;
+    opacity: 0.5;
   }
   .fill-dots-faint {
-    background-image: radial-gradient(var(--ink-12) 1px, transparent 1px);
-    background-size: 8px 8px;
-  }
-
-  /* Stamp-like hover inversion: 120ms steps(2) — a stamp, not a fade. */
-  .hover-stamp {
-    transition:
-      background-color 120ms steps(2, end),
-      color 120ms steps(2, end);
+    background-image: radial-gradient(var(--ink) 1px, transparent 1px);
+    background-size: 10px 10px;
+    opacity: 0.05;
   }
 }
 
-/* Alert ticker («БЕГУЩАЯ СТРОКА», docs/15 §5): duplicated track scrolls
-   left, pauses on hover, disabled for reduced motion. */
-@keyframes ticker-scroll {
+/* Alert wire (Epic A.2): a single quiet line under the header — each rotated
+   item crossfades in (the component re-keys on change), NOT a scrolling
+   marquee. Reduced motion freezes it. */
+@keyframes wire-in {
   from {
-    transform: translateX(0);
+    opacity: 0;
   }
   to {
-    transform: translateX(-50%);
+    opacity: 1;
   }
 }
-.ticker-track {
-  animation: ticker-scroll 36s linear infinite;
-}
-.ticker:hover .ticker-track {
-  animation-play-state: paused;
+.wire-item {
+  animation: wire-in 500ms ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .ticker-track {
+  .wire-item {
     animation: none;
+    opacity: 1;
   }
   .animate-pulse {
     animation: none;
   }
 }
 
-/* Print (docs/15 §6): hide chrome, screens print as A4 documents.
-   print-color-adjust keeps inverted blocks, bar fills and pattern
-   backgrounds — the severity system itself — on paper. */
+/* Print: hide chrome, screens print as A4 documents; keep the demo footer.
+   print-color-adjust preserves the few ink fills that carry meaning. */
 @media print {
   * {
     -webkit-print-color-adjust: exact;
@@ -121,6 +104,6 @@
   }
   @page {
     size: A4;
-    margin: 14mm;
+    margin: 16mm;
   }
 }

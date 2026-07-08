@@ -1,9 +1,9 @@
 'use client';
 
 /**
- * ExecutionBar / HatchBar (docs/15 §4): the plan/fact/forecast bar.
- * Filled black = fact, hatched = forecast (P6, optional), dotted = remainder,
- * plan-to-date mark = 2px vertical tick. All values in ₸ against planYear.
+ * ExecutionBar (Epic A.2): a thin plan/fact/forecast bar. Solid ink = fact
+ * (data mark), hairline forecast segment, faint remainder, plan-to-date mark
+ * = 2px ink tick. Kept slim so 11 stacked rows stay calm, not heavy.
  */
 export default function ExecutionBar({
   planYear,
@@ -24,10 +24,7 @@ export default function ExecutionBar({
   const tickPct = planYtd != null ? clamp((planYtd / planYear) * 100) : null;
 
   return (
-    <div className="relative h-3 w-full min-w-24 border border-ink bg-paper">
-      {/* dotted remainder underlay */}
-      <div className="fill-dots-faint absolute inset-0" aria-hidden />
-      {/* hatched forecast segment (behind fact) */}
+    <div className="relative h-1.5 w-full min-w-24 border border-ink/25 bg-paper">
       {forecastPct != null && forecastPct > factPct ? (
         <div
           className="fill-hatch absolute inset-y-0 left-0"
@@ -35,16 +32,14 @@ export default function ExecutionBar({
           aria-hidden
         />
       ) : null}
-      {/* solid fact segment */}
       <div
         className="absolute inset-y-0 left-0 bg-ink"
         style={{ width: `${factPct}%` }}
         aria-hidden
       />
-      {/* plan-to-date tick */}
       {tickPct != null ? (
         <div
-          className="absolute -inset-y-0.5 w-0.5 bg-ink"
+          className="absolute -inset-y-1 w-0.5 bg-ink"
           style={{ left: `${tickPct}%` }}
           aria-hidden
         />

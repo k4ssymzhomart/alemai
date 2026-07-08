@@ -44,24 +44,22 @@ export default function OverviewPage() {
   const m = overview.data;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-h1 font-medium uppercase tracking-tight text-ink">
-            {t('overview.title')}
-          </h1>
+          <h1 className="font-display text-h1 text-ink">{t('overview.title')}</h1>
           {m?.as_of ? (
-            <p className="mt-1 font-mono text-caption uppercase text-ink/70">
+            <p className="mt-1 label-micro">
               {t('overview.as_of', { period: fmtPeriod(m.as_of) })}
             </p>
           ) : null}
         </div>
-        <label className="flex items-center gap-2 text-caption font-medium uppercase text-ink/70">
+        <label className="flex items-center gap-2 label-micro">
           {t('common.year')}
           <select
             value={year}
             onChange={(event) => setYear(Number(event.target.value))}
-            className="border border-ink bg-paper px-2 py-1.5 font-mono text-xs font-medium text-ink"
+            className="border border-ink/15 bg-paper px-2 py-1.5 font-mono text-secondary text-ink"
           >
             {YEARS.map((y) => (
               <option key={y} value={y}>
@@ -75,8 +73,8 @@ export default function OverviewPage() {
       {overview.error ? (
         <ErrorState detail={overview.error} onRetry={overview.retry} />
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
-          <div className="col-span-2 row-span-1 lg:col-span-1 xl:col-span-2">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-5">
+          <div className="col-span-2 xl:col-span-2">
             <KpiTile
               big
               label={t('overview.kpi.execution_ytd')}
@@ -110,12 +108,12 @@ export default function OverviewPage() {
         </div>
       )}
 
-      <section className="border-2 border-ink bg-paper">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-ink px-4 py-2.5">
-          <h2 className="font-display text-h2 font-medium uppercase text-ink">
+      <section className="border border-ink/15 bg-paper">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink/15 px-4 py-3">
+          <h2 className="flex items-center gap-2 font-display text-h3 text-ink">
             {t('overview.table.title')}
             {lines.data ? (
-              <span className="ml-2 border border-ink px-1.5 py-0.5 font-mono text-xs font-medium tabular-nums">
+              <span className="font-mono text-secondary text-ink/50 tabular-nums">
                 {lines.data.total}
               </span>
             ) : null}
@@ -124,7 +122,7 @@ export default function OverviewPage() {
             <div
               role="group"
               aria-label={t('common.source')}
-              className="flex border border-ink"
+              className="flex border border-ink/15"
             >
               {FUNDING_FILTERS.map((value) => (
                 <button
@@ -133,10 +131,10 @@ export default function OverviewPage() {
                   onClick={() => setFunding(value)}
                   aria-pressed={funding === value}
                   className={clsx(
-                    'hover-stamp px-2.5 py-1 text-xs font-semibold uppercase',
+                    'px-2.5 py-1 text-secondary transition-colors duration-150',
                     funding === value
                       ? 'bg-ink text-paper'
-                      : 'bg-paper text-ink hover:bg-ink hover:text-paper',
+                      : 'text-ink/60 hover:bg-ink/[.03] hover:text-ink',
                   )}
                 >
                   {value === 'all' ? t('common.all') : t(`funding.${value}`)}
@@ -149,7 +147,7 @@ export default function OverviewPage() {
                 setCareType(event.target.value as CareType | 'all')
               }
               aria-label={t('overview.table.care_type')}
-              className="border border-ink bg-paper px-2 py-1.5 text-xs font-medium text-ink"
+              className="border border-ink/15 bg-paper px-2 py-1.5 text-secondary text-ink"
             >
               <option value="all">{t('common.all')}</option>
               {CARE_TYPE_FILTERS.map((value) => (
