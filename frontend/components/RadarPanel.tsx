@@ -46,14 +46,20 @@ export default function RadarPanel() {
     try {
       const res = await api.post<RadarCheckResult>('/radar/check');
       setRows(res.rows);
+    } catch {
+      /* offline / blocked — rows keep their last state, no unhandled rejection */
     } finally {
       setBusy(false);
     }
   };
 
   const confirm = async (id: string) => {
-    const updated = await api.post<RadarRow>(`/radar/${id}/confirm`);
-    setRows((rs) => (rs ? rs.map((r) => (r.source_id === id ? updated : r)) : rs));
+    try {
+      const updated = await api.post<RadarRow>(`/radar/${id}/confirm`);
+      setRows((rs) => (rs ? rs.map((r) => (r.source_id === id ? updated : r)) : rs));
+    } catch {
+      /* ignore — no unhandled rejection */
+    }
   };
 
   return (

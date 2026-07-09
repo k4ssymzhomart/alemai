@@ -20,11 +20,10 @@ export function middleware(request: NextRequest) {
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
-  if (hasSession && isPublic) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/overview';
-    return NextResponse.redirect(url);
-  }
+  // NB: we do NOT bounce cookie-holders off /login. Middleware can't verify the
+  // signature; a present-but-invalid cookie would ping-pong /login↔/overview
+  // forever (adversarial review #8). SessionProvider routes a VALID session
+  // away from /login after /auth/me succeeds; an invalid one lands + stays here.
   return NextResponse.next();
 }
 

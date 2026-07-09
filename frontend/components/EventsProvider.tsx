@@ -38,6 +38,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
   const [unread, setUnread] = useState(0);
   const [epoch, setEpoch] = useState(0);
   const newestRef = useRef<string | null>(null);
+  const seededRef = useRef(false);
 
   const poll = useCallback(async () => {
     try {
@@ -45,8 +46,13 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       const newest = data.items[0]?.id ?? null;
       if (newest !== newestRef.current) {
         newestRef.current = newest;
-        setEpoch((n) => n + 1); // new event → invalidate every screen's cache
+        // The first poll only records the watermark — don't bump the epoch, or
+        // every screen refetches a second time on load (adversarial review #12).
+        if (seededRef.current) {
+          setEpoch((n) => n + 1); // new event → invalidate every screen's cache
+        }
       }
+      seededRef.current = true;
       setEvents(data.items);
       setUnread(data.unread);
     } catch {
@@ -59,6 +65,7 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       setEvents([]);
       setUnread(0);
       newestRef.current = null;
+      seededRef.current = false; // re-seed on the next session's first poll
       return;
     }
     void poll();

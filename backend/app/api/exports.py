@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.api.deps import DenyCurator
 from app.config import get_settings
 from app.db import get_db
 from app.models.claim import Claim
@@ -74,7 +75,7 @@ def _latest_run(db: Session, scope: str) -> RuleRun:
     return run
 
 
-@router.get("/prebilling.xlsx")
+@router.get("/prebilling.xlsx", dependencies=[DenyCurator])
 def export_prebilling(
     db: DbDep,
     scope: Annotated[str, Query(description="e.g. 'period:2025-11'")] = "period:2025-11",
@@ -134,7 +135,7 @@ def export_prebilling(
     return xlsx_response(data, export_filename("prebilling"))
 
 
-@router.get("/reconcile-bucket/{bucket_no}.xlsx")
+@router.get("/reconcile-bucket/{bucket_no}.xlsx", dependencies=[DenyCurator])
 def export_reconcile_bucket(
     db: DbDep, bucket_no: Annotated[int, Path(ge=1, le=4)]
 ) -> StreamingResponse:
@@ -199,7 +200,7 @@ def export_overview(db: DbDep, year: int = 2026) -> StreamingResponse:
     return xlsx_response(data, export_filename("overview"))
 
 
-@router.get("/quarantine/{file_id}.xlsx")
+@router.get("/quarantine/{file_id}.xlsx", dependencies=[DenyCurator])
 def export_quarantine(db: DbDep, file_id: uuid.UUID) -> StreamingResponse:
     """Quarantined rows of one import — the fix list for the МИС operator."""
     import_file = db.get(ImportFile, file_id)

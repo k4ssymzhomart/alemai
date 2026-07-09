@@ -25,7 +25,7 @@ from app.services.auth import Principal
 # Universal ru+kk marker (newline-agnostic; the decoy «Дата обновления:» above it
 # is not matched). official_sources.csv §0.
 VERSION_RE = re.compile(r"(?:Обновленный\s+)?с изменениями на:\s*(\d{2}\.\d{2}\.\d{4})")
-_FETCH_TIMEOUT = 8.0
+_FETCH_TIMEOUT = 6.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,12 +127,25 @@ def _fetch_version(url: str) -> str | None:
 
 
 def run_checks(db: Session, principal: Principal | None) -> dict[str, int]:
-    """Live-check every source; upsert radar_checks; emit an event per stale one."""
+    """Live-check every source; upsert radar_checks; emit an event per stale one.
+
+    Fetches ALL mirrors first (no DB access), then does one quick DB pass — the
+    request-scoped transaction must not stay open for ~30s of serial HTTP
+    (idle-in-transaction; adversarial review #7).
+    """
     from app.services import events as events_svc  # local: avoid import cycle
 
+    # Phase 1 — network only, no DB.
+    detected_by_id: dict[str, str | None] = {
+        src.id: (_fetch_version(src.mirror_url)
+                 if (src.fetchable and src.mirror_url) else None)
+        for src in RADAR_SOURCES
+    }
+
+    # Phase 2 — quick DB pass (upsert + events + one commit).
     summary = {"ok": 0, "stale": 0, "unreachable": 0, "manual": 0}
     for src in RADAR_SOURCES:
-        detected = _fetch_version(src.mirror_url) if (src.fetchable and src.mirror_url) else None
+        detected = detected_by_id[src.id]
         status = _status_for(src.our_version, detected, fetchable=src.fetchable)
         summary[status] = summary.get(status, 0) + 1
         message = {

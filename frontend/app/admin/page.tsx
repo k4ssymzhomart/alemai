@@ -133,6 +133,8 @@ function ThresholdsSection() {
     try {
       await api.put<Thresholds>('/admin/thresholds', values);
       setSaved(true);
+    } catch {
+      /* denied / offline — no unhandled rejection; button just re-enables */
     } finally {
       setSaving(false);
     }

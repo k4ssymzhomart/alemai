@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.api.deps import OptionalPrincipal
+from app.api.deps import CurrentPrincipal, DenyCurator
 from app.db import get_db
 from app.schemas.admin import DemoResetResult, ThresholdsIn, ThresholdsOut
 from app.services import events as events_svc
@@ -34,11 +34,14 @@ def read_thresholds(db: DbDep) -> ThresholdsOut:
     return ThresholdsOut(**get_thresholds(db))
 
 
-@router.put("/thresholds", response_model=ThresholdsOut)
+@router.put("/thresholds", response_model=ThresholdsOut, dependencies=[DenyCurator])
 def update_thresholds(
-    body: ThresholdsIn, db: DbDep, principal: OptionalPrincipal
+    body: ThresholdsIn, db: DbDep, principal: CurrentPrincipal
 ) -> ThresholdsOut:
-    """Persist risk thresholds and emit a threshold_changed event (realtime feed)."""
+    """Persist risk thresholds and emit a threshold_changed event (realtime feed).
+
+    Requires an authenticated principal (401 otherwise); curator denied (403).
+    """
     before = get_thresholds(db)
     values = body.model_dump()
     set_config(db, THRESHOLDS_KEY, values)

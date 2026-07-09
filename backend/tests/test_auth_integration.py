@@ -99,3 +99,30 @@ def test_service_token_bypasses_curator_scope(client: TestClient) -> None:
         headers={"X-Service-Token": get_settings().service_token},
     )
     assert resp.status_code == 200
+
+
+def test_curator_denied_case_level_xlsx_exports(client: TestClient) -> None:
+    """Adversarial review #2: XLSX exports must honour curator scope too."""
+    curator = TestClient(app)
+    _login(curator, "curator")
+    assert curator.get("/api/v1/exports/prebilling.xlsx").status_code == 403
+    assert curator.get("/api/v1/exports/reconcile-bucket/1.xlsx").status_code == 403
+    # aggregate export stays open
+    assert curator.get("/api/v1/exports/overview.xlsx").status_code == 200
+    econ = TestClient(app)
+    _login(econ, "economist")
+    assert econ.get("/api/v1/exports/prebilling.xlsx").status_code == 200
+
+
+def test_thresholds_put_requires_auth_and_denies_curator(client: TestClient) -> None:
+    """Adversarial review #4: threshold mutation is privileged."""
+    body = {"under_pct": 90, "over_pct": 105, "burnout_days": 45,
+            "materiality_tenge": 100000}
+    anon = TestClient(app)
+    assert anon.put("/api/v1/admin/thresholds", json=body).status_code == 401
+    curator = TestClient(app)
+    _login(curator, "curator")
+    assert curator.put("/api/v1/admin/thresholds", json=body).status_code == 403
+    admin = TestClient(app)
+    _login(admin, "admin")
+    assert admin.put("/api/v1/admin/thresholds", json=body).status_code == 200
