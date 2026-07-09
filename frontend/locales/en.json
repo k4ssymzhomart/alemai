@@ -186,7 +186,38 @@
     "lead": "Three-way reconciliation: MIS ↔ bill ↔ payment",
     "rows": "{{n}} rows",
     "highlight": "Delivered but not billed — missed revenue",
-    "export": "Export (XLSX)"
+    "export": "Export (XLSX)",
+    "hint": "Click a record to open its card and the next step",
+    "col": {
+      "patient": "Patient",
+      "service": "Service",
+      "date": "Date",
+      "amount": "Amount"
+    },
+    "record": "Record card",
+    "field": {
+      "claim": "Claim ID",
+      "patient": "Patient IIN",
+      "service": "Service",
+      "code": "Service code",
+      "date": "Service date",
+      "amount": "Amount",
+      "bucket": "Reconciliation status"
+    },
+    "action_label": "What to do",
+    "action": {
+      "1": "Delivered but never billed — add the item to the invoice register; this is missed revenue.",
+      "2": "Item rejected by the Fund — file an objection in time or the removal becomes final.",
+      "3": "Accepted but unpaid — track the payment deadline and escalate if overdue.",
+      "4": "Paid and matching across all three worlds — no action needed."
+    },
+    "cta": {
+      "1": "To register review →",
+      "2": "File an objection →",
+      "3": "To register review →"
+    },
+    "close": "Close",
+    "showing": "Showing {{n}} of {{total}}"
   },
   "settings": {
     "title": "Settings",
@@ -329,7 +360,50 @@
       "report_due": "report/campaign deadline",
       "korrektirovka_window": "adjustment window",
       "invoice_due": "invoice due"
-    }
+    },
+    "months": {
+      "1": "January",
+      "2": "February",
+      "3": "March",
+      "4": "April",
+      "5": "May",
+      "6": "June",
+      "7": "July",
+      "8": "August",
+      "9": "September",
+      "10": "October",
+      "11": "November",
+      "12": "December"
+    },
+    "weekdays": {
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat",
+      "7": "Sun"
+    },
+    "today": "Today",
+    "prev": "Previous month",
+    "next": "Next month",
+    "legend_title": "Legend",
+    "legend": {
+      "objection": "Objection",
+      "window": "Adjustment window",
+      "report": "Report / campaign"
+    },
+    "selected": "Events · {{date}}",
+    "empty_day": "No events on this day",
+    "pick_day": "Pick a marked day to see details and the next step",
+    "upcoming": "Upcoming deadlines",
+    "more": "{{count}} more",
+    "go_prebilling": "Open objection review →",
+    "go_reconcile": "Open volume reconciliation →",
+    "window_active": "active until {{date}}",
+    "in_days": "in {{count}} days",
+    "overdue": "overdue",
+    "today_badge": "today"
   },
   "anomalies": {
     "lead": "Doctor-workload outliers — require review",
