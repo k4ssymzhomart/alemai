@@ -142,6 +142,8 @@ export interface RuleFinding {
     care_type?: string;
     message_kk?: string;
     message_ru?: string;
+    source_url?: string;
+    source_label?: string;
     evidence?: Record<string, unknown>;
   } | null;
 }
