@@ -34,6 +34,8 @@ DB_BACKED_PATHS = {
     "/api/v1/exports/overview.xlsx",
     "/api/v1/exports/reconcile-bucket/{bucket_no}.xlsx",
     "/api/v1/exports/quarantine/{file_id}.xlsx",
+    # does a live external fetch (fms.ecc.kz) — would add a 6s timeout to smoke.
+    "/api/v1/radar/provider-status",
 }
 
 

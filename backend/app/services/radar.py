@@ -19,6 +19,7 @@ import httpx
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.models.events import RadarCheck
 from app.services.auth import Principal
 
@@ -26,6 +27,21 @@ from app.services.auth import Principal
 # is not matched). official_sources.csv §0.
 VERSION_RE = re.compile(r"(?:Обновленный\s+)?с изменениями на:\s*(\d{2}\.\d{2}\.\d{4})")
 _FETCH_TIMEOUT = 6.0
+
+# ФСМС registry of healthcare subjects — static HTML, no login (docs/25 H0.4).
+PROVIDER_REGISTRY_URL = "https://fms.ecc.kz/ru/fsms/healthcare_subjects"
+
+
+def _spaced(n: int) -> str:
+    return f"{n:,}".replace(",", " ")
+
+
+# МРП 2026 + the 200/800-МРП reputational thresholds, derived from config (H0.2).
+_MRP = get_settings().mrp_tenge
+MRP_VERSION = (
+    f"МРП {_spaced(_MRP)} ₸ (2026) · пороги 200/800 МРП = "
+    f"{_spaced(200 * _MRP)} / {_spaced(800 * _MRP)} ₸"
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -89,11 +105,17 @@ RADAR_SOURCES: tuple[RadarSource, ...] = (
         "https://adilet.zan.kz/rus/docs/P1900000421", True,
     ),
     RadarSource(
-        "mrp_kpn", "МРП / КПН (подушевой норматив)", "АЕК / ЖБШН",
-        "3 932 ₸ (2025) · КПН 1710", None,
+        "mrp_kpn", "МРП / пороги ответственности (200/800 МРП)", "АЕК / жауапкершілік шектері",
+        MRP_VERSION, None,
         "https://adilet.zan.kz/rus/docs/V2000021550",
         None,
         "https://adilet.zan.kz/rus/docs/V2000021550", False,  # no clean machine marker
+    ),
+    RadarSource(
+        "providers_fsms", "Реестр поставщиков ФСМС", "ӘМСҚ жеткізушілер тізілімі",
+        "в реестре", None,
+        PROVIDER_REGISTRY_URL, None,
+        PROVIDER_REGISTRY_URL, False,  # registry page, not a dated НПА → manual link
     ),
 )
 SOURCE_BY_ID: dict[str, RadarSource] = {s.id: s for s in RADAR_SOURCES}
@@ -124,6 +146,30 @@ def _fetch_version(url: str) -> str | None:
         return None
     match = VERSION_RE.search(resp.text)
     return match.group(1) if match else None
+
+
+def check_provider_registry() -> dict:
+    """Reachability + presence check of the ФСМС healthcare-subjects registry
+    (H0.4). Degrades to a manual quick-link (reachable=False) when the venue is
+    offline / the host blocks the fetch."""
+    reachable = False
+    in_registry = False
+    try:
+        resp = httpx.get(PROVIDER_REGISTRY_URL, timeout=_FETCH_TIMEOUT,
+                         follow_redirects=True,
+                         headers={"User-Agent": "Mozilla/5.0 QalamRadar"})
+        resp.raise_for_status()
+        reachable = True
+        low = resp.text.lower()
+        in_registry = "субъект" in low or "healthcare" in low or "бин" in low
+    except (httpx.HTTPError, httpx.InvalidURL):
+        reachable = False
+    return {
+        "url": PROVIDER_REGISTRY_URL,
+        "reachable": reachable,
+        "in_registry": in_registry,
+        "checked_at": _now().isoformat(),
+    }
 
 
 def run_checks(db: Session, principal: Principal | None) -> dict[str, int]:

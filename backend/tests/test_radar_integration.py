@@ -36,11 +36,15 @@ def client() -> TestClient:
 
 def test_radar_seeded_states(client: TestClient) -> None:
     rows = {r["source_id"]: r for r in client.get("/api/v1/radar").json()["rows"]}
-    assert len(rows) == 7
+    assert len(rows) == 8  # + ФСМС provider registry (H0.4)
     assert rows["monitoring"]["status"] == "ok"
     assert rows["tarif"]["status"] == "stale"  # deliberate mock (our < official)
     assert rows["tarif"]["detected_version"] == "31.12.2025"
     assert rows["mrp_kpn"]["status"] == "manual"
+    # МРП-2026 thresholds surface as real ₸ (200/800 МРП, H0.2)
+    assert "865 000" in rows["mrp_kpn"]["our_version"]
+    assert "3 460 000" in rows["mrp_kpn"]["our_version"]
+    assert rows["providers_fsms"]["status"] == "manual"
     # every fetchable source exposes an official link
     assert all(r["official_url"].startswith("https://") for r in rows.values())
 

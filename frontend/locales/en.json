@@ -3,7 +3,8 @@
     "title": "Qalam",
     "tagline": "Financial autopilot for contract execution",
     "org": "City Polyclinic #14",
-    "scope_city": "Astana · 14 clinics"
+    "scope_city": "Astana · 14 clinics",
+    "fsms_registry": "FSMS registry"
   },
   "nav": {
     "overview": "Overview",
