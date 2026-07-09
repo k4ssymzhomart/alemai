@@ -31,6 +31,8 @@ services:
       RAPIDAPI_KEY: ${RAPIDAPI_KEY:-}
       LLM_TITLES: ${LLM_TITLES:-off}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      # Local seeding is `make seed`; only cloud deploys set SEED_ON_BOOT=1 (H5).
+      SEED_ON_BOOT: ${SEED_ON_BOOT:-}
     volumes:
       # read-only mounts: app.seed runs datagen from /datagen (make seed);
       # /shared exposes glossary.csv and reference data to the backend

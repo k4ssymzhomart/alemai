@@ -31,6 +31,15 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     application.include_router(api_router, prefix=settings.api_v1_prefix)
+
+    @application.on_event("startup")
+    def _seed_on_boot() -> None:
+        # Cloud deploys (Render) set SEED_ON_BOOT=1 to bootstrap a scratch DB;
+        # a no-op locally (make seed owns local seeding). H5.
+        from app.services.bootstrap import bootstrap_on_boot
+
+        bootstrap_on_boot()
+
     return application
 
 
