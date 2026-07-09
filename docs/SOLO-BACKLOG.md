@@ -72,6 +72,14 @@ Overview findings folded in (lead's screenshot review):
 - [ ] Update docs/09 demo-script numbers from the manifest
 - [ ] AC: two QA run logs; reset timing; video file path; asset cards committed; `git grep -i rapidapi` clean
 
+## EPIC F — Ingest & exchange (DONE 2026-07-09, branch claude/qalam-file-exchange-c2d920)
+
+- [x] F1 import МИС-реестра: POST /imports/mis-registry (XLSX/CSV, пресет «Damumed: реестр услуг», карантин с причинами, идемпотентный upsert по natural key, авто-запуск правил); экран «Импорт» (dropzone → Файл танылды → Маппинг → Нәтиже → «Тексеруді іске қосу»); демо-файлы генерируются из живой БД (GET /imports/samples/*) — нулевой дрейф с сидом
+- [x] F2 exports (openpyxl): исключения пре-биллинга / bucket сверки / план-факт Overview / карантин; qalam_<screen>_<date>.xlsx, числа числами; read-back скрипт scripts→backend/scripts/verify_xlsx_exports.py 16/16
+- [x] F3 доп. соглашение: POST /imports/contract-annex?preview=1 — диф «было → станет, Δ₸», без записи («қолдану — пилотта»); annex_2026.xlsx: МРТ +5,7 млн (объёмы из beat-3 обращения), стоматология −8,7 млн
+- [x] F4 demo assets: qa_golden 16→30 checks (round-trip + идемпотентность + неизменность golden); QA-CHECKLIST beat-4-prelude; слайд 7 «[Загружает XLSX из Damumed]…»; crib-карта «Как данные попадают в систему?»
+- [x] AC: demo-reset + qa_golden 30/30 ×2; pytest 50/50 (3 новых integration); npm build green; скриншот-сет kk; санитарные grep'ы чистые
+
 ## Deferred to post-demo (from the old P-queue, if time never allows)
 
 P6 full forecast engine (manifest-precomputed forecasts cover the demo) · P8 live RAG/eval ≥22/24 · P9 city panel full + alerts engine · PD3 full 12-role matrix · adapter round-trip demo.
