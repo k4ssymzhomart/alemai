@@ -48,7 +48,7 @@ def _intro(ctx: ObrashenieContext, lang: str, label: str) -> str:
     exec_str = fmt_pct(ctx.line.execution_pct_ytd)
     if lang == "kk":
         return (
-            f"{ctx.year} жылғы сатып алу шарты бойынша «{label}» желісінде игерілу "
+            f"{ctx.year} жылғы сатып алу шарты бойынша «{label}» жолында игерілу "
             f"жоспарланғаннан жоғары қарқынмен жүруде (ағымдағы игерілу — {exec_str}). "
             "Ағымдағы қарқын сақталса, жылдық көлем мерзімінен бұрын таусылады."
         )
@@ -91,7 +91,7 @@ def _grounds(ctx: ObrashenieContext, lang: str) -> list[str]:
     rem = fmt_tenge(ctx.free_remainder)
     if lang == "kk":
         return [
-            f"Негіз 26-тш.: сверка деректері бойынша факт-жоспардан асу — {over}.",
+            f"Негіз 26-тш.: салыстыру деректері бойынша факт-жоспардан асу — {over}.",
             f"Негіз 25-тш.: шарт бойынша бос қаражат қалдығы — {rem} "
             "(қайта бөлу көзі).",
         ]
@@ -106,7 +106,7 @@ def _request(ctx: ObrashenieContext, lang: str, label: str) -> str:
     amount = fmt_tenge(ctx.requested_amount)
     if lang == "kk":
         return (
-            f"Жоғарыда көрсетілген негіздер бойынша «{label}» желісі бойынша "
+            f"Жоғарыда көрсетілген негіздер бойынша «{label}» жолы бойынша "
             f"{amount} сомасына қосымша көлем орналастыруды (қосымша келісім жасауды) "
             "сұраймыз."
         )

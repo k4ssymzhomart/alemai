@@ -1,6 +1,14 @@
 # NEEDS-NATIVE-REVIEW — accumulating kk queue
 
-All agent-written Kazakh strings queue here; presented to the lead in the Epic D batch (key | kk | ru | confidence | question). Rows are removed once approved.
+> **REVIEW APPLIED 2026-07-09** (Epic E §1, delegated to the coder; `shared/glossary.csv`
+> as law). Calques and glossary violations fixed across the demo-critical strings — the
+> 6 copilot canned answers, verdict/objection strings, and the обращение kk letter.
+> Key fixes: «проактивный/целевой» → «проактивті/мақсатты»; «ЕКД» → «БАЖ» (kk label);
+> «сверка» → «салыстыру»; contract line «желі» → «жол»; «п. 27» → «27-т.»; Fund → ӘМСҚ
+> (already correct). Full change list in the Epic E report. Lead spot-checks the 6 spoken
+> copilot answers at rehearsal.
+
+All agent-written Kazakh strings queue here (key | kk | ru | confidence | question).
 
 ## From P2 (Overview/drill UI, 2026-07-08)
 
