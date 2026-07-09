@@ -63,11 +63,13 @@ DATA_TABLES: tuple[str, ...] = (
     "app_config",
     "audit_log",
     "claims",
+    "comments",
     "contract_lines",
     "contract_versions",
     "contracts",
     "deadlines",
     "doctors",
+    "document_versions",
     "events",
     "findings",
     "forecasts",
@@ -83,6 +85,7 @@ DATA_TABLES: tuple[str, ...] = (
     "rule_runs",
     "rules",
     "service_group_map",
+    "share_links",
     "users",
 )
 
@@ -173,6 +176,33 @@ def seed_users(connection: Connection) -> int:
     return len(SEED_USERS)
 
 
+def seed_deadlines(connection: Connection) -> int:
+    """Seed the regulatory deadline calendar (H2 Календарь), including the
+    pre-announced 01.01.2027 перечни update (docs/25 H0.5)."""
+    import uuid as _uuid
+
+    rows = [
+        ("report_due", "2027-01-01", "2027-01-01",
+         "Плановое обновление перечней ПП №672/№421 — проверить маппинг источников"),
+        ("korrektirovka_window", "2026-09-01", "2026-09-30",
+         "Ежеквартальная сверка объёмов (III квартал)"),
+        ("report_due", "2026-11-10", "2026-11-10",
+         "Кампания прикрепления населения — крайний срок"),
+        ("korrektirovka_window", "2026-11-01", "2027-02-01",
+         "Окно-запрет корректировок объёмов (01.11–01.02)"),
+    ]
+    for kind, starts, ends, note in rows:
+        connection.execute(
+            text(
+                "INSERT INTO deadlines (id, kind, starts, ends, note) "
+                "VALUES (:id, :k, :s, :e, :n)"
+            ),
+            {"id": str(_uuid.uuid4()), "k": kind, "s": starts, "e": ends, "n": note},
+        )
+    print(f"seed: inserted {len(rows)} deadlines")
+    return len(rows)
+
+
 def stamp_reset(connection: Connection) -> None:
     """Stamp the demo-reset timestamp into app_config (G4 «Жүйе туралы»)."""
     import datetime
@@ -236,6 +266,7 @@ def main(argv: list[str] | None = None) -> int:
     with engine.begin() as connection:
         load_tables(connection, out_dir)
         seed_users(connection)
+        seed_deadlines(connection)
         stamp_reset(connection)
         from app.services.radar import seed_initial as seed_radar
         seed_radar(connection)

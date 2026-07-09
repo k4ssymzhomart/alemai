@@ -3,11 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Swappable logo slot (docs/15 §8, renamed Epic A.2): shows the wordmark
- * «Qalam» (lowercase, Literata display, sentence case, thin rule under) until
- * /brand/logo.svg loads. A hidden probe <img> flips the state, re-checked on
- * mount so a cached drop-in never misses; uploads are grayscale-forced.
- * Dropping a file into frontend/public/brand/logo.svg swaps it, zero code.
+ * Brand logo slot (rebrand v3, docs/25 H1): renders the real Qalam logo from
+ * /brand/logo.png (in colour — the violet mark is the brand now), with the
+ * wordmark «Qalam» as fallback until it loads. A hidden probe <img> flips the
+ * state, re-checked on mount so a cached drop-in never misses.
  */
 export default function Logo({ height = 22 }: { height?: number }) {
   const [fileExists, setFileExists] = useState(false);
@@ -20,16 +19,12 @@ export default function Logo({ height = 22 }: { height?: number }) {
 
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-img-element -- local swappable asset, no optimizer */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- local brand asset, no optimizer */}
       <img
         ref={imgRef}
-        src="/brand/logo.svg"
+        src="/brand/logo.png"
         alt="Qalam"
-        style={
-          fileExists
-            ? { height, filter: 'grayscale(1) contrast(9)' }
-            : { display: 'none' }
-        }
+        style={fileExists ? { height } : { display: 'none' }}
         onLoad={() => setFileExists(true)}
       />
       {!fileExists ? (

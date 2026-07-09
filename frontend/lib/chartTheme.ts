@@ -9,6 +9,9 @@ import { fmtTenge, fmtTengeCompact, type NumLocale } from '@/lib/format';
 
 export const INK = '#000';
 export const PAPER = '#fff';
+// Rebrand v3 (docs/25 H1): the ONE chart hue — small accents only (forecast
+// line, selected series). Base series stay ink; patterns still carry meaning.
+export const ACCENT = '#5200e0';
 export const INK_70 = 'rgba(0,0,0,0.7)';
 export const INK_60 = 'rgba(0,0,0,0.6)';
 export const INK_40 = 'rgba(0,0,0,0.4)';
@@ -45,9 +48,9 @@ export const decals = {
 
 export function baseChartOption(): Record<string, unknown> {
   return {
-    // Pin the palette so a series without explicit itemStyle can never fall
-    // back to ECharts' default hues.
-    color: [INK],
+    // Pin the palette: primary series ink, a secondary series (forecast) picks
+    // the violet accent — never ECharts' default hues.
+    color: [INK, ACCENT],
     animationDuration: ANIMATION_MS,
     animationDurationUpdate: ANIMATION_MS,
     animationEasing: 'cubicOut',

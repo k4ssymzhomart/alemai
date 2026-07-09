@@ -4,10 +4,10 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 
 /**
- * VerdictBlock (Epic A.2 — de-brutalized): a white card with a hairline frame
- * and a 2px ink left rule, verdict set in the display serif, sentence case.
- * `critical` is the ONE screen element allowed to go solid black — reserved
- * for a critical status or a ≤2-day objection timer.
+ * VerdictBlock (rebrand v3, docs/25 H1): a white card with a hairline frame and
+ * a 2px left rule, verdict in the display serif. `critical` now reads as a
+ * red-tinted left rule over a light band (not solid black) — the band stays
+ * white so the verdict text carries. Print degrades to ink.
  */
 export default function VerdictBlock({
   children,
@@ -21,7 +21,7 @@ export default function VerdictBlock({
       className={clsx(
         'border-l-2 px-6 py-4',
         critical
-          ? 'border border-ink border-l-ink bg-ink text-paper'
+          ? 'border border-critical/30 border-l-critical bg-critical/5 text-ink print:border-ink print:border-l-ink print:bg-paper'
           : 'border border-ink/15 border-l-ink bg-paper text-ink',
       )}
     >

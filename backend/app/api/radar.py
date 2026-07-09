@@ -48,6 +48,16 @@ def run_check(db: DbDep, principal: OptionalPrincipal) -> RadarCheckResult:
     return RadarCheckResult(summary=summary, rows=_rows(db))
 
 
+@router.get("/provider-status")
+def provider_status() -> dict:
+    """ФСМС healthcare-subjects registry status for the org-header badge (H0.4).
+
+    Live reachability check; degrades to a quick-link when offline. No DB, no auth
+    — it's a public registry lookup surfaced as a trust badge.
+    """
+    return radar_svc.check_provider_registry()
+
+
 @router.post("/{source_id}/confirm", response_model=RadarRowOut)
 def confirm_source(source_id: str, db: DbDep) -> RadarRowOut:
     """«Отметить обновлённым» — accept the detected edition as ours (no auto-apply)."""

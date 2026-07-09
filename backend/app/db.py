@@ -30,10 +30,23 @@ class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
+def normalize_database_url(url: str) -> str:
+    """Managed Postgres providers (Render/Heroku/Railway) hand out a bare
+    ``postgres://`` URL; SQLAlchemy 2.0 needs a driver — coerce it to
+    ``postgresql+psycopg://`` so a copy-pasted connection string just works (H5)."""
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url[len("postgresql://"):]
+    return url
+
+
 @lru_cache(maxsize=1)
 def get_engine() -> Engine:
     """Create (once) and return the engine. Does not open a connection."""
-    return create_engine(get_settings().database_url, pool_pre_ping=True)
+    return create_engine(
+        normalize_database_url(get_settings().database_url), pool_pre_ping=True
+    )
 
 
 @lru_cache(maxsize=1)

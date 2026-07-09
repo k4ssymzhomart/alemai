@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import type { RadarCheckResult, RadarResponse, RadarRow } from '@/lib/types';
 
-/** Status glyph — B&W, no color (docs/15 §4): ✓ актуально / ! новее / — недоступно. */
-const GLYPH: Record<RadarRow['status'], string> = {
-  ok: '✓',
-  stale: '!',
-  unreachable: '—',
-  manual: '·',
+/** Status glyph + colour (rebrand v3): ✓ актуально / ! новее / — недоступно. */
+const STATUS_STYLE: Record<RadarRow['status'], { glyph: string; chip: string; dot: string }> = {
+  ok: { glyph: '✓', chip: 'text-ok', dot: 'text-ok' },
+  stale: { glyph: '!', chip: 'border border-warn bg-warn/10 px-1.5 py-0.5 text-ink', dot: 'text-warn' },
+  unreachable: { glyph: '—', chip: 'text-ink/50', dot: 'text-ink/50' },
+  manual: { glyph: '·', chip: 'text-ink/60', dot: 'text-ink/60' },
 };
 
 function checkedTime(iso: string | null): string {
@@ -70,7 +70,7 @@ export default function RadarPanel() {
           type="button"
           onClick={runCheck}
           disabled={busy}
-          className="border border-ink/40 px-3 py-1 label-micro text-ink transition-colors duration-150 hover:bg-ink/[.03] disabled:opacity-40"
+          className="border border-accent px-3 py-1 label-micro text-accent transition-colors duration-150 hover:bg-accent/5 disabled:opacity-40"
         >
           {busy ? t('radar.checking') : t('radar.check')}
         </button>
@@ -107,14 +107,10 @@ export default function RadarPanel() {
                   </td>
                   <td className="px-4 py-2.5">
                     <span
-                      className={
-                        r.status === 'stale'
-                          ? 'inline-flex items-center gap-1 border border-ink px-1.5 py-0.5 label-micro text-ink'
-                          : 'inline-flex items-center gap-1 label-micro text-ink/60'
-                      }
+                      className={`inline-flex items-center gap-1 label-micro ${STATUS_STYLE[r.status].chip}`}
                     >
-                      <span aria-hidden className="font-mono">
-                        {GLYPH[r.status]}
+                      <span aria-hidden className={`font-mono ${STATUS_STYLE[r.status].dot}`}>
+                        {STATUS_STYLE[r.status].glyph}
                       </span>
                       {t(`radar.status_${r.status}`)}
                     </span>

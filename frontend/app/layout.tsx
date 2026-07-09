@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="kk" className={fontClassNames}>
+    <html lang="ru" className={fontClassNames}>
       <body>
         <I18nProvider>
           <SessionProvider>

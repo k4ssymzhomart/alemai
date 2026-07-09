@@ -6,14 +6,14 @@ import { useTranslation } from 'react-i18next';
 import type { FindingSeverity } from '@/lib/types';
 
 /**
- * Severity chip (§4 soft variant): block = solid ink (the one heavy mark for
- * a blocker), warn = hatch outline, yellow = dotted (0 ₸ fix-only), info =
- * plain. No color, no directional glyph.
+ * Severity chip (rebrand v3, docs/25 H1): color is now the primary signal.
+ * block = red fill, warn = amber outline+tint, yellow (0 ₸ fix-only) = amber
+ * dashed, info = plain. Print degrades to ink (keeps the ч/б story honest).
  */
 const STYLE: Record<FindingSeverity, string> = {
-  block: 'border border-ink bg-ink text-paper',
-  warn: 'border-2 border-ink/50 text-ink',
-  yellow: 'border border-dashed border-ink/40 text-ink/70',
+  block: 'border border-critical bg-critical text-paper print:border-ink print:bg-ink',
+  warn: 'border-2 border-warn bg-warn/10 text-ink print:border-ink print:bg-transparent',
+  yellow: 'border border-dashed border-warn text-ink/70 print:border-ink',
   info: 'border border-ink/15 text-ink/60',
 };
 

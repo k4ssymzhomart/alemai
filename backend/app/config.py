@@ -13,7 +13,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     database_url: str = DEFAULT_DATABASE_URL
-    cors_origins: list[str] = ["http://localhost:3000"]
+    # Comma-separated so a deploy can set CORS_ORIGINS="https://a,https://b" as a
+    # plain env string (pydantic-settings would JSON-parse a list field). H5.
+    cors_origins: str = "http://localhost:3000"
     app_name: str = "IGERIM API"
     api_v1_prefix: str = "/api/v1"
 
@@ -21,6 +23,9 @@ class Settings(BaseSettings):
     # АПП penalties are counted in («100 КПН» etc.). gp14-real ≈ 1710
     # (calibration_stats.md). Used to money-ize the sanction-risk verdict.
     kpn_tenge: int = 1710
+    # МРП (месячный расчётный показатель), ₸ — 2026 = 4 325 (закон №239-VIII от
+    # 08.12.2025). The 200/800-МРП reputational thresholds derive from it. H0.
+    mrp_tenge: int = 4325
 
     # Auth / session (EPIC G1). Demo defaults — override via env in prod. The
     # cookie is a signed, timestamped payload (itsdangerous), no server store.
@@ -30,6 +35,11 @@ class Settings(BaseSettings):
     # Header token that lets headless scripts (scripts/qa_golden.py, CI) act as
     # an admin service principal without a login round-trip.
     service_token: str = "qalam-service-token-demo"
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        """CORS allow-list parsed from the comma-separated ``cors_origins``."""
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 
 @lru_cache(maxsize=1)

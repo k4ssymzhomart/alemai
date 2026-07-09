@@ -10,17 +10,19 @@ from __future__ import annotations
 
 import io
 from collections.abc import Iterable
+from pathlib import Path
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.shared import Pt
+from docx.shared import Mm, Pt
 
 # Visible marker so an un-reviewed kk artifact is obvious on paper and in tests.
 NATIVE_REVIEW_MARK = "[kk: NEEDS-NATIVE-REVIEW]"
-ORG_HEADER_RU = "ГП №14 · демо"
-ORG_HEADER_KK = "№14 қалалық емхана · демо"
-DEMO_BADGE_RU = "демо-данные"
-DEMO_BADGE_KK = "демо-деректер"
+ORG_HEADER_RU = "ГП №14"
+ORG_HEADER_KK = "№14 қалалық емхана"
+# Brand letterhead (docs/25 H1). __file__-relative so it resolves both in the
+# api container (/app/...) and in local pytest runs.
+_LOGO_PATH = Path(__file__).resolve().parent / "assets" / "logo.png"
 
 
 def new_document() -> Document:
@@ -32,7 +34,11 @@ def new_document() -> Document:
 
 
 def add_org_header(doc: Document, lang: str, date_str: str) -> None:
-    """Org line + date, right/left aligned like an official letterhead."""
+    """Logo letterhead + org line + date, like an official document header."""
+    if _LOGO_PATH.exists():
+        lp = doc.add_paragraph()
+        lp.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        lp.add_run().add_picture(str(_LOGO_PATH), width=Mm(42))
     org = ORG_HEADER_KK if lang == "kk" else ORG_HEADER_RU
     p = doc.add_paragraph()
     run = p.add_run(org)
@@ -96,17 +102,14 @@ def add_signature_block(doc: Document, lang: str) -> None:
 
 
 def add_native_review_footer(doc: Document, lang: str) -> None:
-    """For kk artifacts: an explicit marker paragraph + demo badge."""
+    """For kk artifacts: an explicit NEEDS-NATIVE-REVIEW marker (no demo badge)."""
+    if lang != "kk":
+        return
     doc.add_paragraph()
-    badge = DEMO_BADGE_KK if lang == "kk" else DEMO_BADGE_RU
-    p = doc.add_paragraph()
-    run = p.add_run(badge)
-    run.font.size = Pt(8)
-    if lang == "kk":
-        mp = doc.add_paragraph()
-        mr = mp.add_run(NATIVE_REVIEW_MARK)
-        mr.font.size = Pt(8)
-        mr.italic = True
+    mp = doc.add_paragraph()
+    mr = mp.add_run(NATIVE_REVIEW_MARK)
+    mr.font.size = Pt(8)
+    mr.italic = True
 
 
 def render(doc: Document) -> bytes:

@@ -98,7 +98,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full bg-ink px-4 py-2.5 text-secondary font-medium text-paper transition-colors duration-150 hover:bg-ink/80 disabled:opacity-40"
+            className="w-full bg-accent px-4 py-2.5 text-secondary font-medium text-paper transition-colors duration-150 hover:bg-accent/90 disabled:opacity-40"
           >
             {busy ? t('common.loading') : t('auth.sign_in')}
           </button>

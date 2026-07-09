@@ -14,6 +14,8 @@ import api from '@/lib/api';
 import { useRefreshEpoch } from '@/lib/refresh';
 import { mockLineMonthly, mockLines, mockOverview } from '@/lib/mock';
 import type {
+  AnomaliesResponse,
+  DeadlinesResponse,
   LineMonthlyResponse,
   LinesQuery,
   LinesResponse,
@@ -203,6 +205,24 @@ export function useReconcileRows(
           })
         : Promise.resolve({ bucket_no: bucketNo, rows: [] }),
     [bucketNo, year, enabled],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /deadlines — the seeded regulatory deadline calendar (H2 Календарь). */
+export function useDeadlines(): FetchState<DeadlinesResponse> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) => api.get<DeadlinesResponse>('/deadlines', { signal }),
+    [],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /anomalies — doctor-workload outliers from claims (H2 Аномалии). */
+export function useAnomalies(): FetchState<AnomaliesResponse> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) => api.get<AnomaliesResponse>('/anomalies', { signal }),
+    [],
   );
   return useFetch(fetcher);
 }

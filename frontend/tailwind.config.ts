@@ -23,6 +23,16 @@ const config: Config = {
       inherit: 'inherit',
       ink: '#000000',
       paper: '#ffffff',
+      // Rebrand v3 (docs/25 H1): violet accent + semantic G/Y/R status colors.
+      // Accent = CTA / active nav / links / focus / selected / small chart
+      // accents ONLY — never backgrounds, statuses, or decorative floods.
+      accent: '#5200E0',
+      // Status colors carry meaning (color is now the primary severity signal;
+      // hatch/glyph stay secondary). In print they degrade to ink via the
+      // Tailwind `print:` variant on each usage (keeps the ч/б story honest).
+      ok: '#12B76A',
+      warn: '#F79009',
+      critical: '#D92D20',
     },
     borderRadius: {
       none: '0',

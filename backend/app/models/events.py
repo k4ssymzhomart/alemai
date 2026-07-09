@@ -64,3 +64,55 @@ class RadarCheck(Base):
     our_version: Mapped[str | None] = mapped_column(String(64))
     detected_version: Mapped[str | None] = mapped_column(String(64))
     message: Mapped[str | None] = mapped_column(Text)
+
+
+class ShareLink(Base):
+    """Shareable state link (EPIC H3) — a short code → the exact route+state a
+    user was looking at. Opening /s/<code> restores it (through the opener's own
+    permissions). No external SaaS; this is the offline-safe collaboration."""
+
+    __tablename__ = "share_links"
+
+    code: Mapped[str] = mapped_column(String(16), primary_key=True)
+    url_state: Mapped[dict[str, Any]] = mapped_column(JSONB)  # {path, query, locale}
+    created_by: Mapped[str | None] = mapped_column(String(64))
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow
+    )
+    expires_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class DocumentVersion(Base):
+    """Every docgen call persisted (EPIC H4) — params + deterministic auto-title
+    so a доп.обращение can be re-run «с теми же параметрами»."""
+
+    __tablename__ = "document_versions"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    doc_type: Mapped[str] = mapped_column(String(32), index=True)
+    entity_ref: Mapped[str | None] = mapped_column(String(160), index=True)
+    params: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    author: Mapped[str | None] = mapped_column(String(64))
+    author_name: Mapped[str | None] = mapped_column(String(128))
+    ts: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow, index=True
+    )
+    auto_title: Mapped[str] = mapped_column(Text)
+    lang: Mapped[str] = mapped_column(String(4), default="ru")
+
+
+class Comment(Base):
+    """Notes + source suggestions threaded on radar rows / findings (EPIC H4)."""
+
+    __tablename__ = "comments"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    entity_ref: Mapped[str] = mapped_column(String(160), index=True)
+    author: Mapped[str | None] = mapped_column(String(64))
+    author_name: Mapped[str | None] = mapped_column(String(128))
+    text: Mapped[str] = mapped_column(Text)
+    type: Mapped[str] = mapped_column(String(24), default="note")  # note|source_suggestion
+    url: Mapped[str | None] = mapped_column(String(500))
+    ts: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow, index=True
+    )

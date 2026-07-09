@@ -2,8 +2,9 @@
   "app": {
     "title": "Qalam",
     "tagline": "Financial autopilot for contract execution",
-    "org": "City Polyclinic #14 · demo",
-    "scope_city": "Astana · 14 clinics · demo"
+    "org": "City Polyclinic #14",
+    "scope_city": "Astana · 14 clinics",
+    "fsms_registry": "FSMS registry"
   },
   "nav": {
     "overview": "Overview",
@@ -23,7 +24,6 @@
   "common": {
     "loading": "Loading…",
     "empty": "No data yet",
-    "demo_data_note": "demo data, calibrated against open statistics",
     "error": "Failed to load data",
     "retry": "Retry",
     "no_data": "No data",
@@ -33,7 +33,6 @@
     "year": "Year",
     "source": "Funding source",
     "computed_pending": "computing…",
-    "demo_badge": "demo data",
     "go_overview": "Go to overview",
     "language_label": "Language",
     "period": "Period",
@@ -233,7 +232,7 @@
     "lead": "Upload MIS files — this is how data enters the system",
     "dropzone": "Drop an XLSX or CSV file here",
     "dropzone_hint": "or click to choose a file",
-    "samples": "Demo files (Damumed shape)",
+    "samples": "Sample files (Damumed shape)",
     "step_file": "File recognized",
     "step_mapping": "Mapping",
     "step_result": "Result",
@@ -270,7 +269,7 @@
     "error": "Wrong username or password",
     "logout": "Sign out",
     "quick_login": "Quick login",
-    "demo_hint": "Demo: password for all — qalam2026"
+    "demo_hint": "Password for all — qalam2026"
   },
   "notifications": {
     "title": "Notifications",
@@ -290,7 +289,7 @@
     "active_users": "Active users",
     "ok": "ok",
     "quarantine": "quarantine",
-    "last_reset": "Last demo-reset",
+    "last_reset": "Last data reset",
     "live_note": "Counters update in real time on events"
   },
   "radar": {
@@ -316,5 +315,39 @@
     "monthly_report": "Generate the monthly report",
     "generate": "Generate",
     "note": "All numbers computed by the system — not the LLM"
+  },
+  "risks": {
+    "lead": "Risk register — lines deviating from plan",
+    "none": "No risks — all lines on track",
+    "generate_obrashenie": "Generate request"
+  },
+  "calendar": {
+    "lead": "Regulatory deadlines and objection windows",
+    "objection": "Objection · code {{code}}",
+    "days_left": "{{count}} working days until auto-removal",
+    "kind": {
+      "report_due": "report/campaign deadline",
+      "korrektirovka_window": "adjustment window",
+      "invoice_due": "invoice due"
+    }
+  },
+  "anomalies": {
+    "lead": "Doctor-workload outliers — require review",
+    "none": "No outliers found",
+    "col_doctor": "Doctor",
+    "col_type": "Type",
+    "col_period": "Period",
+    "col_count": "Count",
+    "col_status": "Status",
+    "type_day_volume": "Daily peak",
+    "type_weekend": "Weekend services",
+    "requires_review": "requires review"
+  },
+  "share": {
+    "button": "Share",
+    "copied": "Link copied",
+    "copy_manual": "Copy the link",
+    "opening": "Opening…",
+    "not_found": "Link not found"
   }
 }
