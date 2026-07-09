@@ -72,6 +72,7 @@ export default function PrebillingPage() {
                 ? t('prebilling.verdict_block', {
                     count: totals.block_positions,
                     amount: fmtTenge(totals.block_amount),
+                    sanction: fmtTenge(totals.sanction_risk),
                   })
                 : t('prebilling.verdict_clean')}
             </VerdictBlock>

@@ -8,6 +8,8 @@ Real mechanism = п. 19 Правил закупа (ред. №99 от 26.09.2025
 
 from __future__ import annotations
 
+import datetime
+
 from sqlalchemy.orm import Session
 
 from app.services import regs_cite
@@ -18,7 +20,7 @@ from app.services.docgen.data import (
     funding_name,
     get_obrashenie_context,
 )
-from app.services.textfmt import fmt_date, fmt_pct, fmt_tenge
+from app.services.textfmt import fmt_date, fmt_pct, fmt_period, fmt_tenge
 
 _ADDRESSEE = {
     "ru": "В НАО «Фонд социального медицинского страхования»",
@@ -117,14 +119,26 @@ def _request(ctx: ObrashenieContext, lang: str, label: str) -> str:
     )
 
 
+def _as_of_note(ctx: ObrashenieContext, lang: str) -> str:
+    """«по данным на MM.YYYY» — the reporting period the figures reflect."""
+    period = fmt_period(ctx.as_of) if ctx.as_of else "—"
+    return (
+        f"{period} жағдайындағы деректер бойынша"
+        if lang == "kk"
+        else f"по данным на {period}"
+    )
+
+
 def build(session: Session, line_key: str, lang: str) -> bytes:
     """Render the обращение .docx for one line in ru or kk."""
     ctx = get_obrashenie_context(session, line_key)
     label = _line_label(ctx, lang)
-    date_str = fmt_date(f"{ctx.as_of}-09") if ctx.as_of else fmt_date("2026-07-09")
+    # Document date = today (the letter's issue date), not the reporting period.
+    date_str = fmt_date(datetime.date.today())
 
     doc = builder.new_document()
     builder.add_org_header(doc, lang, date_str)
+    builder.add_paragraph(doc, _as_of_note(ctx, lang))
     builder.add_paragraph(doc, _ADDRESSEE[lang])
     for line in _TITLE[lang].split("\n"):
         builder.add_title(doc, line)

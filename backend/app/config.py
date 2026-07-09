@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     app_name: str = "IGERIM API"
     api_v1_prefix: str = "/api/v1"
 
+    # Комплексный подушевой норматив (КПН/ПН), ₸/чел/мес — the base the ЕКД
+    # АПП penalties are counted in («100 КПН» etc.). gp14-real ≈ 1710
+    # (calibration_stats.md). Used to money-ize the sanction-risk verdict.
+    kpn_tenge: int = 1710
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

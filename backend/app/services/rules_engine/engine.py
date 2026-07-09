@@ -23,6 +23,7 @@ from typing import Any
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.models.claim import Claim
 from app.models.enums import RuleSeverity
 from app.models.people import Patient
@@ -40,6 +41,7 @@ _BILLED_STATUSES = ("submitted", "accepted", "paid", "rejected")
 class RuleAgg:
     count: int = 0
     amount_at_risk: int = 0
+    sanction: int = 0  # full ЕКД penalty exposure (снятие % + АПП КПН)
     severity: str = "warn"
     ekd_code: str = ""
 
@@ -54,6 +56,9 @@ class RunResult:
     total_amount_at_risk: int
     block_positions: int
     block_amount: int
+    # «Санкциялық тәуекел»: full penalty exposure of the BLOCK findings — the
+    # 300 %-снятие + АПП КПН fines a приписка/дефект would actually cost.
+    sanction_risk: int = 0
     by_rule: dict[str, RuleAgg] = field(default_factory=dict)
 
     def totals_json(self) -> dict[str, Any]:
@@ -64,11 +69,13 @@ class RunResult:
             "total_amount_at_risk": self.total_amount_at_risk,
             "block_positions": self.block_positions,
             "block_amount": self.block_amount,
+            "sanction_risk": self.sanction_risk,
             "duration_ms": self.duration_ms,
             "by_rule": {
                 code: {
                     "count": agg.count,
                     "amount_at_risk": agg.amount_at_risk,
+                    "sanction": agg.sanction,
                     "severity": agg.severity,
                     "ekd_code": agg.ekd_code,
                 }
@@ -145,6 +152,7 @@ def run(
     """Sync the catalog, evaluate every enabled rule over the scope, persist findings."""
     catalog = sync_catalog(session, catalog if catalog is not None else load_catalog())
     rows = fetch_claims(session, scope, limit)
+    kpn = get_settings().kpn_tenge
 
     started = perf_counter()
     run_row = RuleRun(scope=scope, started_at=datetime.datetime.now(tz=datetime.UTC))
@@ -198,15 +206,16 @@ def run(
             )
             agg.count += 1
             agg.amount_at_risk += amount_at_risk
+            agg.sanction += ekd.sanction_total(rule.ekd_code, claim.care_type, billed, kpn)
 
     session.add_all(findings)
 
-    block_positions = sum(
-        agg.count for agg in by_rule.values() if agg.severity == RuleSeverity.block.value
-    )
+    _block = RuleSeverity.block.value
+    block_positions = sum(agg.count for agg in by_rule.values() if agg.severity == _block)
     block_amount = sum(
-        agg.amount_at_risk for agg in by_rule.values() if agg.severity == RuleSeverity.block.value
+        agg.amount_at_risk for agg in by_rule.values() if agg.severity == _block
     )
+    sanction_risk = sum(agg.sanction for agg in by_rule.values() if agg.severity == _block)
     result = RunResult(
         run_id=run_row.id,
         scope=scope,
@@ -216,6 +225,7 @@ def run(
         total_amount_at_risk=sum(f.amount_at_risk for f in findings),
         block_positions=block_positions,
         block_amount=block_amount,
+        sanction_risk=sanction_risk,
         by_rule={code: agg for code, agg in by_rule.items() if agg.count > 0},
     )
     run_row.duration_ms = result.duration_ms
