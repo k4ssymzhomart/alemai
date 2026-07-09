@@ -12,8 +12,8 @@ export type Role = (typeof ROLES)[number];
  * that's the PD3-lite demo trick.
  */
 export const ROLE_NAV: Record<Role, string[]> = {
-  economist: ['/overview', '/risks', '/reconcile', '/calendar', '/reports', '/copilot', '/admin'],
-  statistician: ['/overview', '/prebilling', '/reconcile', '/anomalies', '/copilot'],
+  economist: ['/overview', '/risks', '/reconcile', '/calendar', '/reports', '/copilot', '/imports', '/admin'],
+  statistician: ['/overview', '/prebilling', '/reconcile', '/anomalies', '/copilot', '/imports'],
   head: ['/overview', '/risks', '/reports', '/city', '/copilot', '/admin'],
   curator: ['/city', '/overview', '/copilot'],
 };

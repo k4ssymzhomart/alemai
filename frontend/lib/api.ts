@@ -127,6 +127,56 @@ export async function downloadFile(
   URL.revokeObjectURL(href);
 }
 
+/**
+ * GET a binary endpoint (the F2 XLSX exports) and save it as a file.
+ * Same Content-Disposition handling as {@link downloadFile}.
+ */
+export async function downloadFileGet(
+  path: string,
+  params: QueryParams | undefined,
+  fallbackName: string,
+): Promise<void> {
+  const url = buildUrl(path, params);
+  const response = await fetch(url, { method: 'GET', cache: 'no-store' });
+  if (!response.ok) {
+    const errBody: unknown = await response.json().catch(() => null);
+    throw new ApiError(response.status, response.statusText, errBody, url);
+  }
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+  const name = match ? decodeURIComponent(match[1]) : fallbackName;
+  const blob = await response.blob();
+  const href = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = href;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(href);
+}
+
+/**
+ * POST one file as multipart/form-data (the F1 import endpoints) and return
+ * the parsed JSON response. The browser sets the multipart boundary itself.
+ */
+export async function uploadFile<T>(path: string, file: File): Promise<T> {
+  const url = buildUrl(path);
+  const body = new FormData();
+  body.append('file', file, file.name);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { Accept: 'application/json' },
+    body,
+    cache: 'no-store',
+  });
+  if (!response.ok) {
+    const errBody: unknown = await response.json().catch(() => null);
+    throw new ApiError(response.status, response.statusText, errBody, url);
+  }
+  return (await response.json()) as T;
+}
+
 export const api = {
   get: <T>(path: string, options?: ApiRequestOptions) =>
     request<T>('GET', path, undefined, options),

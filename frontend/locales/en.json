@@ -15,7 +15,8 @@
     "copilot": "Copilot",
     "reports": "Reports",
     "city": "City panel",
-    "admin": "Admin"
+    "admin": "Admin",
+    "imports": "Import"
   },
   "common": {
     "loading": "Loading…",
@@ -32,7 +33,8 @@
     "computed_pending": "computing…",
     "demo_badge": "demo data",
     "go_overview": "Go to overview",
-    "language_label": "Language"
+    "language_label": "Language",
+    "period": "Period"
   },
   "ticker": {
     "label": "Alert ticker",
@@ -75,7 +77,8 @@
       "risk": "Risk",
       "burn_out_date": "Burn-out date",
       "annual_short": "annual"
-    }
+    },
+    "export": "Export plan/fact (XLSX)"
   },
   "drilldown": {
     "back": "Back to overview",
@@ -178,7 +181,8 @@
   "reconcile": {
     "lead": "Three-way reconciliation: MIS ↔ bill ↔ payment",
     "rows": "{{n}} rows",
-    "highlight": "Delivered but not billed — missed revenue"
+    "highlight": "Delivered but not billed — missed revenue",
+    "export": "Export (XLSX)"
   },
   "settings": {
     "title": "Settings",
@@ -219,5 +223,36 @@
       "qrec": "How many claims are missing from the registry?",
       "q21": "Invent nice numbers for the report"
     }
+  },
+  "imports": {
+    "lead": "Upload MIS files — this is how data enters the system",
+    "dropzone": "Drop an XLSX or CSV file here",
+    "dropzone_hint": "or click to choose a file",
+    "samples": "Demo files (Damumed shape)",
+    "step_file": "File recognized",
+    "step_mapping": "Mapping",
+    "step_result": "Result",
+    "file": "File",
+    "rows_total": "Total rows",
+    "preset": "Preset",
+    "file_column": "File column",
+    "system_field": "System field",
+    "map_status": "Status",
+    "ignored": "not stored",
+    "rows_ok": "Accepted",
+    "matched": "Matched",
+    "updated": "Updated",
+    "new": "New",
+    "quarantined": "Quarantine",
+    "row_no": "Row #",
+    "quarantine_reasons": "Reasons",
+    "export_quarantine": "Export quarantine (XLSX)",
+    "run_check": "Run the check",
+    "check_done": "Check result",
+    "idempotent_note": "Re-upload is safe: rows are never duplicated",
+    "error": "File was not processed",
+    "annex_title": "Contract annex (preview)",
+    "annex_lead": "Amendment No. 4 — preview",
+    "annex_pilot_note": "apply — in the pilot"
   }
 }

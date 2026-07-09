@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import ErrorState from '@/components/ErrorState';
+import { downloadFileGet } from '@/lib/api';
 import { fmtDate, fmtNumber, fmtTenge, type NumLocale } from '@/lib/format';
 import { useReconcile, useReconcileRows } from '@/lib/hooks';
 import type { ReconcileBucket } from '@/lib/types';
@@ -100,6 +101,21 @@ function BucketRow({
 
       {open ? (
         <div className="overflow-x-auto border-t border-ink/15 bg-ink/[.02]">
+          <div className="flex justify-end px-4 pt-3">
+            <button
+              type="button"
+              onClick={() =>
+                void downloadFileGet(
+                  `/exports/reconcile-bucket/${bucket.bucket_no}.xlsx`,
+                  undefined,
+                  `qalam_reconcile_bucket${bucket.bucket_no}.xlsx`,
+                )
+              }
+              className="border border-ink/40 px-2.5 py-1 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03]"
+            >
+              {t('reconcile.export')}
+            </button>
+          </div>
           {rows.loading ? (
             <div className="fill-dots-faint h-20 animate-pulse" />
           ) : rows.data && rows.data.rows.length > 0 ? (

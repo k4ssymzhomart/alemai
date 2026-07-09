@@ -8,6 +8,7 @@ import EmptyState from '@/components/EmptyState';
 import ErrorState from '@/components/ErrorState';
 import KpiTile from '@/components/overview/KpiTile';
 import LinesTable from '@/components/overview/LinesTable';
+import { downloadFileGet } from '@/lib/api';
 import { fmtPct, fmtPeriod, fmtTenge, type NumLocale } from '@/lib/format';
 import { useLines, useOverview } from '@/lib/hooks';
 import type { CareType, FundingSource } from '@/lib/types';
@@ -156,6 +157,19 @@ export default function OverviewPage() {
                 </option>
               ))}
             </select>
+            <button
+              type="button"
+              onClick={() =>
+                void downloadFileGet(
+                  '/exports/overview.xlsx',
+                  { year },
+                  'qalam_overview.xlsx',
+                )
+              }
+              className="border border-ink/40 px-2.5 py-1 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03]"
+            >
+              {t('overview.export')}
+            </button>
           </div>
         </div>
 
