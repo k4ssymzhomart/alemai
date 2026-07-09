@@ -86,6 +86,8 @@ def build_tokens() -> dict[str, str]:
         "prebill_positions": str(run["block_positions"]),
         "prebill_amount": tng(run["block_amount"]),
         "sanction_risk": mln(run["sanction_risk"]),
+        # beat-4 upload: the Nov-2025 registry file = the period's billed claims
+        "registry_rows": f"{run['claims_scanned']:,}".replace(",", NBSP),
         "reconcile_count": str(b1["rows_count"]),
         "reconcile_amount": tng(b1["total_amount"]),
         "objection_days": str(soonest["deadline_working_days"]),
@@ -105,11 +107,13 @@ CRIB = """# QALAM — A5 Q&A CRIB (printable, fold to A5)
 **Demo numbers (from the live seed):**
 - Освоение YTD {exec_pct} · разрыв {forecast_gap} · рисков {risk_count}
 - МРТ 118 % → выгорание {burn_out} · возместимо {mri_recoverable}
+- Импорт: XLSX из Damumed, {registry_rows} строк → маппинг → тот же вердикт (повторная загрузка = 0 дублей)
 - Пре-биллинг: {prebill_positions} позиций / {prebill_amount} · **санкционный риск {sanction_risk}**
 - Сверка: {reconcile_count} записей / {reconcile_amount} не выставлено
 - Возражение: {objection_days} раб. день до автоснятия
 
 **Q&A (30 сек each):**
+- «Как данные попадают в систему?» → экран «Импорт»: XLSX/CSV из МИС (Damumed) → маппинг по пресету → карантин плохих строк → проверка. Показано live; повторная загрузка = 0 дублей. Роадмап: API МИС по расписанию.
 - «Фонд уже делает Qalqan?» → Qalqan = антифрод плательщика ПОСЛЕ подачи; п. 15 — алгоритмы Фонда закрыты; п. 24 — после дефекта исправления не принимаются. Клинике нужен свой контур ДО счёта. Дополняем, не конкурируем.
 - «Откуда цифры в копилоте?» → «цифры не проходят через языковую модель — их считает система». Один семантический слой, один источник.
 - «Мониторинг — сколько видов?» → ДВА: текущий (каждый раб. день в ИСФ) + внеплановый (п. 4, ред. №68). Проактивный/целевой отменены (ред. 2022–2024).
