@@ -16,7 +16,9 @@
     "reports": "Есептер",
     "city": "Қала панелі",
     "admin": "Әкімшілік",
-    "imports": "Импорт"
+    "imports": "Импорт",
+    "collapse": "Жию",
+    "expand": "Ашу"
   },
   "common": {
     "loading": "Жүктелуде…",

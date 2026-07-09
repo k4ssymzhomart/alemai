@@ -16,7 +16,9 @@
     "reports": "Reports",
     "city": "City panel",
     "admin": "Admin",
-    "imports": "Import"
+    "imports": "Import",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "common": {
     "loading": "Loading…",
