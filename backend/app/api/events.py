@@ -22,7 +22,8 @@ DbDep = Annotated[Session, Depends(get_db)]
 # aggregates (docs/13 §3; adversarial review #6). Curators still see import /
 # threshold / source-update events.
 _CASE_LEVEL_TYPES = (
-    "finding_excluded", "finding_dismissed", "rules_run_finished", "objection_filed",
+    "finding_excluded", "finding_dismissed", "finding_restored", "rules_run_finished",
+    "objection_filed",
 )
 
 

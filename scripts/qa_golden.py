@@ -37,6 +37,15 @@ def post(path: str, body: dict) -> dict:
         return json.load(r)
 
 
+def patch(path: str, body: dict) -> dict:
+    req = urllib.request.Request(
+        f"{API}{path}", data=json.dumps(body).encode(),
+        headers={"Content-Type": "application/json", **_AUTH}, method="PATCH",
+    )
+    with urllib.request.urlopen(req, timeout=30) as r:
+        return json.load(r)
+
+
 def get_bytes(path: str) -> bytes:
     req = urllib.request.Request(f"{API}{path}", headers=_AUTH)
     with urllib.request.urlopen(req, timeout=120) as r:
@@ -143,6 +152,24 @@ def main() -> int:
                if b["bucket_no"] == 1)
     check("import", "bucket1 unchanged",
           (b1b["rows_count"], b1b["total_amount"]), (260, 2992000))
+
+    # EPIC I2 — collaboration: a pre-billing exclusion emits an event the other
+    # window sees, and «Отменить исключение» (undo) emits a symmetric restore
+    # event so a rehearsal resets without a reseed. (Verdict-delta on exclusion
+    # is deferred — the engine recomputes totals per run.)
+    run_id = post("/rules/run", {"scope": "period:2025-11"})["run_id"]
+    fnd = get(f"/rules/runs/{run_id}/findings?limit=1")["findings"]
+    check("collab", "run yields findings", len(fnd) >= 1, True)
+    if fnd:
+        fid = fnd[0]["id"]
+        patch(f"/findings/{fid}", {"status": "excluded", "comment": "qa_golden"})
+        evs = get("/events?limit=25")["items"]
+        check("collab", "exclusion emits event",
+              any(e["type"] == "finding_excluded" for e in evs), True)
+        patch(f"/findings/{fid}", {"status": "open"})  # undo — leaves state clean
+        evs2 = get("/events?limit=25")["items"]
+        check("collab", "undo emits restore event",
+              any(e["type"] == "finding_restored" for e in evs2), True)
 
     print(f"\nQA GOLDEN: {'ALL PASS' if _fails == 0 else str(_fails) + ' FAIL'}")
     return 1 if _fails else 0
