@@ -69,6 +69,7 @@ async function request<T>(
     headers,
     signal: options.signal,
     cache: options.cache ?? 'no-store',
+    credentials: 'include', // send the session cookie (cross-origin :3000→:8800)
   };
 
   if (body !== undefined) {
@@ -108,6 +109,7 @@ export async function downloadFile(
     headers: { 'Content-Type': 'application/json', Accept: '*/*' },
     body: JSON.stringify(body),
     cache: 'no-store',
+    credentials: 'include',
   });
   if (!response.ok) {
     const errBody: unknown = await response.json().catch(() => null);
@@ -137,7 +139,11 @@ export async function downloadFileGet(
   fallbackName: string,
 ): Promise<void> {
   const url = buildUrl(path, params);
-  const response = await fetch(url, { method: 'GET', cache: 'no-store' });
+  const response = await fetch(url, {
+    method: 'GET',
+    cache: 'no-store',
+    credentials: 'include',
+  });
   if (!response.ok) {
     const errBody: unknown = await response.json().catch(() => null);
     throw new ApiError(response.status, response.statusText, errBody, url);
@@ -169,6 +175,7 @@ export async function uploadFile<T>(path: string, file: File): Promise<T> {
     headers: { Accept: 'application/json' },
     body,
     cache: 'no-store',
+    credentials: 'include',
   });
   if (!response.ok) {
     const errBody: unknown = await response.json().catch(() => null);

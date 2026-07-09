@@ -50,10 +50,11 @@
   },
   "roles": {
     "label": "Рөл",
-    "economist": "Айгерім — экономист",
-    "statistician": "Дана — статистик",
-    "head": "Ерлан — басшы",
-    "curator": "Марат — куратор"
+    "economist": "экономист",
+    "statistician": "статистик",
+    "chief": "директор",
+    "curator": "куратор",
+    "admin": "IT-әкімші"
   },
   "overview": {
     "title": "Шартты игеруді шолу",
@@ -257,5 +258,14 @@
     "annex_line": "Желі",
     "annex_was": "Қазіргі жоспар",
     "annex_becomes": "Жаңа жоспар"
+  },
+  "auth": {
+    "sign_in": "Кіру",
+    "username": "Логин",
+    "password": "Құпиясөз",
+    "error": "Қате логин немесе құпиясөз",
+    "logout": "Шығу",
+    "quick_login": "Жедел кіру",
+    "demo_hint": "Демо: барлық құпиясөз — qalam2026"
   }
 }

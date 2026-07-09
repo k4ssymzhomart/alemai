@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import AppShell from '@/components/AppShell';
 import I18nProvider from '@/components/I18nProvider';
-import { RoleProvider } from '@/components/RoleProvider';
+import { SessionProvider } from '@/components/SessionProvider';
 import { fontClassNames } from '@/lib/fonts';
 
 import './globals.css';
@@ -19,9 +19,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="kk" className={fontClassNames}>
       <body>
         <I18nProvider>
-          <RoleProvider>
+          <SessionProvider>
             <AppShell>{children}</AppShell>
-          </RoleProvider>
+          </SessionProvider>
         </I18nProvider>
       </body>
     </html>

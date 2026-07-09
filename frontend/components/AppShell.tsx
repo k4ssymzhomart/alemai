@@ -21,8 +21,8 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import LocaleSwitcher from '@/components/LocaleSwitcher';
-import RoleSwitcher from '@/components/RoleSwitcher';
-import { useRole } from '@/components/RoleProvider';
+import UserMenu from '@/components/UserMenu';
+import { useSession } from '@/components/SessionProvider';
 import Ticker from '@/components/Ticker';
 import Logo from '@/components/brand/Logo';
 
@@ -55,7 +55,13 @@ const NAV_ITEMS: NavItem[] = [
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const { role, nav } = useRole();
+  const { role, nav } = useSession();
+
+  // The login screen renders without the shell (no sidebar/header).
+  if (pathname === '/login') {
+    return <>{children}</>;
+  }
+
   const scopeKey = role === 'curator' ? 'app.scope_city' : 'app.org';
   const visibleNav = NAV_ITEMS.filter((item) => nav.includes(item.href));
 
@@ -70,7 +76,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </span>
         <Ticker />
         <div className="flex shrink-0 items-center gap-2">
-          <RoleSwitcher />
+          <UserMenu />
           <LocaleSwitcher />
         </div>
       </header>

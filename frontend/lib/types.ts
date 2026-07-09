@@ -307,3 +307,13 @@ export interface AnnexPreview {
   total_delta: number;
   preview_only: boolean;
 }
+
+// ─── EPIC G: ecosystem (auth, events, ops, radar) ───────────────────────────
+
+export interface Me {
+  user_id: string | null;
+  username: string;
+  name: string;
+  role: string;
+  is_service: boolean;
+}

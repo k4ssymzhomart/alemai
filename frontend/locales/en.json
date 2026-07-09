@@ -50,10 +50,11 @@
   },
   "roles": {
     "label": "Role",
-    "economist": "Aigerim — Economist",
-    "statistician": "Dana — Statistician",
-    "head": "Yerlan — Director",
-    "curator": "Marat — Curator"
+    "economist": "economist",
+    "statistician": "statistician",
+    "chief": "director",
+    "curator": "curator",
+    "admin": "IT admin"
   },
   "overview": {
     "title": "Contract execution overview",
@@ -257,5 +258,14 @@
     "annex_line": "Line",
     "annex_was": "Current plan",
     "annex_becomes": "New plan"
+  },
+  "auth": {
+    "sign_in": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "error": "Wrong username or password",
+    "logout": "Sign out",
+    "quick_login": "Quick login",
+    "demo_hint": "Demo: password for all — qalam2026"
   }
 }
