@@ -23,6 +23,7 @@ from app.api import (
     reports,
     risks,
     rules,
+    share,
 )
 
 api_router = APIRouter()
@@ -39,6 +40,7 @@ api_router.include_router(forecasts.router)
 api_router.include_router(risks.router)
 api_router.include_router(alerts.router)
 api_router.include_router(anomalies.router)
+api_router.include_router(share.router)
 api_router.include_router(copilot.router)
 api_router.include_router(documents.router)
 api_router.include_router(reports.router)

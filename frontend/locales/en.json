@@ -342,5 +342,12 @@
     "type_day_volume": "Daily peak",
     "type_weekend": "Weekend services",
     "requires_review": "requires review"
+  },
+  "share": {
+    "button": "Share",
+    "copied": "Link copied",
+    "copy_manual": "Copy the link",
+    "opening": "Opening…",
+    "not_found": "Link not found"
   }
 }

@@ -36,6 +36,7 @@ DB_BACKED_PATHS = {
     "/api/v1/exports/quarantine/{file_id}.xlsx",
     # does a live external fetch (fms.ecc.kz) — would add a 6s timeout to smoke.
     "/api/v1/radar/provider-status",
+    "/api/v1/share/{code}",  # 404 for a random code (covered by integration)
 }
 
 

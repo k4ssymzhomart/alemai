@@ -63,11 +63,13 @@ DATA_TABLES: tuple[str, ...] = (
     "app_config",
     "audit_log",
     "claims",
+    "comments",
     "contract_lines",
     "contract_versions",
     "contracts",
     "deadlines",
     "doctors",
+    "document_versions",
     "events",
     "findings",
     "forecasts",
@@ -83,6 +85,7 @@ DATA_TABLES: tuple[str, ...] = (
     "rule_runs",
     "rules",
     "service_group_map",
+    "share_links",
     "users",
 )
 

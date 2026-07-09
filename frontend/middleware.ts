@@ -8,7 +8,9 @@ import { NextResponse, type NextRequest } from 'next/server';
  * redirects if /auth/me rejects an expired/forged cookie.
  */
 const SESSION_COOKIE = 'qalam_session';
-const PUBLIC_PATHS = ['/login'];
+// /s/<code> (share-link resolver, H3) is public so it can resolve before auth;
+// it then routes to the target, where the guard applies as usual.
+const PUBLIC_PATHS = ['/login', '/s'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

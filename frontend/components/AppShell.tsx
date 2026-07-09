@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import NotificationBell from '@/components/NotificationBell';
 import ProviderBadge from '@/components/ProviderBadge';
+import ShareButton from '@/components/ShareButton';
 import UserMenu from '@/components/UserMenu';
 import { useSession } from '@/components/SessionProvider';
 import Ticker from '@/components/Ticker';
@@ -94,6 +95,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <ProviderBadge />
         <Ticker />
         <div className="flex shrink-0 items-center gap-2">
+          <ShareButton />
           <NotificationBell />
           <UserMenu />
           <LocaleSwitcher />
