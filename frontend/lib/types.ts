@@ -153,6 +153,7 @@ export interface RuleRunTotals {
   total_amount_at_risk: number;
   block_positions: number;
   block_amount: number;
+  sanction_risk: number;
   duration_ms: number;
   by_rule: Record<
     string,
