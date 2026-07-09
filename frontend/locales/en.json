@@ -253,6 +253,9 @@
     "error": "File was not processed",
     "annex_title": "Contract annex (preview)",
     "annex_lead": "Amendment No. 4 — preview",
-    "annex_pilot_note": "apply — in the pilot"
+    "annex_pilot_note": "apply — in the pilot",
+    "annex_line": "Line",
+    "annex_was": "Current plan",
+    "annex_becomes": "New plan"
   }
 }

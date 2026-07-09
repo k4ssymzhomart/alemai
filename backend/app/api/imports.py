@@ -17,6 +17,8 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models.imports import ImportFile, QuarantineRow
 from app.schemas.imports import (
+    AnnexLineDiffOut,
+    AnnexPreviewOut,
     ColumnMapOut,
     QuarantineOut,
     QuarantineRowOut,
@@ -24,6 +26,7 @@ from app.schemas.imports import (
 )
 from app.services.exports.xlsx import xlsx_response
 from app.services.ingest import samples
+from app.services.ingest.annex import preview_annex
 from app.services.ingest.registry import RegistryParseError, import_registry
 from app.services.metrics.refresh import refresh_line_execution
 from app.services.rules_engine import engine
@@ -90,6 +93,35 @@ async def import_mis_registry(file: FileDep, db: DbDep) -> RegistryImportOut:
         ],
         rule_run_id=rule_run_id,
         rule_totals=rule_totals,
+    )
+
+
+@router.post("/contract-annex", response_model=AnnexPreviewOut)
+async def import_contract_annex(
+    file: FileDep, db: DbDep, preview: int = 1, year: int = 2026
+) -> AnnexPreviewOut:
+    """Annex diff — PREVIEW ONLY, nothing is written (применение — в пилоте).
+
+    ``preview`` is accepted for API-shape compatibility but commit is not
+    implemented by design (docs/17 F3: the demo stops at the preview).
+    """
+    data = await file.read()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="файл больше 30 МБ")
+    try:
+        result = preview_annex(db, file.filename or "annex.xlsx", data, year)
+    except RegistryParseError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    return AnnexPreviewOut(
+        filename=result.filename,
+        year=result.year,
+        lines=[AnnexLineDiffOut.model_validate(d, from_attributes=True)
+               for d in result.lines],
+        changed=result.changed,
+        total_current=result.total_current,
+        total_annex=result.total_annex,
+        total_delta=result.total_delta,
+        preview_only=True,
     )
 
 

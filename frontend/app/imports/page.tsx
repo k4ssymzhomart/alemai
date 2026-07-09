@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { API_BASE, downloadFileGet, uploadFile } from '@/lib/api';
 import { fmtNumber, fmtTenge } from '@/lib/format';
-import type { RegistryImportResult } from '@/lib/types';
+import type { AnnexPreview, RegistryImportResult } from '@/lib/types';
 
 /**
  * Screen «Импорт» (EPIC F1) — the answer to «как данные попадают в систему?».
@@ -54,6 +54,145 @@ export default function ImportsPage() {
       ) : null}
 
       {result ? <ImportSteps result={result} /> : null}
+
+      <AnnexSection />
+    </div>
+  );
+}
+
+/**
+ * F3 — contract annex, PREVIEW ONLY: diff «line: was → becomes, Δ₸»; commit
+ * is deliberately absent in the demo («қолдану — пилотта»).
+ */
+function AnnexSection() {
+  const { t } = useTranslation();
+  const [preview, setPreview] = useState<AnnexPreview | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onFile = async (file: File) => {
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      setPreview(
+        await uploadFile<AnnexPreview>('/imports/contract-annex?preview=1', file),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="space-y-4 border-t-2 border-ink pt-6">
+      <div>
+        <h2 className="font-display text-h2 text-ink">{t('imports.annex_title')}</h2>
+        <p className="mt-1 label-micro">{t('imports.annex_pilot_note')}</p>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => inputRef.current?.click()}
+          className="border border-dashed border-ink/40 px-4 py-2 text-secondary font-medium text-ink transition-colors duration-150 hover:border-ink disabled:opacity-40"
+        >
+          {busy ? t('common.loading') : t('imports.dropzone_hint')}
+        </button>
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".xlsx,.csv"
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) onFile(file);
+            event.target.value = '';
+          }}
+        />
+        <a
+          href={`${API_BASE}/imports/samples/annex_2026.xlsx`}
+          className="font-mono text-micro lowercase text-ink/60 underline decoration-ink/30 underline-offset-2 hover:text-ink"
+        >
+          annex_2026.xlsx
+        </a>
+      </div>
+
+      {error ? (
+        <p className="border-l-2 border-ink px-3 py-2 text-secondary text-ink/80">
+          ! {t('imports.error')}{' '}
+          <span className="font-mono text-micro text-ink/50">{error}</span>
+        </p>
+      ) : null}
+
+      {preview ? <AnnexDiff preview={preview} /> : null}
+    </section>
+  );
+}
+
+function AnnexDiff({ preview }: { preview: AnnexPreview }) {
+  const { t } = useTranslation();
+  return (
+    <div className="space-y-3">
+      <p className="text-body font-medium text-ink">
+        {t('imports.annex_lead')} ·{' '}
+        <span className="font-mono tabular-nums">
+          Δ {fmtTenge(preview.total_delta)}
+        </span>
+      </p>
+      <div className="border border-ink/15">
+        <table className="w-full border-collapse text-secondary">
+          <thead>
+            <tr className="border-b border-ink/15 text-left label-micro">
+              <th className="px-4 py-2 font-normal">{t('imports.annex_line')}</th>
+              <th className="px-4 py-2 text-right font-normal">
+                {t('imports.annex_was')}
+              </th>
+              <th className="px-4 py-2 text-right font-normal">
+                {t('imports.annex_becomes')}
+              </th>
+              <th className="px-4 py-2 text-right font-normal">Δ ₸</th>
+            </tr>
+          </thead>
+          <tbody>
+            {preview.lines.map((line) => {
+              const changed = line.status !== 'unchanged';
+              const name = [
+                t(`care_type.${line.care_type}`),
+                line.service_group,
+                t(`funding.${line.funding_source}`),
+              ]
+                .filter(Boolean)
+                .join(' · ');
+              return (
+                <tr
+                  key={`${line.care_type}:${line.funding_source}:${line.service_group}`}
+                  className={clsx(
+                    'border-b border-ink/[.06] last:border-0',
+                    changed && 'border-l-2 border-l-ink font-medium',
+                  )}
+                >
+                  <td className="px-4 py-1.5 text-ink/80">{name}</td>
+                  <td className="px-4 py-1.5 text-right font-mono tabular-nums text-ink/60">
+                    {fmtTenge(line.plan_current)}
+                  </td>
+                  <td className="px-4 py-1.5 text-right font-mono tabular-nums text-ink">
+                    {changed ? '→ ' : ''}
+                    {fmtTenge(line.plan_annex)}
+                  </td>
+                  <td className="px-4 py-1.5 text-right font-mono tabular-nums">
+                    {line.delta === 0 ? '—' : fmtTenge(line.delta)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="label-micro">{t('imports.annex_pilot_note')}</p>
     </div>
   );
 }
