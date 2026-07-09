@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import AppShell from '@/components/AppShell';
+import { EventsProvider } from '@/components/EventsProvider';
 import I18nProvider from '@/components/I18nProvider';
 import { SessionProvider } from '@/components/SessionProvider';
 import { fontClassNames } from '@/lib/fonts';
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <I18nProvider>
           <SessionProvider>
-            <AppShell>{children}</AppShell>
+            <EventsProvider>
+              <AppShell>{children}</AppShell>
+            </EventsProvider>
           </SessionProvider>
         </I18nProvider>
       </body>

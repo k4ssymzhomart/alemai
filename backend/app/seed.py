@@ -60,6 +60,7 @@ LOAD_ORDER: tuple[str, ...] = (
 # All model data tables — truncated before every load so reseeding is idempotent.
 DATA_TABLES: tuple[str, ...] = (
     "alerts",
+    "app_config",
     "audit_log",
     "claims",
     "contract_lines",
@@ -67,6 +68,7 @@ DATA_TABLES: tuple[str, ...] = (
     "contracts",
     "deadlines",
     "doctors",
+    "events",
     "findings",
     "forecasts",
     "import_files",
@@ -170,6 +172,20 @@ def seed_users(connection: Connection) -> int:
     return len(SEED_USERS)
 
 
+def stamp_reset(connection: Connection) -> None:
+    """Stamp the demo-reset timestamp into app_config (G4 «Жүйе туралы»)."""
+    import datetime
+
+    connection.execute(
+        text(
+            "INSERT INTO app_config (key, value, updated_at) "
+            "VALUES ('last_demo_reset', :val, now()) "
+            "ON CONFLICT (key) DO UPDATE SET value = :val, updated_at = now()"
+        ),
+        {"val": json.dumps({"at": datetime.datetime.now(datetime.UTC).isoformat()})},
+    )
+
+
 def verify_counts(connection: Connection, expected_rows: dict[str, int]) -> bool:
     """Compare live per-table counts to the manifest; print a report."""
     ok = True
@@ -219,6 +235,7 @@ def main(argv: list[str] | None = None) -> int:
     with engine.begin() as connection:
         load_tables(connection, out_dir)
         seed_users(connection)
+        stamp_reset(connection)
         print("seed: REFRESH MATERIALIZED VIEW mv_line_execution")
         refresh_line_execution(connection)
 

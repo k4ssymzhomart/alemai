@@ -10,6 +10,7 @@ from app.api import (
     contracts,
     copilot,
     documents,
+    events,
     exports,
     forecasts,
     imports,
@@ -23,6 +24,7 @@ from app.api import (
 
 api_router = APIRouter()
 api_router.include_router(auth.router)
+api_router.include_router(events.router)
 api_router.include_router(imports.router)
 api_router.include_router(exports.router)
 api_router.include_router(contracts.router)

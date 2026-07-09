@@ -7,7 +7,7 @@ import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import DenyCurator
+from app.api.deps import DenyCurator, OptionalPrincipal
 from app.db import get_db
 from app.models.enums import FindingStatus
 from app.models.rules import Finding, Rule
@@ -19,6 +19,7 @@ from app.schemas.rules import (
     RuleRunStarted,
     RunFindingsOut,
 )
+from app.services import events as events_svc
 from app.services.rules_engine import engine
 
 router = APIRouter(tags=["rules"])
@@ -29,7 +30,7 @@ LimitQuery = Annotated[int, Query(ge=1, le=5000, description="max findings retur
 
 
 @router.post("/rules/run", response_model=RuleRunStarted, status_code=202)
-def run_rules(body: RuleRunIn, db: DbDep) -> RuleRunStarted:
+def run_rules(body: RuleRunIn, db: DbDep, principal: OptionalPrincipal) -> RuleRunStarted:
     """Run the ЕКД catalog over the scope, persist findings, return the summary.
 
     Synchronous (fast at demo scale): findings are committed before the response
@@ -37,12 +38,14 @@ def run_rules(body: RuleRunIn, db: DbDep) -> RuleRunStarted:
     | 'year:YYYY' | 'import:<uuid>'.
     """
     result = engine.run(db, scope=body.scope)
+    totals = result.totals_json()
+    events_svc.rules_run_finished(db, principal, scope=result.scope, totals=totals)
     db.commit()
     return RuleRunStarted(
         run_id=result.run_id,
         scope=result.scope,
         status="completed",
-        totals=result.totals_json(),
+        totals=totals,
     )
 
 
@@ -90,9 +93,11 @@ def get_run_findings(
     return RunFindingsOut(run_id=run_id, group_by=group_by, groups=groups, findings=findings)
 
 
-@router.patch("/findings/{finding_id}", response_model=FindingOut)
-def patch_finding(finding_id: uuid.UUID, body: FindingPatch, db: DbDep) -> FindingOut:
-    """Exclude a finding from the registry or dismiss it (docs/04 GUARD)."""
+@router.patch("/findings/{finding_id}", response_model=FindingOut, dependencies=[DenyCurator])
+def patch_finding(
+    finding_id: uuid.UUID, body: FindingPatch, db: DbDep, principal: OptionalPrincipal
+) -> FindingOut:
+    """Exclude a finding from the registry or dismiss it (docs/04 GUARD). Curator: 403."""
     finding = db.get(Finding, finding_id)
     if finding is None:
         raise HTTPException(status_code=404, detail="finding not found")
@@ -101,6 +106,12 @@ def patch_finding(finding_id: uuid.UUID, body: FindingPatch, db: DbDep) -> Findi
         details = dict(finding.details or {})
         details["comment"] = body.comment
         finding.details = details
+    if finding.status in (FindingStatus.excluded, FindingStatus.dismissed):
+        events_svc.finding_status_changed(
+            db, principal, finding_id=str(finding.id), rule_code=finding.rule_code,
+            ekd_code=(finding.details or {}).get("ekd_code"),
+            amount=int(finding.amount_at_risk), status=finding.status.value,
+        )
     db.commit()
     db.refresh(finding)
     return FindingOut.model_validate(finding)

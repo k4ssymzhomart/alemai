@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import api from '@/lib/api';
+import { useRefreshEpoch } from '@/lib/refresh';
 import { mockLineMonthly, mockLines, mockOverview } from '@/lib/mock';
 import type {
   LineMonthlyResponse,
@@ -40,6 +41,9 @@ function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>): FetchState<T
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  // Events-driven revalidation (G2): a bump re-runs this effect so the screen
+  // reflects another session's mutation within one poll cycle.
+  const epoch = useRefreshEpoch();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -61,7 +65,7 @@ function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>): FetchState<T
       alive = false;
       controller.abort();
     };
-  }, [fetcher, attempt]);
+  }, [fetcher, attempt, epoch]);
 
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
 

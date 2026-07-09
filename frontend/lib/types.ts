@@ -317,3 +317,23 @@ export interface Me {
   role: string;
   is_service: boolean;
 }
+
+export interface EventItem {
+  id: string;
+  ts: string;
+  type: string;
+  severity: 'info' | 'warn' | 'critical';
+  actor: string;
+  role: string | null;
+  entity_ref: string | null;
+  link: string | null;
+  title_kk: string;
+  title_ru: string;
+  payload: Record<string, unknown> | null;
+}
+
+export interface EventsResponse {
+  items: EventItem[];
+  unread: number;
+  cursor: string | null;
+}

@@ -7,6 +7,7 @@ from app.models.alerts import Alert, Deadline
 from app.models.analytics import Forecast, RiskAssessment
 from app.models.claim import Claim
 from app.models.contract import Contract, ContractLine, ContractVersion
+from app.models.events import AppConfig, Event
 from app.models.imports import ImportFile, QuarantineRow
 from app.models.org import Organization
 from app.models.people import Doctor, Patient
@@ -16,12 +17,14 @@ from app.models.users import AuditLog, User
 
 __all__ = [
     "Alert",
+    "AppConfig",
     "AuditLog",
     "Claim",
     "Contract",
     "ContractLine",
     "ContractVersion",
     "Deadline",
+    "Event",
     "Doctor",
     "Finding",
     "Forecast",

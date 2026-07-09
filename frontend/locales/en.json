@@ -267,5 +267,10 @@
     "logout": "Sign out",
     "quick_login": "Quick login",
     "demo_hint": "Demo: password for all — qalam2026"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_read": "Mark all read",
+    "empty": "No notifications"
   }
 }
