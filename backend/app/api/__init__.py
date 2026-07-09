@@ -9,6 +9,7 @@ from app.api import (
     contracts,
     copilot,
     documents,
+    exports,
     forecasts,
     imports,
     metrics,
@@ -21,6 +22,7 @@ from app.api import (
 
 api_router = APIRouter()
 api_router.include_router(imports.router)
+api_router.include_router(exports.router)
 api_router.include_router(contracts.router)
 api_router.include_router(metrics.router)
 api_router.include_router(reconcile.router)
