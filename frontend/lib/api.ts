@@ -92,6 +92,41 @@ async function request<T>(
   return (await response.json()) as T;
 }
 
+/**
+ * POST a JSON body and download the binary response (e.g. a generated .docx)
+ * as a file. Throws ApiError on a non-2xx status. The server sets the filename
+ * via Content-Disposition; `fallbackName` is used otherwise.
+ */
+export async function downloadFile(
+  path: string,
+  body: unknown,
+  fallbackName: string,
+): Promise<void> {
+  const url = buildUrl(path);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: '*/*' },
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  });
+  if (!response.ok) {
+    const errBody: unknown = await response.json().catch(() => null);
+    throw new ApiError(response.status, response.statusText, errBody, url);
+  }
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposition);
+  const name = match ? decodeURIComponent(match[1]) : fallbackName;
+  const blob = await response.blob();
+  const href = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = href;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(href);
+}
+
 export const api = {
   get: <T>(path: string, options?: ApiRequestOptions) =>
     request<T>('GET', path, undefined, options),
