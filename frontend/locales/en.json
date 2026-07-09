@@ -19,7 +19,8 @@
     "admin": "Admin",
     "imports": "Import",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "regs": "Regulations"
   },
   "common": {
     "loading": "Loading…",
@@ -349,5 +350,19 @@
     "copy_manual": "Copy the link",
     "opening": "Opening…",
     "not_found": "Link not found"
+  },
+  "regs": {
+    "title": "Regulations",
+    "lead": "Primary sources — the orders and rules the system cites",
+    "contents": "Contents",
+    "search": "Search in document…",
+    "revision": "rev.",
+    "source": "Source",
+    "openSource": "Open source",
+    "found": "Found",
+    "noResults": "Nothing found",
+    "selectDoc": "Select a document",
+    "loading": "Loading…",
+    "punkt": "cl."
   }
 }

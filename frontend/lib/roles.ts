@@ -28,16 +28,16 @@ export const ROLE_LABEL_KEY: Record<Role, string> = {
 export const ROLE_NAV: Record<Role, string[]> = {
   economist: [
     '/overview', '/risks', '/reconcile', '/calendar',
-    '/reports', '/copilot', '/imports', '/admin',
+    '/reports', '/copilot', '/regs', '/imports', '/admin',
   ],
   statistician: [
-    '/overview', '/prebilling', '/reconcile', '/anomalies', '/copilot', '/imports',
+    '/overview', '/prebilling', '/reconcile', '/anomalies', '/copilot', '/regs', '/imports',
   ],
-  chief: ['/overview', '/risks', '/reports', '/city', '/copilot', '/admin'],
-  curator: ['/city', '/overview', '/copilot'],
+  chief: ['/overview', '/risks', '/reports', '/city', '/copilot', '/regs', '/admin'],
+  curator: ['/city', '/overview', '/copilot', '/regs'],
   admin: [
     '/overview', '/risks', '/prebilling', '/reconcile', '/anomalies',
-    '/calendar', '/copilot', '/reports', '/city', '/imports', '/admin',
+    '/calendar', '/copilot', '/regs', '/reports', '/city', '/imports', '/admin',
   ],
 };
 
