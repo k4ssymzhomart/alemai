@@ -91,3 +91,11 @@ verdict.* action.* settings.*`). All kk agent/coordinator-written.
 | objections.silence | Үнсіздік = автоматты түрде алып тастау (п. 27) | Молчание = автоснятие (п. 27) | medium | — |
 | settings.ref_ekd | ЕКД (Мониторинг қағидаларының 1-қосымшасы) | ЕКД (Приложение 1 Правил мониторинга) | high | official kk name of «Правила мониторинга»? |
 | docgen.obrashenie_kk | (see backend/app/services/docgen/obrashenie.py — full letter body kk) | — | low | full-letter native review before printing for the jury |
+
+<!-- EPIC G (2026-07-09) — glossary law applied; these are the calque-prone ones -->
+| radar.title | Дереккөз тексерісі (нормативтік радар) | Проверка источников (нормативный радар) | medium | «нормативтік радар» is a coined term — confirm reads naturally |
+| ops.live_note | Санақтар оқиғалар бойынша нақты уақытта жаңарады | Счётчики обновляются в реальном времени по событиям | medium | «нақты уақытта» (real-time) — calque; ok? |
+| ops.sanctions_prevented | Алдын алынған санкциялар | Предотвращено санкций | medium | «алдын алынған» = предотвращённый — confirm |
+| reports.note | Барлық сандарды жүйе есептейді — тілдік модель емес | Все числа считает система — не языковая модель | high | echoes the pitch line; must be crisp |
+| radar.status_stale | жаңасы бар | доступна новее | low | terse chip label |
+| auth.error | Қате логин немесе құпиясөз | Неверный логин или пароль | low | «логин» loanword — acceptable |
