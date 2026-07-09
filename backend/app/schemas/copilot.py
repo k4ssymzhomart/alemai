@@ -16,12 +16,13 @@ class CopilotAskIn(APIModel):
 
 
 class CitationOut(APIModel):
-    """Rendered by the UI as «п. X, приказ Y» (docs/05 §6)."""
+    """Rendered by the UI as «п. X, приказ Y» (docs/05 §6), linking to the source."""
 
     doc_title: str
     doc_number: str
     anchor: str
     lang: str = "kk"
+    url: str | None = None  # official source (EPIC G5)
 
 
 class ToolTraceOut(APIModel):

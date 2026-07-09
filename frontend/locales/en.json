@@ -163,7 +163,8 @@
     "claims_scanned": "{{n}} claims scanned",
     "export": "Export exceptions (XLSX)",
     "stamp_removed": "REMOVED",
-    "at_risk": "at risk"
+    "at_risk": "at risk",
+    "source": "Source"
   },
   "sev": {
     "block": "Blocker",
@@ -290,5 +291,23 @@
     "quarantine": "quarantine",
     "last_reset": "Last demo-reset",
     "live_note": "Counters update in real time on events"
+  },
+  "radar": {
+    "title": "Source check (normative radar)",
+    "check": "Check",
+    "checking": "Checking…",
+    "source": "Source",
+    "our_version": "Our version",
+    "official_version": "Official",
+    "status": "Status",
+    "actions": "Actions",
+    "checked": "checked",
+    "open_source": "Open source",
+    "mark_updated": "Mark updated",
+    "status_ok": "current",
+    "status_stale": "newer available",
+    "status_unreachable": "unavailable",
+    "status_manual": "manual check",
+    "pilot_note": "Apply — in the pilot (auto-update off)"
   }
 }

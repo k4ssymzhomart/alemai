@@ -76,6 +76,7 @@ DATA_TABLES: tuple[str, ...] = (
     "package_mapping",
     "patients",
     "quarantine_rows",
+    "radar_checks",
     "reg_chunks",
     "reg_documents",
     "risk_assessments",
@@ -236,6 +237,8 @@ def main(argv: list[str] | None = None) -> int:
         load_tables(connection, out_dir)
         seed_users(connection)
         stamp_reset(connection)
+        from app.services.radar import seed_initial as seed_radar
+        seed_radar(connection)
         print("seed: REFRESH MATERIALIZED VIEW mv_line_execution")
         refresh_line_execution(connection)
 

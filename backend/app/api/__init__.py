@@ -17,6 +17,7 @@ from app.api import (
     metrics,
     objections,
     ops,
+    radar,
     reconcile,
     reports,
     risks,
@@ -42,3 +43,4 @@ api_router.include_router(reports.router)
 api_router.include_router(city.router)
 api_router.include_router(admin.router)
 api_router.include_router(ops.router)
+api_router.include_router(radar.router)

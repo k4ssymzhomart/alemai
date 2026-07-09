@@ -154,6 +154,7 @@ function RuleRow({
   const { t } = useTranslation();
   const sample = findings?.findings.find((f) => f.rule_code === group.rule_code);
   const ekd = sample?.details?.ekd_code;
+  const sourceUrl = sample?.details?.source_url as string | undefined;
   const message =
     (locale === 'kk' ? sample?.details?.message_kk : sample?.details?.message_ru) ??
     sample?.details?.message_ru ??
@@ -172,6 +173,17 @@ function RuleRow({
         <SeverityChip severity={group.severity} />
         {message ? (
           <span className="truncate text-secondary text-ink/70">{message}</span>
+        ) : null}
+        {sourceUrl ? (
+          <a
+            href={sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="shrink-0 label-micro text-ink/50 underline decoration-ink/30 underline-offset-2 hover:text-ink"
+          >
+            {t('prebilling.source')}
+          </a>
         ) : null}
       </div>
       <div className="flex shrink-0 items-center gap-4">

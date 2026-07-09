@@ -48,3 +48,19 @@ class AppConfig(Base):
     updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), default=_utcnow, onupdate=_utcnow
     )
+
+
+class RadarCheck(Base):
+    """Latest normative-source check per source (EPIC G5). One row per source,
+    upserted on «Тексеру»."""
+
+    __tablename__ = "radar_checks"
+
+    source_id: Mapped[str] = mapped_column(String(48), primary_key=True)
+    checked_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime(timezone=True), default=_utcnow
+    )
+    status: Mapped[str] = mapped_column(String(16))  # ok | stale | unreachable | manual
+    our_version: Mapped[str | None] = mapped_column(String(64))
+    detected_version: Mapped[str | None] = mapped_column(String(64))
+    message: Mapped[str | None] = mapped_column(Text)

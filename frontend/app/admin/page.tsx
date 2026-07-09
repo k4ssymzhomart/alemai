@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import ErrorState from '@/components/ErrorState';
+import RadarPanel from '@/components/RadarPanel';
 import api from '@/lib/api';
 import { fmtNumber, fmtTenge } from '@/lib/format';
 import { useOps } from '@/lib/hooks';
@@ -94,11 +95,10 @@ export default function AdminPage() {
         </div>
       </Section>
 
-      <ThresholdsSection />
+      {/* Нормативный радар (G5) — validation vs official sources */}
+      <RadarPanel />
 
-      <Section title={t('settings.sec_refs')}>
-        <p className="text-secondary text-ink/60">{t('settings.other_rules')}</p>
-      </Section>
+      <ThresholdsSection />
     </div>
   );
 }

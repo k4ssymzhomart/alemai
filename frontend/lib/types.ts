@@ -236,6 +236,7 @@ export interface CopilotCitation {
   doc_number: string;
   anchor: string;
   lang?: string;
+  url?: string | null;
 }
 
 export interface CopilotToolTrace {
@@ -366,3 +367,20 @@ export interface Thresholds {
   burnout_days: number;
   materiality_tenge: number;
 }
+
+export interface RadarRow {
+  source_id: string;
+  name_ru: string;
+  name_kk: string;
+  our_version: string;
+  detected_version: string | null;
+  status: 'ok' | 'stale' | 'unreachable' | 'manual';
+  message: string | null;
+  checked_at: string | null;
+  official_url: string;
+  mirror_url: string | null;
+  quick_link: string;
+  fetchable: boolean;
+}
+export interface RadarResponse { rows: RadarRow[]; checked_any: boolean }
+export interface RadarCheckResult { summary: Record<string, number>; rows: RadarRow[] }

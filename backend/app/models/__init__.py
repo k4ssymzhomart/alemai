@@ -7,7 +7,7 @@ from app.models.alerts import Alert, Deadline
 from app.models.analytics import Forecast, RiskAssessment
 from app.models.claim import Claim
 from app.models.contract import Contract, ContractLine, ContractVersion
-from app.models.events import AppConfig, Event
+from app.models.events import AppConfig, Event, RadarCheck
 from app.models.imports import ImportFile, QuarantineRow
 from app.models.org import Organization
 from app.models.people import Doctor, Patient
@@ -33,6 +33,7 @@ __all__ = [
     "PackageMapping",
     "Patient",
     "QuarantineRow",
+    "RadarCheck",
     "RegChunk",
     "RegDocument",
     "RiskAssessment",

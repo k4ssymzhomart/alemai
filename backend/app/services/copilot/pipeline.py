@@ -27,20 +27,24 @@ BURN_OUT = "14.10.2026"
 
 Lang = str
 
+_MONITORING_URL = "https://adilet.zan.kz/rus/docs/V2000021904"
 CITE_MONITORING = CitationOut(
     doc_title="Правила мониторинга (V2000021904)",
     doc_number="приказ №68 от 18.07.2025",
     anchor="п. 4",
+    url=_MONITORING_URL,
 )
 CITE_SURVEY = CitationOut(
     doc_title="Правила мониторинга",
     doc_number="V2000021904",
     anchor="п. 6 пп. 5",
+    url=_MONITORING_URL,
 )
 CITE_OBJECTION = CitationOut(
     doc_title="Правила мониторинга",
     doc_number="V2000021904",
     anchor="пп. 26–27",
+    url=_MONITORING_URL,
 )
 
 
