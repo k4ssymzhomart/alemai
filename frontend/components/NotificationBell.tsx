@@ -40,7 +40,7 @@ export default function NotificationBell() {
       >
         <Bell className="h-4 w-4" strokeWidth={1.75} aria-hidden />
         {unread > 0 ? (
-          <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center bg-ink px-1 font-mono text-[10px] leading-none text-paper tabular-nums">
+          <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center bg-ink px-1 font-mono text-micro leading-none text-paper tabular-nums">
             {unread > 99 ? '99+' : unread}
           </span>
         ) : null}

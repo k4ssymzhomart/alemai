@@ -10,6 +10,13 @@ import { fmtNumber, fmtTenge } from '@/lib/format';
 import { useOps } from '@/lib/hooks';
 import type { Thresholds } from '@/lib/types';
 
+/** Readable labels for document kinds (backend enum → UI). */
+const DOC_KIND_LABEL: Record<string, string> = {
+  obrashenie: 'обращение',
+  monthly_report: 'отчёт',
+  vozrazhenie: 'возражение',
+};
+
 const THRESHOLD_FIELDS: Array<{ key: keyof Thresholds; labelKey: string }> = [
   { key: 'under_pct', labelKey: 'settings.th_under' },
   { key: 'over_pct', labelKey: 'settings.th_over' },
@@ -62,7 +69,9 @@ export default function AdminPage() {
               <Stat
                 label={t('ops.documents')}
                 value={fmtNumber(d.documents_generated)}
-                sub={d.documents_by_kind.map((k) => `${k.key} ${k.count}`).join(' · ')}
+                sub={d.documents_by_kind
+                  .map((k) => `${DOC_KIND_LABEL[k.key] ?? k.key} ${k.count}`)
+                  .join(' · ')}
               />
               <Stat
                 label={t('ops.imports')}

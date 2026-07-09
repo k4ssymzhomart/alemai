@@ -99,3 +99,6 @@ verdict.* action.* settings.*`). All kk agent/coordinator-written.
 | reports.note | Барлық сандарды жүйе есептейді — тілдік модель емес | Все числа считает система — не языковая модель | high | echoes the pitch line; must be crisp |
 | radar.status_stale | жаңасы бар | доступна новее | low | terse chip label |
 | auth.error | Қате логин немесе құпиясөз | Неверный логин или пароль | low | «логин» loanword — acceptable |
+| ops.reconcile (FIXED) | Салыстыру алшақтықтары | Расхождений по сверке | done | review caught «расхождения» calque → fixed |
+| ops.live_note (FIXED) | Есептегіштер оқиғалар бойынша нақты уақытта жаңарады | ... | done | «Санақтар»→«Есептегіштер» per review |
+| ops.positions | Сканерленген позициялар | Просканировано позиций | low | loanword-heavy — confirm or use «тексерілген жолдар» |
