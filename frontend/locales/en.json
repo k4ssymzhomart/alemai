@@ -315,5 +315,32 @@
     "monthly_report": "Generate the monthly report",
     "generate": "Generate",
     "note": "All numbers computed by the system — not the LLM"
+  },
+  "risks": {
+    "lead": "Risk register — lines deviating from plan",
+    "none": "No risks — all lines on track",
+    "generate_obrashenie": "Generate request"
+  },
+  "calendar": {
+    "lead": "Regulatory deadlines and objection windows",
+    "objection": "Objection · code {{code}}",
+    "days_left": "{{count}} working days until auto-removal",
+    "kind": {
+      "report_due": "report/campaign deadline",
+      "korrektirovka_window": "adjustment window",
+      "invoice_due": "invoice due"
+    }
+  },
+  "anomalies": {
+    "lead": "Doctor-workload outliers — require review",
+    "none": "No outliers found",
+    "col_doctor": "Doctor",
+    "col_type": "Type",
+    "col_period": "Period",
+    "col_count": "Count",
+    "col_status": "Status",
+    "type_day_volume": "Daily peak",
+    "type_weekend": "Weekend services",
+    "requires_review": "requires review"
   }
 }

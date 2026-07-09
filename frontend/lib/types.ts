@@ -386,3 +386,33 @@ export interface RadarRow {
 }
 export interface RadarResponse { rows: RadarRow[]; checked_any: boolean }
 export interface RadarCheckResult { summary: Record<string, number>; rows: RadarRow[] }
+
+// ─── EPIC H2: fill-or-kill (deadlines / anomalies) ──────────────────────────
+
+export interface Deadline {
+  id: string;
+  kind: string;
+  starts: string;
+  ends: string;
+  note: string | null;
+}
+
+export interface DeadlinesResponse {
+  deadlines: Deadline[];
+}
+
+export interface Anomaly {
+  type: 'day_volume' | 'weekend';
+  doctor: string;
+  specialty: string;
+  dept: string;
+  period: string;
+  count: number;
+  threshold: number;
+}
+
+export interface AnomaliesResponse {
+  items: Anomaly[];
+  day_volume_threshold: number;
+  weekend_threshold: number;
+}

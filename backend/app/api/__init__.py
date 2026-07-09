@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api import (
     admin,
     alerts,
+    anomalies,
     auth,
     city,
     contracts,
@@ -37,6 +38,7 @@ api_router.include_router(objections.router)
 api_router.include_router(forecasts.router)
 api_router.include_router(risks.router)
 api_router.include_router(alerts.router)
+api_router.include_router(anomalies.router)
 api_router.include_router(copilot.router)
 api_router.include_router(documents.router)
 api_router.include_router(reports.router)
