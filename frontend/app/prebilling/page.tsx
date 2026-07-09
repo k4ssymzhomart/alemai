@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
@@ -10,9 +10,15 @@ import CodeChip from '@/components/vedomost/CodeChip';
 import DeadlineBox from '@/components/vedomost/DeadlineBox';
 import StampMark from '@/components/vedomost/StampMark';
 import VerdictBlock from '@/components/vedomost/VerdictBlock';
+import { downloadFile } from '@/lib/api';
 import { fmtNumber, fmtTenge, type NumLocale } from '@/lib/format';
 import { useObjections, usePrebilling } from '@/lib/hooks';
-import type { FindingSeverity, RuleFindingGroup, RunFindings } from '@/lib/types';
+import type {
+  FindingSeverity,
+  Objection,
+  RuleFindingGroup,
+  RunFindings,
+} from '@/lib/types';
 
 /** The demo registry the pre-billing check runs over (storyline 5). */
 const DEMO_SCOPE = 'period:2025-11';
@@ -179,41 +185,67 @@ function ObjectionsSection({
           </p>
           <div className="flex flex-wrap gap-4">
             {state.data.items.map((o) => (
-              <div
-                key={o.case_ref}
-                className="flex w-64 flex-col gap-3 border border-ink/15 p-4"
-              >
-                <div className="flex items-center gap-2">
-                  <CodeChip code={o.ekd_code} />
-                  {o.yellow ? <SeverityChip severity="yellow" /> : null}
-                  <span className="font-mono text-micro text-ink/50">
-                    {o.case_ref}
-                  </span>
-                </div>
-                <p className="text-secondary text-ink/70">
-                  {t('objections.case')}: {o.ekd_name_ru}
-                </p>
-                <DeadlineBox
-                  deadline={o.deadline_date}
-                  daysLeft={o.deadline_working_days}
-                  citation={t('objections.citation')}
-                  label={
-                    o.amount_at_stake > 0
-                      ? `${t('objections.at_stake')} ${fmtTenge(o.amount_at_stake)}`
-                      : t('sev.yellow')
-                  }
-                />
-                <button
-                  type="button"
-                  className="border border-ink/40 px-3 py-1.5 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03]"
-                >
-                  {t('objections.construct')}
-                </button>
-              </div>
+              <ObjectionCard key={o.case_ref} objection={o} />
             ))}
           </div>
         </>
       )}
     </section>
+  );
+}
+
+function ObjectionCard({ objection: o }: { objection: Objection }) {
+  const { t, i18n } = useTranslation();
+  const lang = (i18n.resolvedLanguage ?? 'kk') === 'kk' ? 'kk' : 'ru';
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+
+  const draft = async () => {
+    if (busy) return;
+    setBusy(true);
+    setError(false);
+    try {
+      await downloadFile(
+        '/documents/vozrazhenie',
+        { case_ref: o.case_ref, lang },
+        `vozrazhenie_${o.case_ref}_${lang}.docx`,
+      );
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex w-64 flex-col gap-3 border border-ink/15 p-4">
+      <div className="flex items-center gap-2">
+        <CodeChip code={o.ekd_code} />
+        {o.yellow ? <SeverityChip severity="yellow" /> : null}
+        <span className="font-mono text-micro text-ink/50">{o.case_ref}</span>
+      </div>
+      <p className="text-secondary text-ink/70">
+        {t('objections.case')}: {o.ekd_name_ru}
+      </p>
+      <DeadlineBox
+        deadline={o.deadline_date}
+        daysLeft={o.deadline_working_days}
+        citation={t('objections.citation')}
+        label={
+          o.amount_at_stake > 0
+            ? `${t('objections.at_stake')} ${fmtTenge(o.amount_at_stake)}`
+            : t('sev.yellow')
+        }
+      />
+      <button
+        type="button"
+        onClick={draft}
+        disabled={busy}
+        className="border border-ink/40 px-3 py-1.5 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03] disabled:opacity-40"
+      >
+        {busy ? t('copilot.thinking') : t('objections.construct')}
+      </button>
+      {error ? <span className="label-micro text-ink/50">{t('common.error')}</span> : null}
+    </div>
   );
 }
