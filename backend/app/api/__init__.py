@@ -8,6 +8,7 @@ from app.api import (
     city,
     contracts,
     copilot,
+    documents,
     forecasts,
     imports,
     metrics,
@@ -29,6 +30,7 @@ api_router.include_router(forecasts.router)
 api_router.include_router(risks.router)
 api_router.include_router(alerts.router)
 api_router.include_router(copilot.router)
+api_router.include_router(documents.router)
 api_router.include_router(reports.router)
 api_router.include_router(city.router)
 api_router.include_router(admin.router)
