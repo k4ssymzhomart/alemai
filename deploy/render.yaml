@@ -5,8 +5,12 @@
 # DATABASE_URL automatically. After the API is up, set CORS_ORIGINS to your
 # Vercel URL (see deploy/README-DEPLOY.md).
 #
-# The venue demo runs LOCAL `docker compose` regardless — this public URL is
-# for jury follow-up, not the stage.
+# Both resources are on the FREE tier — zero-cost, and it provisions on a
+# blocked/free (Hobby) workspace. Trade-offs (fine for the pitch window): the
+# web service spins down after 15 min idle (~30–60 s cold start on first hit)
+# and the free Postgres expires 30 days after creation. The venue demo runs
+# LOCAL `docker compose` regardless — this public URL is for jury follow-up,
+# not the stage. Production upgrade path is noted inline at the bottom.
 services:
   - type: web
     name: qalam-api
@@ -14,7 +18,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
     healthCheckPath: /healthz
-    plan: starter
+    plan: free # free web instance — no bill on a blocked/free workspace
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -31,4 +35,9 @@ services:
 
 databases:
   - name: qalam-db
-    plan: starter
+    plan: free # free Postgres — the only DB plan valid for a NEW db on a free workspace
+    ipAllowList: [] # internal-only: the API reaches the DB over Render's private network
+    # NB: do NOT set diskSizeGB on free (fixed 1 GB) — that field is only valid on basic-*/pro-*.
+    # UPGRADE PATH (once the card is fixed / for production): set this DB `plan: basic-256mb`
+    #   (optional: diskSizeGB: 15) and the web service `plan: starter` — no 30-day expiry,
+    #   no cold starts. Leave as a commented alternative.
