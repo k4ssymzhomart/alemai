@@ -1,34 +1,25 @@
-"""Copilot endpoint (docs/05 §5-§6, docs/07). Plain JSON stub; SSE later."""
+"""Copilot endpoint (docs/05 §5-§6, docs/07, docs/11 P8).
 
-from fastapi import APIRouter
+Numbers are computed by the semantic layer, never by an LLM — the pipeline
+runs a deterministic keyword router + templates that work with the network off
+(the mandatory canned mode).
+"""
 
+from typing import Annotated
+
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.db import get_db
 from app.schemas.copilot import CopilotAnswerOut, CopilotAskIn
+from app.services.copilot import pipeline
 
 router = APIRouter(prefix="/copilot", tags=["copilot"])
 
-_STUB_ANSWERS = {
-    "kk": (
-        "Көмекші әзірге іске қосылмаған. Мен үш нәрсеге жауап бере аламын: "
-        "деректер бойынша сұрақтар, нормативтік құжаттар және есеп жобалары."
-    ),
-    "ru": (
-        "Копилот пока не подключен. Я умею три вещи: вопросы по данным, "
-        "вопросы по нормативке и черновики отчётов."
-    ),
-    "en": (
-        "The copilot is not wired up yet. It will support three capabilities: "
-        "data Q&A, regulations Q&A with citations, and report drafting."
-    ),
-}
+DbDep = Annotated[Session, Depends(get_db)]
 
 
 @router.post("/ask", response_model=CopilotAnswerOut)
-def ask(body: CopilotAskIn) -> CopilotAnswerOut:
-    """Answer a question. Stub: fixed out-of-scope reply, no LLM call, no numbers."""
-    return CopilotAnswerOut(
-        answer=_STUB_ANSWERS.get(body.locale, _STUB_ANSWERS["kk"]),
-        intent="out_of_scope",
-        locale=body.locale,
-        citations=[],
-        tool_traces=[],
-    )
+def ask(body: CopilotAskIn, db: DbDep) -> CopilotAnswerOut:
+    """Answer a data/regulation/report question, or refuse out-of-scope ones."""
+    return pipeline.answer(db, body.question, body.locale)

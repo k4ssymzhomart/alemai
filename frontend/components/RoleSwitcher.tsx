@@ -1,17 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-/** Hardcoded demo roles (docs/13 §2 core four); PD3-lite wires scope in Epic D. */
-const ROLES = ['economist', 'statistician', 'head', 'curator'] as const;
+import { ROLES, useRole, type Role } from '@/components/RoleProvider';
 
-export type Role = (typeof ROLES)[number];
-
-/** Role switcher (Epic A.2): quiet hairline select. */
+/** Role switcher (PD3-lite): drives nav + data scope via RoleProvider. */
 export default function RoleSwitcher() {
   const { t } = useTranslation();
-  const [role, setRole] = useState<Role>('economist');
+  const { role, setRole } = useRole();
 
   return (
     <label className="flex items-center gap-2 border border-ink/15 px-2 py-1">

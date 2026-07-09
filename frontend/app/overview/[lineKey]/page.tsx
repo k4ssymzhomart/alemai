@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -10,9 +10,15 @@ import CumulativeChart from '@/components/charts/CumulativeChart';
 import MonthlyChart from '@/components/charts/MonthlyChart';
 import KpiTile from '@/components/overview/KpiTile';
 import VerdictBlock from '@/components/vedomost/VerdictBlock';
+import { downloadFile } from '@/lib/api';
 import { fmtDate, fmtPct, fmtPeriod, fmtTenge, type NumLocale } from '@/lib/format';
 import { useLineMonthly, useLines } from '@/lib/hooks';
 import type { ContractLine, LocalizedText } from '@/lib/types';
+
+/** Docgen supports kk/ru only; en falls back to ru. */
+function docLang(locale: NumLocale): 'kk' | 'ru' {
+  return locale === 'kk' ? 'kk' : 'ru';
+}
 
 const DEFAULT_YEAR = 2026;
 
@@ -132,6 +138,25 @@ function PassportBody({
   const { t } = useTranslation();
   const name = line.service_group || t(`care_type.${line.care_type}`);
   const risk = line.risk_class;
+  const [docBusy, setDocBusy] = useState(false);
+  const [docError, setDocError] = useState(false);
+
+  const generateObrashenie = async () => {
+    if (docBusy) return;
+    setDocBusy(true);
+    setDocError(false);
+    try {
+      await downloadFile(
+        '/documents/obrashenie',
+        { line_key: line.line_key, lang: docLang(locale) },
+        `obrashenie_${docLang(locale)}.docx`,
+      );
+    } catch {
+      setDocError(true);
+    } finally {
+      setDocBusy(false);
+    }
+  };
 
   // ── Вердикт ────────────────────────────────────────────────────────────
   const verdictKey = risk ?? 'pending';
@@ -240,12 +265,19 @@ function PassportBody({
                 </p>
               ) : null}
             </div>
-            <button
-              type="button"
-              className="shrink-0 bg-ink px-4 py-2 text-secondary font-medium text-paper hover:opacity-80"
-            >
-              {t('action.generate')}
-            </button>
+            <div className="flex shrink-0 flex-col items-end gap-1">
+              <button
+                type="button"
+                onClick={generateObrashenie}
+                disabled={docBusy}
+                className="bg-ink px-4 py-2 text-secondary font-medium text-paper transition-opacity duration-150 hover:opacity-80 disabled:opacity-40"
+              >
+                {docBusy ? t('copilot.thinking') : t('action.generate')}
+              </button>
+              {docError ? (
+                <span className="label-micro text-ink/50">{t('common.error')}</span>
+              ) : null}
+            </div>
           </div>
         ) : (
           <p className="text-body text-ink/60">
