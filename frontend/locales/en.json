@@ -274,5 +274,21 @@
     "title": "Notifications",
     "mark_read": "Mark all read",
     "empty": "No notifications"
+  },
+  "ops": {
+    "title": "Ops panel",
+    "registries": "Registries checked",
+    "positions": "Positions scanned",
+    "findings": "Findings total",
+    "sanctions_prevented": "Sanctions prevented",
+    "objections": "Objections filed",
+    "documents": "Documents generated",
+    "imports": "Imports",
+    "reconcile": "Reconcile discrepancies",
+    "active_users": "Active users",
+    "ok": "ok",
+    "quarantine": "quarantine",
+    "last_reset": "Last demo-reset",
+    "live_note": "Counters update in real time on events"
   }
 }

@@ -337,3 +337,32 @@ export interface EventsResponse {
   unread: number;
   cursor: string | null;
 }
+
+export interface OpsCounter { key: string; count: number }
+export interface RefVersion { key: string; label: string; version: string }
+export interface OpsDashboard {
+  registries_checked: number;
+  positions_scanned: number;
+  findings_total: number;
+  findings_by_severity: OpsCounter[];
+  sanctions_prevented_tenge: number;
+  objections_filed: number;
+  documents_generated: number;
+  documents_by_kind: OpsCounter[];
+  reconcile_cases: number;
+  reconcile_tenge: number;
+  imports_count: number;
+  import_rows_ok: number;
+  import_rows_quarantined: number;
+  active_users: number;
+  events_total: number;
+  last_demo_reset: string | null;
+  app_version: string;
+  ref_versions: RefVersion[];
+}
+export interface Thresholds {
+  under_pct: number;
+  over_pct: number;
+  burnout_days: number;
+  materiality_tenge: number;
+}

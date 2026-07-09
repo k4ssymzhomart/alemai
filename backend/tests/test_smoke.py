@@ -23,6 +23,7 @@ DB_BACKED_PATHS = {
     "/api/v1/auth/me",
     "/api/v1/events",
     "/api/v1/admin/thresholds",
+    "/api/v1/ops/dashboard",
     "/api/v1/metrics/overview",
     "/api/v1/metrics/lines",
     "/api/v1/metrics/line/{line_key}/monthly",

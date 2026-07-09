@@ -17,6 +17,7 @@ import type {
   LineMonthlyResponse,
   LinesQuery,
   LinesResponse,
+  OpsDashboard,
   OverviewMetrics,
   PrebillingResult,
   ReconcileBuckets,
@@ -163,6 +164,15 @@ export function useReconcile(year: number): FetchState<ReconcileBuckets> {
 export function useObjections(): FetchState<ObjectionsResult> {
   const fetcher = useCallback(
     (signal: AbortSignal) => api.get<ObjectionsResult>('/objections', { signal }),
+    [],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /ops/dashboard — live ops counters; auto-revalidates on the event epoch. */
+export function useOps(): FetchState<OpsDashboard> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) => api.get<OpsDashboard>('/ops/dashboard', { signal }),
     [],
   );
   return useFetch(fetcher);
