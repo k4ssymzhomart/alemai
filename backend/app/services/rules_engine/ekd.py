@@ -23,6 +23,7 @@ didn't compute»).
 from __future__ import annotations
 
 import datetime
+import re
 from dataclasses import dataclass
 
 # Ред. № 19 в силе через 10 кал. дней после первого офиц. опубликования
@@ -119,6 +120,27 @@ def sanction_amount(code: str, care_type: str, billed: int) -> int | None:
     if care_type not in _COST_PRICED or ekd.cost_multiplier is None:
         return None
     return int(round(billed * ekd.cost_multiplier))
+
+
+def kpn_multiple(code: str) -> int:
+    """Leading integer of the АПП column («100 КПН/ПН» → 100); 0 if none/yellow."""
+    ekd = _CODES[code]
+    if ekd.yellow or not ekd.app_penalty:
+        return 0
+    m = re.match(r"\d+", ekd.app_penalty)
+    return int(m.group()) if m else 0
+
+
+def sanction_total(code: str, care_type: str, billed: int, kpn_tenge: int) -> int:
+    """Full penalty exposure per finding, ₸: снятие (% стоимости, cost-priced) +
+    the АПП fine (кратность подушевого норматива × КПН). E.g. код 5.1 on a
+    cost-priced service = 300 % × billed + 100 × КПН. Yellow codes = 0."""
+    ekd = _CODES[code]
+    if ekd.yellow:
+        return 0
+    cost_part = sanction_amount(code, care_type, billed) or 0
+    kpn_part = kpn_multiple(code) * kpn_tenge
+    return cost_part + kpn_part
 
 
 def descriptor(

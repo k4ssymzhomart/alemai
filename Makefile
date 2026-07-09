@@ -1,6 +1,6 @@
 # IGERIM — hackathon monorepo make targets (docs/05 §1: `make up seed reset demo`)
 
-.PHONY: up down logs seed reset demo eval-copilot fmt lint
+.PHONY: up down logs seed reset demo-reset demo eval-copilot fmt lint
 
 ## Bring up the whole stack (db + api + web), rebuilding images
 up:
@@ -18,9 +18,16 @@ logs:
 seed:
 	docker compose exec api python -m app.seed
 
-## Restore the pg_dump demo snapshot (<60s per docs/05 §7) — wired to POST /admin/demo-reset later
-reset:
-	@echo "reset: not implemented yet — will invoke backend demo-reset (POST /api/v1/admin/demo-reset)"
+reset: demo-reset
+
+## Deterministic demo reset (<60s): re-seed the full gp14 dataset + verify.
+## seed is idempotent (TRUNCATE + COPY) with a fixed RNG, so this restores the
+## exact demo state mid-presentation if anything gets clicked into a bad place.
+demo-reset:
+	@start=$$(date +%s); \
+	docker compose exec -T api python -m app.seed >/dev/null && \
+	docker compose exec -T api sh -c 'M=$$(find / -name manifest.json 2>/dev/null | grep igerim_seed | head -1); python scripts/assert_seed_integrity.py "$$M" >/dev/null' && \
+	echo "demo-reset OK — full gp14 restored + integrity green in $$(( $$(date +%s) - start ))s"
 
 ## One command to demo-readiness: stack up + seeded data
 demo: up seed

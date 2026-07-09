@@ -151,7 +151,7 @@
     "run_check": "Check registry",
     "registry": "November 2025 registry",
     "who": "Pre-billing check — reporting period",
-    "verdict_block": "BLOCKERS: {{count}} positions · {{amount}} at risk",
+    "verdict_block": "BLOCKERS: {{count}} positions · {{amount}} of services · sanction risk ≈ {{sanction}}",
     "verdict_clean": "No blockers — registry clean",
     "sec_findings": "By rule",
     "claims_scanned": "{{n}} claims scanned",
