@@ -10,6 +10,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   FileText,
+  FileUp,
   LayoutDashboard,
   MessageSquare,
   Scale,
@@ -42,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/copilot', labelKey: 'nav.copilot', icon: MessageSquare },
   { href: '/reports', labelKey: 'nav.reports', icon: FileText },
   { href: '/city', labelKey: 'nav.city', icon: Building2 },
+  { href: '/imports', labelKey: 'nav.imports', icon: FileUp },
   { href: '/admin', labelKey: 'nav.admin', icon: Settings },
 ];
 

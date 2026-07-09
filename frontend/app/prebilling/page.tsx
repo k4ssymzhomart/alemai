@@ -10,7 +10,7 @@ import CodeChip from '@/components/vedomost/CodeChip';
 import DeadlineBox from '@/components/vedomost/DeadlineBox';
 import StampMark from '@/components/vedomost/StampMark';
 import VerdictBlock from '@/components/vedomost/VerdictBlock';
-import { downloadFile } from '@/lib/api';
+import { downloadFile, downloadFileGet } from '@/lib/api';
 import { fmtNumber, fmtTenge, type NumLocale } from '@/lib/format';
 import { useObjections, usePrebilling } from '@/lib/hooks';
 import type {
@@ -98,12 +98,7 @@ export default function PrebillingPage() {
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                className="border border-ink/40 px-4 py-2 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03]"
-              >
-                {t('prebilling.export')}
-              </button>
+              <ExportExceptionsButton />
             </div>
           </>
         )}
@@ -111,6 +106,37 @@ export default function PrebillingPage() {
 
       <ObjectionsSection state={objections} />
     </div>
+  );
+}
+
+/** ST-3: the exceptions list Дана hands to врачи for fixing (XLSX). */
+function ExportExceptionsButton() {
+  const { t } = useTranslation();
+  const [busy, setBusy] = useState(false);
+
+  const exportExceptions = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await downloadFileGet(
+        '/exports/prebilling.xlsx',
+        { scope: DEMO_SCOPE },
+        'qalam_prebilling.xlsx',
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={exportExceptions}
+      disabled={busy}
+      className="border border-ink/40 px-4 py-2 text-secondary font-medium text-ink transition-colors duration-150 hover:bg-ink/[.03] disabled:opacity-40"
+    >
+      {t('prebilling.export')}
+    </button>
   );
 }
 
