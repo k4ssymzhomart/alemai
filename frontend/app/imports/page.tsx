@@ -143,7 +143,7 @@ function AnnexDiff({ preview }: { preview: AnnexPreview }) {
           Δ {fmtTenge(preview.total_delta)}
         </span>
       </p>
-      <div className="border border-ink/15">
+      <div className="overflow-x-auto border border-ink/15">
         <table className="w-full border-collapse text-secondary">
           <thead>
             <tr className="border-b border-ink/15 text-left label-micro">
