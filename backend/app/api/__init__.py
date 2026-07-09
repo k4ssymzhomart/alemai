@@ -20,6 +20,7 @@ from app.api import (
     ops,
     radar,
     reconcile,
+    regs,
     reports,
     risks,
     rules,
@@ -48,3 +49,4 @@ api_router.include_router(city.router)
 api_router.include_router(admin.router)
 api_router.include_router(ops.router)
 api_router.include_router(radar.router)
+api_router.include_router(regs.router)
