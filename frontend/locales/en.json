@@ -36,7 +36,8 @@
     "demo_badge": "demo data",
     "go_overview": "Go to overview",
     "language_label": "Language",
-    "period": "Period"
+    "period": "Period",
+    "month": "Month"
   },
   "ticker": {
     "label": "Alert ticker",
@@ -309,5 +310,11 @@
     "status_unreachable": "unavailable",
     "status_manual": "manual check",
     "pilot_note": "Apply — in the pilot (auto-update off)"
+  },
+  "reports": {
+    "lead": "Monthly management report (docx)",
+    "monthly_report": "Generate the monthly report",
+    "generate": "Generate",
+    "note": "All numbers computed by the system — not the LLM"
   }
 }
