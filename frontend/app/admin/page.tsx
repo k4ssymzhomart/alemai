@@ -97,11 +97,6 @@ export default function AdminPage() {
           <Row key={r.key} label={r.label} value={r.version} />
         ))}
         <Row label={t('ops.last_reset')} value={fmtReset(d?.last_demo_reset ?? null)} />
-        <div className="pt-1">
-          <span className="label-micro border border-ink/40 px-1.5 py-0.5 text-ink/60">
-            {t('common.demo_badge')}
-          </span>
-        </div>
       </Section>
 
       {/* Нормативный радар (G5) — validation vs official sources */}

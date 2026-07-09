@@ -67,7 +67,7 @@ export default function DeadlineBox({
       className={clsx(
         'inline-block px-4 py-3',
         critical
-          ? 'border border-ink bg-ink text-paper'
+          ? 'border border-critical bg-critical text-paper print:border-ink print:bg-ink'
           : 'border border-ink/15 text-ink',
       )}
     >

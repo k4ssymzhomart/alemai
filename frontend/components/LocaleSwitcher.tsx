@@ -3,7 +3,7 @@
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
-import { locales, type Locale } from '@/lib/i18n';
+import { LOCALE_STORAGE_KEY, locales, type Locale } from '@/lib/i18n';
 
 const LABELS: Record<Locale, string> = {
   kk: 'ҚАЗ',
@@ -18,6 +18,9 @@ export default function LocaleSwitcher() {
 
   const handleChange = (locale: Locale) => {
     void i18n.changeLanguage(locale);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, locale); // persist choice over RU default
+    }
     if (typeof document !== 'undefined') {
       document.documentElement.lang = locale;
     }

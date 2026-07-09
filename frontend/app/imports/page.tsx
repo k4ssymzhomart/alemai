@@ -393,7 +393,7 @@ function ImportSteps({ result }: { result: RegistryImportResult }) {
           <button
             type="button"
             onClick={() => router.push('/prebilling')}
-            className="bg-ink px-5 py-2.5 text-secondary font-medium text-paper transition-colors duration-150 hover:bg-ink/80"
+            className="bg-accent px-5 py-2.5 text-secondary font-medium text-paper transition-colors duration-150 hover:bg-accent/90"
           >
             {t('imports.run_check')} →
           </button>

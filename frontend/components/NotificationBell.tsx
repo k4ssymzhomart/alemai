@@ -8,8 +8,13 @@ import { useTranslation } from 'react-i18next';
 import { useEvents } from '@/components/EventsProvider';
 import type { EventItem } from '@/lib/types';
 
-/** Severity glyph — B&W, no color (docs/15 §4). */
+/** Severity glyph + colour (rebrand v3): glyph = colour-blind backup. */
 const GLYPH: Record<string, string> = { critical: '▲', warn: '!', info: '·' };
+const GLYPH_COLOR: Record<string, string> = {
+  critical: 'text-critical',
+  warn: 'text-warn',
+  info: 'text-ink/40',
+};
 
 function eventTime(ts: string): string {
   const d = new Date(ts);
@@ -40,7 +45,7 @@ export default function NotificationBell() {
       >
         <Bell className="h-4 w-4" strokeWidth={1.75} aria-hidden />
         {unread > 0 ? (
-          <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center bg-ink px-1 font-mono text-micro leading-none text-paper tabular-nums">
+          <span className="absolute -right-1.5 -top-1.5 flex h-4 min-w-[16px] items-center justify-center bg-accent px-1 font-mono text-micro leading-none text-paper tabular-nums">
             {unread > 99 ? '99+' : unread}
           </span>
         ) : null}
@@ -77,7 +82,9 @@ export default function NotificationBell() {
                   const row = (
                     <div className="flex gap-3 px-4 py-2.5">
                       <span
-                        className="mt-0.5 w-3 shrink-0 text-center font-mono text-ink"
+                        className={`mt-0.5 w-3 shrink-0 text-center font-mono ${
+                          GLYPH_COLOR[e.severity] ?? 'text-ink/40'
+                        }`}
                         aria-hidden
                       >
                         {GLYPH[e.severity] ?? '·'}

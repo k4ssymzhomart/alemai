@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import CodeChip from '@/components/vedomost/CodeChip';
 import api from '@/lib/api';
-import type { NumLocale } from '@/lib/format';
 import type { CopilotAnswer } from '@/lib/types';
 
 interface Turn {
@@ -23,8 +22,7 @@ const DEMO_QS = ['q1', 'q13', 'q13b', 'qobj', 'qrec', 'q21'] as const;
  * Canned mode makes this work with the network off.
  */
 export default function CopilotPage() {
-  const { t, i18n } = useTranslation();
-  const locale = (i18n.resolvedLanguage ?? 'kk') as NumLocale;
+  const { t } = useTranslation();
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
@@ -39,7 +37,8 @@ export default function CopilotPage() {
     try {
       const res = await api.post<CopilotAnswer>('/copilot/ask', {
         question: q,
-        locale,
+        // The copilot beat is performed in Kazakh regardless of UI locale (docs/25 H1).
+        locale: 'kk',
       });
       setTurns((ts) =>
         ts.map((turn, i) =>

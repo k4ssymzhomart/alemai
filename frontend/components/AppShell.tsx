@@ -6,7 +6,6 @@ import { useEffect, useState, type ReactNode } from 'react';
 import clsx from 'clsx';
 import {
   Activity,
-  Building2,
   CalendarDays,
   ChevronsLeft,
   ChevronsRight,
@@ -45,7 +44,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/calendar', labelKey: 'nav.calendar', icon: CalendarDays },
   { href: '/copilot', labelKey: 'nav.copilot', icon: MessageSquare },
   { href: '/reports', labelKey: 'nav.reports', icon: FileText },
-  { href: '/city', labelKey: 'nav.city', icon: Building2 },
+  // /city stays killed (docs/25 H2 fill-or-kill) — tracked as a roadmap issue.
   { href: '/imports', labelKey: 'nav.imports', icon: FileUp },
   { href: '/admin', labelKey: 'nav.admin', icon: Settings },
 ];
@@ -122,7 +121,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                     'flex items-center border-l-2 py-2 text-secondary transition-colors duration-150',
                     collapsed ? 'justify-center px-0' : 'gap-2.5 px-5',
                     active
-                      ? 'border-ink font-medium text-ink'
+                      ? 'border-accent font-medium text-accent'
                       : 'border-transparent text-ink/60 hover:bg-ink/[.03] hover:text-ink',
                   )}
                 >
@@ -162,15 +161,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <main className="mx-auto w-full max-w-content flex-1 px-8 py-8">
             {children}
           </main>
-          {/* NOT print-hidden: printed output must carry the demo-data label. */}
-          <footer className="flex items-center gap-2 border-t border-ink/15 px-8 py-3">
-            <span className="label-micro border border-ink/40 px-1.5 py-0.5 text-ink/60">
-              {t('common.demo_badge')}
-            </span>
-            <span className="text-secondary text-ink/40">
-              {t('common.demo_data_note')}
-            </span>
-          </footer>
         </div>
       </div>
     </div>
