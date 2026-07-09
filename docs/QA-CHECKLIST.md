@@ -49,11 +49,18 @@ Automated half: `assert_storylines.py` re-checks every row above against the liv
 - [ ] Risk register ranked by ₸; МРТ risk card shows возместимо **≈5.67 млн ₸** и дедлайн
 - [ ] [Сформировать обращение] (пп. 25)/26) п. 19) → docx downloads, Kazakh, numbers filled, no `{{...}}` leftovers
 
+### Beat 4-prelude — Импорт: файл из МИС (role: Дана, EPIC F1)
+- [ ] «Импорт» in the sidebar → drop `registry_2025-11.xlsx` (download link on the screen; формат Damumed) → «Файл танылды: … строк · 2025-11 · пресет Damumed»
+- [ ] Маппинг table: ИИН/коды/суммы `auto`; ФИО / дата рождения / пол → «—» (персданные не сохраняются)
+- [ ] Нәтиже: все строки приняты, **карантин 0, новых 0** (реестр = уже загруженный период) → «Тексеруді іске қосу» ведёт к вердикту beat 4
+- [ ] Re-upload the same file → counters identical, **никаких дублей** (идемпотентность — страховка живой демо-загрузки)
+- [ ] Drop `registry_broken.xlsx` → **3 строки в карантине** с причинами (нет ИИН / код вне тарификатора / сумма не сходится) + экспорт карантина XLSX
+
 ### Beat 4 — Pre-billing check (role: Дана)
 - [ ] Switch role to Дана — menu changes
 - [ ] «Проверить реестр» on the 11.2025 registry → verdict **46 позиции / ≈168 600 ₸**
 - [ ] Findings include услуги после даты смерти (R01, ЕКД 5.1) and скрининги не того пола (R02): 31 маммографий мужчинам, 12 скринингов вне возраста, 3 услуги после смерти
-- [ ] Export exceptions XLSX works
+- [ ] «Экспорт исключений (XLSX)» → file opens, 46 blocker rows, суммы числами (EPIC F2)
 
 ### Beat 5 — Reconciliation
 - [ ] Bucket «оказано, но не выставлено» shows **260 случаев / ≈2.99 млн ₸**

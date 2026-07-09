@@ -251,3 +251,59 @@ export interface CopilotAnswer {
   citations: CopilotCitation[];
   tool_traces: CopilotToolTrace[];
 }
+
+// ─── EPIC F: ingest & exchange ──────────────────────────────────────────────
+
+export interface ImportColumnMap {
+  column: string;
+  field: string | null;
+  status: 'auto' | 'ignored' | 'unknown';
+  confidence: string | null;
+  note: string | null;
+}
+
+export interface ImportQuarantineRow {
+  row_no: number;
+  raw: Record<string, unknown>;
+  errors: string[];
+}
+
+export interface RegistryImportResult {
+  file_id: string;
+  filename: string;
+  preset: string;
+  period_detected: string | null;
+  rows_total: number;
+  rows_ok: number;
+  matched: number;
+  updated: number;
+  new: number;
+  quarantined: number;
+  control_sum: number;
+  claims_in_period: number;
+  mapping: ImportColumnMap[];
+  quarantine: ImportQuarantineRow[];
+  rule_run_id: string | null;
+  rule_totals: RuleRunTotals | null;
+}
+
+export interface AnnexLineDiff {
+  care_type: string;
+  funding_source: string;
+  service_group: string;
+  plan_current: number;
+  plan_annex: number;
+  delta: number;
+  status: 'changed' | 'unchanged' | 'new' | 'missing';
+}
+
+export interface AnnexPreview {
+  filename: string;
+  year: number;
+  lines: AnnexLineDiff[];
+  changed: number;
+  total_current: number;
+  total_annex: number;
+  total_delta: number;
+  preview_only: boolean;
+}

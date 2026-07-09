@@ -15,12 +15,19 @@ pytestmark = pytest.mark.smoke
 
 client = TestClient(app)
 
-# GET routes that read the live database (P1 real metrics) — covered by
-# tests/test_metrics_integration.py instead; smoke stays DB-free by design.
+# GET routes that read the live database (P1 real metrics, EPIC F exchange) —
+# covered by tests/test_metrics_integration.py / test_imports_integration.py
+# instead; smoke stays DB-free by design.
 DB_BACKED_PATHS = {
     "/api/v1/metrics/overview",
     "/api/v1/metrics/lines",
     "/api/v1/metrics/line/{line_key}/monthly",
+    "/api/v1/imports/{file_id}/quarantine",
+    "/api/v1/imports/samples/{filename}",
+    "/api/v1/exports/prebilling.xlsx",
+    "/api/v1/exports/overview.xlsx",
+    "/api/v1/exports/reconcile-bucket/{bucket_no}.xlsx",
+    "/api/v1/exports/quarantine/{file_id}.xlsx",
 }
 
 
