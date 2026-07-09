@@ -30,6 +30,11 @@ from dataclasses import dataclass
 # (рег. 03.03.2026) → оценка 2026-03-14 (ekd_notes.md §2 + mentor-question #4).
 EDITION_19_EFFECTIVE = datetime.date(2026, 3, 14)
 
+# Finding-level source (EPIC G5): the ЕКД is Приложение 1 к Правилам мониторинга
+# (приказ ҚР ДСМ-321/2020, V2000021904). Every ЕКД finding links here.
+EKD_SOURCE_URL = "https://adilet.zan.kz/rus/docs/V2000021904"
+EKD_SOURCE_LABEL = "ЕКД — прил. 1 к Правилам мониторинга (приказ ҚР ДСМ-321/2020)"
+
 # Care types priced per service/case (снятие = % стоимости). ПМСП is подушевик.
 _COST_PRICED = frozenset({"kdu", "day_hosp", "hosp", "dent", "screening", "ambulance"})
 
@@ -168,4 +173,7 @@ def descriptor(
         "app_penalty": ekd.app_penalty,
         "sanction_amount": sanction,
         "sanction_ru": sanction_ru,
+        # Finding-level source link (EPIC G5): «покажите, откуда это правило».
+        "source_url": EKD_SOURCE_URL,
+        "source_label": EKD_SOURCE_LABEL,
     }

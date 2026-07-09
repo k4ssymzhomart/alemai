@@ -22,6 +22,15 @@ class Settings(BaseSettings):
     # (calibration_stats.md). Used to money-ize the sanction-risk verdict.
     kpn_tenge: int = 1710
 
+    # Auth / session (EPIC G1). Demo defaults — override via env in prod. The
+    # cookie is a signed, timestamped payload (itsdangerous), no server store.
+    secret_key: str = "qalam-demo-secret-change-in-prod-0a1b2c3d4e5f"
+    session_cookie: str = "qalam_session"
+    session_max_age: int = 86_400  # 24h
+    # Header token that lets headless scripts (scripts/qa_golden.py, CI) act as
+    # an admin service principal without a login round-trip.
+    service_token: str = "qalam-service-token-demo"
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

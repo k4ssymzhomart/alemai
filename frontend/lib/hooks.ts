@@ -11,11 +11,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import api from '@/lib/api';
+import { useRefreshEpoch } from '@/lib/refresh';
 import { mockLineMonthly, mockLines, mockOverview } from '@/lib/mock';
 import type {
   LineMonthlyResponse,
   LinesQuery,
   LinesResponse,
+  OpsDashboard,
   OverviewMetrics,
   PrebillingResult,
   ReconcileBuckets,
@@ -35,11 +37,22 @@ export interface FetchState<T> {
   retry: () => void;
 }
 
-function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>): FetchState<T> {
+function useFetch<T>(
+  fetcher: (signal: AbortSignal) => Promise<T>,
+  opts: { live?: boolean } = {},
+): FetchState<T> {
+  const { live = true } = opts;
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
+  // Events-driven revalidation (G2): a bump re-runs this effect so the screen
+  // reflects another session's mutation within one poll cycle. Hooks whose
+  // fetcher MUTATES (usePrebilling POSTs /rules/run) opt out with live:false —
+  // otherwise the run emits an event that bumps the epoch that re-runs the
+  // fetcher → a self-sustaining loop (adversarial-review CRITICAL).
+  const liveEpoch = useRefreshEpoch();
+  const epoch = live ? liveEpoch : 0;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -61,7 +74,7 @@ function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>): FetchState<T
       alive = false;
       controller.abort();
     };
-  }, [fetcher, attempt]);
+  }, [fetcher, attempt, epoch]);
 
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
@@ -139,7 +152,9 @@ export function usePrebilling(scope: string): FetchState<PrebillingResult> {
     },
     [scope],
   );
-  return useFetch(fetcher);
+  // live:false — the fetcher POSTs a rules run (mutation); must NOT re-run on
+  // the event epoch or it self-triggers every poll cycle.
+  return useFetch(fetcher, { live: false });
 }
 
 /** GET /reconcile/buckets?year= */
@@ -159,6 +174,15 @@ export function useReconcile(year: number): FetchState<ReconcileBuckets> {
 export function useObjections(): FetchState<ObjectionsResult> {
   const fetcher = useCallback(
     (signal: AbortSignal) => api.get<ObjectionsResult>('/objections', { signal }),
+    [],
+  );
+  return useFetch(fetcher);
+}
+
+/** GET /ops/dashboard — live ops counters; auto-revalidates on the event epoch. */
+export function useOps(): FetchState<OpsDashboard> {
+  const fetcher = useCallback(
+    (signal: AbortSignal) => api.get<OpsDashboard>('/ops/dashboard', { signal }),
     [],
   );
   return useFetch(fetcher);

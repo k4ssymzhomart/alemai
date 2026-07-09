@@ -147,11 +147,23 @@ function TurnView({ turn, busyLast }: { turn: Turn; busyLast: boolean }) {
           {turn.answer.citations.length > 0 ? (
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="label-micro">{t('copilot.sources')}:</span>
-              {turn.answer.citations.map((c, j) => (
-                <span key={j} title={`${c.doc_title} ${c.doc_number}`}>
-                  <CodeChip code={`${c.anchor} · ${c.doc_number}`} />
-                </span>
-              ))}
+              {turn.answer.citations.map((c, j) =>
+                c.url ? (
+                  <a
+                    key={j}
+                    href={c.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={`${c.doc_title} ${c.doc_number}`}
+                  >
+                    <CodeChip code={`${c.anchor} · ${c.doc_number}`} />
+                  </a>
+                ) : (
+                  <span key={j} title={`${c.doc_title} ${c.doc_number}`}>
+                    <CodeChip code={`${c.anchor} · ${c.doc_number}`} />
+                  </span>
+                ),
+              )}
             </div>
           ) : null}
         </div>

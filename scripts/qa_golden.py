@@ -14,25 +14,32 @@ import sys
 import urllib.request
 
 API = os.environ.get("API_BASE", "http://localhost:8800/api/v1")
+# Auth bootstrap (EPIC G1): act as an admin service principal so the golden
+# checks keep passing after routes read the session role. Header-based — no
+# login round-trip.
+SERVICE_TOKEN = os.environ.get("QALAM_SERVICE_TOKEN", "qalam-service-token-demo")
+_AUTH = {"X-Service-Token": SERVICE_TOKEN}
 _fails = 0
 
 
 def get(path: str) -> dict:
-    with urllib.request.urlopen(f"{API}{path}", timeout=20) as r:
+    req = urllib.request.Request(f"{API}{path}", headers=_AUTH)
+    with urllib.request.urlopen(req, timeout=20) as r:
         return json.load(r)
 
 
 def post(path: str, body: dict) -> dict:
     req = urllib.request.Request(
         f"{API}{path}", data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json"}, method="POST",
+        headers={"Content-Type": "application/json", **_AUTH}, method="POST",
     )
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.load(r)
 
 
 def get_bytes(path: str) -> bytes:
-    with urllib.request.urlopen(f"{API}{path}", timeout=120) as r:
+    req = urllib.request.Request(f"{API}{path}", headers=_AUTH)
+    with urllib.request.urlopen(req, timeout=120) as r:
         return r.read()
 
 
@@ -50,7 +57,7 @@ def post_multipart(path: str, filename: str, blob: bytes) -> dict:
     )
     req = urllib.request.Request(
         f"{API}{path}", data=body,
-        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}", **_AUTH},
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=180) as r:

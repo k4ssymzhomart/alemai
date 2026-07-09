@@ -14,6 +14,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
+from app.api.deps import OptionalPrincipal
 from app.db import get_db
 from app.models.imports import ImportFile, QuarantineRow
 from app.schemas.imports import (
@@ -24,6 +25,7 @@ from app.schemas.imports import (
     QuarantineRowOut,
     RegistryImportOut,
 )
+from app.services import events as events_svc
 from app.services.exports.xlsx import xlsx_response
 from app.services.ingest import samples
 from app.services.ingest.annex import preview_annex
@@ -48,7 +50,9 @@ _SAMPLE_BUILDERS = {
 
 
 @router.post("/mis-registry", response_model=RegistryImportOut, status_code=201)
-async def import_mis_registry(file: FileDep, db: DbDep) -> RegistryImportOut:
+async def import_mis_registry(
+    file: FileDep, db: DbDep, principal: OptionalPrincipal
+) -> RegistryImportOut:
     """Import a МИС «реестр услуг» export; idempotent — re-upload adds nothing."""
     data = await file.read()
     if len(data) > MAX_UPLOAD_BYTES:
@@ -62,15 +66,23 @@ async def import_mis_registry(file: FileDep, db: DbDep) -> RegistryImportOut:
     # (the golden-path upload matches everything, so this is skipped there).
     if report.updated or report.new:
         refresh_line_execution(db)
+    events_svc.import_completed(
+        db, principal, filename=report.filename, period=report.period_detected,
+        rows_ok=report.rows_ok, quarantined=len(report.quarantine),
+        new=report.new, matched=report.matched,
+    )
     db.commit()
 
     rule_run_id = None
     rule_totals = None
     if report.period_detected and report.rows_ok:
         result = engine.run(db, scope=f"period:{report.period_detected}")
+        rule_totals = result.totals_json()
+        events_svc.rules_run_finished(
+            db, principal, scope=result.scope, totals=rule_totals, triggered_by="import",
+        )
         db.commit()
         rule_run_id = result.run_id
-        rule_totals = result.totals_json()
 
     return RegistryImportOut(
         file_id=report.file_id,

@@ -16,7 +16,9 @@
     "reports": "Reports",
     "city": "City panel",
     "admin": "Admin",
-    "imports": "Import"
+    "imports": "Import",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "common": {
     "loading": "Loading…",
@@ -34,7 +36,8 @@
     "demo_badge": "demo data",
     "go_overview": "Go to overview",
     "language_label": "Language",
-    "period": "Period"
+    "period": "Period",
+    "month": "Month"
   },
   "ticker": {
     "label": "Alert ticker",
@@ -50,10 +53,11 @@
   },
   "roles": {
     "label": "Role",
-    "economist": "Aigerim — Economist",
-    "statistician": "Dana — Statistician",
-    "head": "Yerlan — Director",
-    "curator": "Marat — Curator"
+    "economist": "economist",
+    "statistician": "statistician",
+    "chief": "director",
+    "curator": "curator",
+    "admin": "IT admin"
   },
   "overview": {
     "title": "Contract execution overview",
@@ -160,7 +164,8 @@
     "claims_scanned": "{{n}} claims scanned",
     "export": "Export exceptions (XLSX)",
     "stamp_removed": "REMOVED",
-    "at_risk": "at risk"
+    "at_risk": "at risk",
+    "source": "Source"
   },
   "sev": {
     "block": "Blocker",
@@ -257,5 +262,59 @@
     "annex_line": "Line",
     "annex_was": "Current plan",
     "annex_becomes": "New plan"
+  },
+  "auth": {
+    "sign_in": "Sign in",
+    "username": "Username",
+    "password": "Password",
+    "error": "Wrong username or password",
+    "logout": "Sign out",
+    "quick_login": "Quick login",
+    "demo_hint": "Demo: password for all — qalam2026"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_read": "Mark all read",
+    "empty": "No notifications"
+  },
+  "ops": {
+    "title": "Ops panel",
+    "registries": "Registries checked",
+    "positions": "Positions scanned",
+    "findings": "Findings total",
+    "sanctions_prevented": "Sanctions prevented",
+    "objections": "Objections filed",
+    "documents": "Documents generated",
+    "imports": "Imports",
+    "reconcile": "Reconcile discrepancies",
+    "active_users": "Active users",
+    "ok": "ok",
+    "quarantine": "quarantine",
+    "last_reset": "Last demo-reset",
+    "live_note": "Counters update in real time on events"
+  },
+  "radar": {
+    "title": "Source check (normative radar)",
+    "check": "Check",
+    "checking": "Checking…",
+    "source": "Source",
+    "our_version": "Our version",
+    "official_version": "Official",
+    "status": "Status",
+    "actions": "Actions",
+    "checked": "checked",
+    "open_source": "Open source",
+    "mark_updated": "Mark updated",
+    "status_ok": "current",
+    "status_stale": "newer available",
+    "status_unreachable": "unavailable",
+    "status_manual": "manual check",
+    "pilot_note": "Apply — in the pilot (auto-update off)"
+  },
+  "reports": {
+    "lead": "Monthly management report (docx)",
+    "monthly_report": "Generate the monthly report",
+    "generate": "Generate",
+    "note": "All numbers computed by the system — not the LLM"
   }
 }

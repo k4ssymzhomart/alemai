@@ -5,15 +5,19 @@ from fastapi import APIRouter
 from app.api import (
     admin,
     alerts,
+    auth,
     city,
     contracts,
     copilot,
     documents,
+    events,
     exports,
     forecasts,
     imports,
     metrics,
     objections,
+    ops,
+    radar,
     reconcile,
     reports,
     risks,
@@ -21,6 +25,8 @@ from app.api import (
 )
 
 api_router = APIRouter()
+api_router.include_router(auth.router)
+api_router.include_router(events.router)
 api_router.include_router(imports.router)
 api_router.include_router(exports.router)
 api_router.include_router(contracts.router)
@@ -36,3 +42,5 @@ api_router.include_router(documents.router)
 api_router.include_router(reports.router)
 api_router.include_router(city.router)
 api_router.include_router(admin.router)
+api_router.include_router(ops.router)
+api_router.include_router(radar.router)

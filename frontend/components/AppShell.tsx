@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import clsx from 'clsx';
 import {
   Activity,
   Building2,
   CalendarDays,
+  ChevronsLeft,
+  ChevronsRight,
   ClipboardCheck,
   FileText,
   FileUp,
@@ -21,8 +23,9 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import LocaleSwitcher from '@/components/LocaleSwitcher';
-import RoleSwitcher from '@/components/RoleSwitcher';
-import { useRole } from '@/components/RoleProvider';
+import NotificationBell from '@/components/NotificationBell';
+import UserMenu from '@/components/UserMenu';
+import { useSession } from '@/components/SessionProvider';
 import Ticker from '@/components/Ticker';
 import Logo from '@/components/brand/Logo';
 
@@ -52,10 +55,30 @@ const NAV_ITEMS: NavItem[] = [
  * a hairline-ruled sidebar and an air-rich, max-width document body. Active
  * nav = 2px left rule + medium weight, no black band. All chrome print-hidden.
  */
+const SIDEBAR_KEY = 'qalam.sidebar.collapsed';
+
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const pathname = usePathname();
-  const { role, nav } = useRole();
+  const { role, nav } = useSession();
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    setCollapsed(localStorage.getItem(SIDEBAR_KEY) === '1');
+  }, []);
+
+  const toggleSidebar = () =>
+    setCollapsed((c) => {
+      const next = !c;
+      localStorage.setItem(SIDEBAR_KEY, next ? '1' : '0');
+      return next;
+    });
+
+  // The login screen renders without the shell (no sidebar/header).
+  if (pathname === '/login') {
+    return <>{children}</>;
+  }
+
   const scopeKey = role === 'curator' ? 'app.scope_city' : 'app.org';
   const visibleNav = NAV_ITEMS.filter((item) => nav.includes(item.href));
 
@@ -70,39 +93,69 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </span>
         <Ticker />
         <div className="flex shrink-0 items-center gap-2">
-          <RoleSwitcher />
+          <NotificationBell />
+          <UserMenu />
           <LocaleSwitcher />
         </div>
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <aside className="print-hidden sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-ink/15 bg-paper">
+        <aside
+          className={clsx(
+            'print-hidden sticky top-0 flex h-screen shrink-0 flex-col border-r border-ink/15 bg-paper transition-[width] duration-[160ms] ease-out motion-reduce:transition-none',
+            collapsed ? 'w-14' : 'w-56',
+          )}
+        >
           <nav className="flex-1 overflow-y-auto py-3">
             {visibleNav.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
+              const label = t(item.labelKey);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
+                  title={collapsed ? label : undefined}
                   className={clsx(
-                    'flex items-center gap-2.5 border-l-2 px-5 py-2 text-secondary transition-colors duration-150',
+                    'flex items-center border-l-2 py-2 text-secondary transition-colors duration-150',
+                    collapsed ? 'justify-center px-0' : 'gap-2.5 px-5',
                     active
                       ? 'border-ink font-medium text-ink'
                       : 'border-transparent text-ink/60 hover:bg-ink/[.03] hover:text-ink',
                   )}
                 >
                   <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
-                  {t(item.labelKey)}
+                  {collapsed ? null : <span className="truncate">{label}</span>}
                 </Link>
               );
             })}
           </nav>
-          <p className="border-t border-ink/15 px-5 py-3 text-secondary text-ink/40">
-            {t('app.tagline')}
-          </p>
+
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-label={t(collapsed ? 'nav.expand' : 'nav.collapse')}
+            title={t(collapsed ? 'nav.expand' : 'nav.collapse')}
+            className={clsx(
+              'flex items-center border-t border-ink/15 py-2.5 text-ink/50 transition-colors duration-150 hover:bg-ink/[.03] hover:text-ink',
+              collapsed ? 'justify-center px-0' : 'gap-2.5 px-5',
+            )}
+          >
+            {collapsed ? (
+              <ChevronsRight className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            ) : (
+              <ChevronsLeft className="h-4 w-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            )}
+            {collapsed ? null : <span className="label-micro">{t('nav.collapse')}</span>}
+          </button>
+
+          {collapsed ? null : (
+            <p className="border-t border-ink/15 px-5 py-3 text-secondary text-ink/40">
+              {t('app.tagline')}
+            </p>
+          )}
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col">

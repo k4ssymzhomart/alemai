@@ -142,6 +142,8 @@ export interface RuleFinding {
     care_type?: string;
     message_kk?: string;
     message_ru?: string;
+    source_url?: string;
+    source_label?: string;
     evidence?: Record<string, unknown>;
   } | null;
 }
@@ -236,6 +238,7 @@ export interface CopilotCitation {
   doc_number: string;
   anchor: string;
   lang?: string;
+  url?: string | null;
 }
 
 export interface CopilotToolTrace {
@@ -307,3 +310,79 @@ export interface AnnexPreview {
   total_delta: number;
   preview_only: boolean;
 }
+
+// ─── EPIC G: ecosystem (auth, events, ops, radar) ───────────────────────────
+
+export interface Me {
+  user_id: string | null;
+  username: string;
+  name: string;
+  role: string;
+  is_service: boolean;
+}
+
+export interface EventItem {
+  id: string;
+  ts: string;
+  type: string;
+  severity: 'info' | 'warn' | 'critical';
+  actor: string;
+  role: string | null;
+  entity_ref: string | null;
+  link: string | null;
+  title_kk: string;
+  title_ru: string;
+  payload: Record<string, unknown> | null;
+}
+
+export interface EventsResponse {
+  items: EventItem[];
+  unread: number;
+  cursor: string | null;
+}
+
+export interface OpsCounter { key: string; count: number }
+export interface RefVersion { key: string; label: string; version: string }
+export interface OpsDashboard {
+  registries_checked: number;
+  positions_scanned: number;
+  findings_total: number;
+  findings_by_severity: OpsCounter[];
+  sanctions_prevented_tenge: number;
+  objections_filed: number;
+  documents_generated: number;
+  documents_by_kind: OpsCounter[];
+  reconcile_cases: number;
+  reconcile_tenge: number;
+  imports_count: number;
+  import_rows_ok: number;
+  import_rows_quarantined: number;
+  active_users: number;
+  events_total: number;
+  last_demo_reset: string | null;
+  app_version: string;
+  ref_versions: RefVersion[];
+}
+export interface Thresholds {
+  under_pct: number;
+  over_pct: number;
+  burnout_days: number;
+  materiality_tenge: number;
+}
+
+export interface RadarRow {
+  source_id: string;
+  name_ru: string;
+  name_kk: string;
+  our_version: string;
+  detected_version: string | null;
+  status: 'ok' | 'stale' | 'unreachable' | 'manual';
+  message: string | null;
+  checked_at: string | null;
+  official_url: string;
+  mirror_url: string | null;
+  quick_link: string;
+  fetchable: boolean;
+}
+export interface RadarResponse { rows: RadarRow[]; checked_any: boolean }
+export interface RadarCheckResult { summary: Record<string, number>; rows: RadarRow[] }

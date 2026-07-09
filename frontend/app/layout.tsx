@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import AppShell from '@/components/AppShell';
+import { EventsProvider } from '@/components/EventsProvider';
 import I18nProvider from '@/components/I18nProvider';
-import { RoleProvider } from '@/components/RoleProvider';
+import { SessionProvider } from '@/components/SessionProvider';
 import { fontClassNames } from '@/lib/fonts';
 
 import './globals.css';
@@ -19,9 +20,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="kk" className={fontClassNames}>
       <body>
         <I18nProvider>
-          <RoleProvider>
-            <AppShell>{children}</AppShell>
-          </RoleProvider>
+          <SessionProvider>
+            <EventsProvider>
+              <AppShell>{children}</AppShell>
+            </EventsProvider>
+          </SessionProvider>
         </I18nProvider>
       </body>
     </html>

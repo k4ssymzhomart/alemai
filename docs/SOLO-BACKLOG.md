@@ -80,6 +80,17 @@ Overview findings folded in (lead's screenshot review):
 - [x] F4 demo assets: qa_golden 16→30 checks (round-trip + идемпотентность + неизменность golden); QA-CHECKLIST beat-4-prelude; слайд 7 «[Загружает XLSX из Damumed]…»; crib-карта «Как данные попадают в систему?»
 - [x] AC: demo-reset + qa_golden 30/30 ×2; pytest 50/50 (3 новых integration); npm build green; скриншот-сет kk; санитарные grep'ы чистые
 
+## EPIC G — Ecosystem: auth, realtime, ops, radar (DONE 2026-07-09, branch claude/qalam-ecosystem-g)
+
+- [x] G1 real login: session-cookie auth (itsdangerous), 5 seeded users (password qalam2026), curator scope (403 on patient-level), qa_golden service-token bootstrap; login page (kk, 5 quick-login), middleware route guard, header user menu; client role switcher retired → role from session
+- [x] G2 realtime: events table + writers (finding excl/dismiss, rules run, import, docgen, objection, threshold); GET /events polling (4s) → refresh-epoch invalidates all screens; cross-session ≤5s verified
+- [x] G3 notifications bell (қоңырау): unread badge, dropdown (last 20, severity glyph, actor, time, entity link), mark-all-read
+- [x] G4 ops dashboard («Операциялық панель», in Админ): live counters (registries/positions/defects·severity/sanctions-prevented ₸/objections/documents/imports/reconcile/active-users, deduped by claim+rule), «Жүйе туралы» versions + last demo-reset; Пороги form now persists (PUT /admin/thresholds → event)
+- [x] G5 normative radar («Дереккөз тексерісі»): 7-source registry from official_sources.csv, GET /radar (✓/⚠/— seeded offline-safe), POST /radar/check LIVE-fetches zakon.uchet.kz mirrors + extracts version marker + events, «Отметить обновлённым» (no auto-apply, pilot); finding-level + copilot-citation source links (NOT cuttable)
+- [x] G6a collapsible sidebar (56px rail ↔ 224px, localStorage, 160ms, tooltips); G6b dead-end audit (Reports stub → live monthly-report; empty/breadcrumb/next-action verified)
+- [x] Contributor cleanup: stripped all Co-Authored-By trailers from main history, force-pushed, deleted stale branches → only k4ssymzhomart
+- [x] AC: demo-reset + qa_golden 30/30 ×2, pytest 66, build+ruff+lint green, design/secret gates clean, adversarial review
+
 ## Deferred to post-demo (from the old P-queue, if time never allows)
 
 P6 full forecast engine (manifest-precomputed forecasts cover the demo) · P8 live RAG/eval ≥22/24 · P9 city panel full + alerts engine · PD3 full 12-role matrix · adapter round-trip demo.

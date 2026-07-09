@@ -60,6 +60,7 @@ LOAD_ORDER: tuple[str, ...] = (
 # All model data tables — truncated before every load so reseeding is idempotent.
 DATA_TABLES: tuple[str, ...] = (
     "alerts",
+    "app_config",
     "audit_log",
     "claims",
     "contract_lines",
@@ -67,6 +68,7 @@ DATA_TABLES: tuple[str, ...] = (
     "contracts",
     "deadlines",
     "doctors",
+    "events",
     "findings",
     "forecasts",
     "import_files",
@@ -74,6 +76,7 @@ DATA_TABLES: tuple[str, ...] = (
     "package_mapping",
     "patients",
     "quarantine_rows",
+    "radar_checks",
     "reg_chunks",
     "reg_documents",
     "risk_assessments",
@@ -145,6 +148,45 @@ def load_tables(connection: Connection, out_dir: Path) -> dict[str, int]:
     return copied
 
 
+def seed_users(connection: Connection) -> int:
+    """Insert the 5 demo login users (EPIC G1) after the COPY load.
+
+    Kept out of the datagen/manifest pipeline on purpose — auth users are fixed
+    fixtures, not synthetic data. Deterministic ids (uuid5) so a live session
+    survives a demo-reset. Idempotent: TRUNCATE cleared the table first.
+    """
+    # Imported here so `app.seed` stays importable without the auth deps loaded.
+    from app.services.auth import DEMO_PASSWORD, SEED_USERS, hash_password
+
+    for user in SEED_USERS:
+        connection.execute(
+            text(
+                "INSERT INTO users (id, name, role, username, password_hash) "
+                "VALUES (:id, :name, :role, :username, :pw)"
+            ),
+            {
+                "id": str(user.id), "name": user.name, "role": user.role.value,
+                "username": user.username, "pw": hash_password(DEMO_PASSWORD),
+            },
+        )
+    print(f"seed: inserted {len(SEED_USERS)} login users (password=qalam2026)")
+    return len(SEED_USERS)
+
+
+def stamp_reset(connection: Connection) -> None:
+    """Stamp the demo-reset timestamp into app_config (G4 «Жүйе туралы»)."""
+    import datetime
+
+    connection.execute(
+        text(
+            "INSERT INTO app_config (key, value, updated_at) "
+            "VALUES ('last_demo_reset', :val, now()) "
+            "ON CONFLICT (key) DO UPDATE SET value = :val, updated_at = now()"
+        ),
+        {"val": json.dumps({"at": datetime.datetime.now(datetime.UTC).isoformat()})},
+    )
+
+
 def verify_counts(connection: Connection, expected_rows: dict[str, int]) -> bool:
     """Compare live per-table counts to the manifest; print a report."""
     ok = True
@@ -193,6 +235,10 @@ def main(argv: list[str] | None = None) -> int:
     # One transaction: truncate + load + MV refresh commit atomically.
     with engine.begin() as connection:
         load_tables(connection, out_dir)
+        seed_users(connection)
+        stamp_reset(connection)
+        from app.services.radar import seed_initial as seed_radar
+        seed_radar(connection)
         print("seed: REFRESH MATERIALIZED VIEW mv_line_execution")
         refresh_line_execution(connection)
 
