@@ -21,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 
 import LocaleSwitcher from '@/components/LocaleSwitcher';
 import RoleSwitcher from '@/components/RoleSwitcher';
+import { useRole } from '@/components/RoleProvider';
 import Ticker from '@/components/Ticker';
 import Logo from '@/components/brand/Logo';
 
@@ -52,6 +53,9 @@ const NAV_ITEMS: NavItem[] = [
 export default function AppShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation();
   const pathname = usePathname();
+  const { role, nav } = useRole();
+  const scopeKey = role === 'curator' ? 'app.scope_city' : 'app.org';
+  const visibleNav = NAV_ITEMS.filter((item) => nav.includes(item.href));
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -60,7 +64,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <Logo height={22} />
         </Link>
         <span className="hidden shrink-0 label-micro md:inline-block">
-          {t('app.org')}
+          {t(scopeKey)}
         </span>
         <Ticker />
         <div className="flex shrink-0 items-center gap-2">
@@ -72,7 +76,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <div className="flex min-h-0 flex-1">
         <aside className="print-hidden sticky top-0 flex h-screen w-56 shrink-0 flex-col border-r border-ink/15 bg-paper">
           <nav className="flex-1 overflow-y-auto py-3">
-            {NAV_ITEMS.map((item) => {
+            {visibleNav.map((item) => {
               const active =
                 pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
