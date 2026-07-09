@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from app.api import (
     admin,
     alerts,
+    auth,
     city,
     contracts,
     copilot,
@@ -21,6 +22,7 @@ from app.api import (
 )
 
 api_router = APIRouter()
+api_router.include_router(auth.router)
 api_router.include_router(imports.router)
 api_router.include_router(exports.router)
 api_router.include_router(contracts.router)

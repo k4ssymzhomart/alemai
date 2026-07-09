@@ -7,6 +7,7 @@ import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.api.deps import DenyCurator
 from app.db import get_db
 from app.models.enums import FindingStatus
 from app.models.rules import Finding, Rule
@@ -45,11 +46,15 @@ def run_rules(body: RuleRunIn, db: DbDep) -> RuleRunStarted:
     )
 
 
-@router.get("/rules/runs/{run_id}/findings", response_model=RunFindingsOut)
+@router.get(
+    "/rules/runs/{run_id}/findings",
+    response_model=RunFindingsOut,
+    dependencies=[DenyCurator],
+)
 def get_run_findings(
     run_id: uuid.UUID, db: DbDep, group_by: GroupByQuery = None, limit: LimitQuery = 200
 ) -> RunFindingsOut:
-    """Findings of a run: always the per-rule groups; ``findings`` capped at ``limit``."""
+    """Findings of a run: per-rule groups + case-level rows. Curator: 403 (case-level)."""
     severity_by_code = {
         code: severity
         for code, severity in db.execute(sa.select(Rule.code, Rule.severity)).all()

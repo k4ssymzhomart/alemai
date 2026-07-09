@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, Query
 from sqlalchemy.orm import Session
 
+from app.api.deps import DenyCurator
 from app.db import get_db
 from app.schemas.reconcile import BucketOut, BucketRowsOut, BucketsOut, ReconcileRowOut
 from app.services import reconcile as svc
@@ -32,13 +33,13 @@ def get_buckets(db: DbDep) -> BucketsOut:
     )
 
 
-@router.get("/bucket/{bucket_no}/rows", response_model=BucketRowsOut)
+@router.get("/bucket/{bucket_no}/rows", response_model=BucketRowsOut, dependencies=[DenyCurator])
 def get_bucket_rows(
     db: DbDep,
     bucket_no: Annotated[int, Path(ge=1, le=4)],
     limit: Annotated[int, Query(ge=1, le=2000)] = 200,
 ) -> BucketRowsOut:
-    """Claim-level drill-down for one bucket (largest ₸ first)."""
+    """Claim-level drill-down for one bucket (largest ₸ first). Curator: 403 (case-level)."""
     return BucketRowsOut(
         bucket_no=bucket_no,
         rows=[

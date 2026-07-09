@@ -145,6 +145,31 @@ def load_tables(connection: Connection, out_dir: Path) -> dict[str, int]:
     return copied
 
 
+def seed_users(connection: Connection) -> int:
+    """Insert the 5 demo login users (EPIC G1) after the COPY load.
+
+    Kept out of the datagen/manifest pipeline on purpose — auth users are fixed
+    fixtures, not synthetic data. Deterministic ids (uuid5) so a live session
+    survives a demo-reset. Idempotent: TRUNCATE cleared the table first.
+    """
+    # Imported here so `app.seed` stays importable without the auth deps loaded.
+    from app.services.auth import DEMO_PASSWORD, SEED_USERS, hash_password
+
+    for user in SEED_USERS:
+        connection.execute(
+            text(
+                "INSERT INTO users (id, name, role, username, password_hash) "
+                "VALUES (:id, :name, :role, :username, :pw)"
+            ),
+            {
+                "id": str(user.id), "name": user.name, "role": user.role.value,
+                "username": user.username, "pw": hash_password(DEMO_PASSWORD),
+            },
+        )
+    print(f"seed: inserted {len(SEED_USERS)} login users (password=qalam2026)")
+    return len(SEED_USERS)
+
+
 def verify_counts(connection: Connection, expected_rows: dict[str, int]) -> bool:
     """Compare live per-table counts to the manifest; print a report."""
     ok = True
@@ -193,6 +218,7 @@ def main(argv: list[str] | None = None) -> int:
     # One transaction: truncate + load + MV refresh commit atomically.
     with engine.begin() as connection:
         load_tables(connection, out_dir)
+        seed_users(connection)
         print("seed: REFRESH MATERIALIZED VIEW mv_line_execution")
         refresh_line_execution(connection)
 

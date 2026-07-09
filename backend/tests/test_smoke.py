@@ -17,8 +17,10 @@ client = TestClient(app)
 
 # GET routes that read the live database (P1 real metrics, EPIC F exchange) —
 # covered by tests/test_metrics_integration.py / test_imports_integration.py
-# instead; smoke stays DB-free by design.
+# instead; smoke stays DB-free by design. /auth/me legitimately 401s without a
+# session (covered by test_auth_integration.py).
 DB_BACKED_PATHS = {
+    "/api/v1/auth/me",
     "/api/v1/metrics/overview",
     "/api/v1/metrics/lines",
     "/api/v1/metrics/line/{line_key}/monthly",

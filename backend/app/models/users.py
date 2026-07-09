@@ -20,6 +20,14 @@ class User(Base):
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     name: Mapped[str] = mapped_column(String(128))
     role: Mapped[UserRole] = mapped_column(text_enum(UserRole))
+    # Login identity + PBKDF2 hash (EPIC G1). nullable in DB for the pre-G1
+    # schema; every seeded user sets both.
+    username: Mapped[str | None] = mapped_column(String(64), unique=True)
+    password_hash: Mapped[str | None] = mapped_column(String(255))
+    # Per-user notifications read cursor (G3): unread = events after this ts.
+    notifications_read_at: Mapped[datetime.datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
 
 
 class AuditLog(Base):
