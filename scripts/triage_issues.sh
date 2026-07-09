@@ -27,17 +27,19 @@ done
 echo "== 2. Roadmap board (run ONCE) =="
 if [ "${SKIP_CREATE:-0}" = "1" ]; then echo "  SKIP_CREATE=1 — not creating"; exit 0; fi
 
-status=$(gh issue create --repo "$REPO" --title "📌 STATUS — QALAM demo-ready (epics A–E ✅)" --body "$(cat <<'EOF'
+status=$(gh issue create --repo "$REPO" --title "📌 STATUS — QALAM demo-ready (epics A–G ✅)" --body "$(cat <<'EOF'
 QALAM (ранее Igerim) — Task 07, Astana AI Week 2026. SOLO mode.
 
-**Epics A–E complete, main demo-stable** (tag \`demo-stable\`):
+**Epics A–G complete, main demo-ready:**
 - A/A.2 — QALAM design system (premium B&W, Manrope)
 - B — gp14-real data + storylines manifest
 - C — rules engine (ЕКД, golden 8/8) + pre-billing + reconcile + возражения + Passport
 - D — docgen (обращение docx) + copilot (deterministic, kk) + roles/settings
 - E — demo-reset <60s, golden-path QA ×2, pitch render, print pack
+- F — ingest & exchange: МИС registry import (Damumed preset, quarantine, idempotent) + XLSX exports + annex preview
+- G — real login/sessions (5 users, curator scope) + realtime events across sessions + notifications bell + ops dashboard + normative radar (source validation) + collapsible sidebar
 
-Golden path (beats 1–6) verified: освоение 60,8% · пре-биллинг 46/168 600 ₸ · санкц. риск 6,67 млн ₸ · сверка 260/2 992 000 ₸ · копилот kk. Scope & pitch in docs/13–21. Open issues below = roadmap only.
+Golden path (beats 1–6) verified: освоение 60,8% · пре-биллинг 46/168 600 ₸ · санкц. риск 6,67 млн ₸ · сверка 260/2 992 000 ₸ · копилот kk. Import round-trip + idempotency green (qa_golden 30/30). Scope & pitch in docs/13–21. Open issues below = post-pilot roadmap only.
 EOF
 )")
 echo "  STATUS: $status"
