@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import clsx from 'clsx';
 import {
   Activity,
+  BookText,
   CalendarDays,
   ChevronsLeft,
   ChevronsRight,
@@ -45,6 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/anomalies', labelKey: 'nav.anomalies', icon: Activity },
   { href: '/calendar', labelKey: 'nav.calendar', icon: CalendarDays },
   { href: '/copilot', labelKey: 'nav.copilot', icon: MessageSquare },
+  { href: '/regs', labelKey: 'nav.regs', icon: BookText },
   { href: '/reports', labelKey: 'nav.reports', icon: FileText },
   // /city stays killed (docs/25 H2 fill-or-kill) — tracked as a roadmap issue.
   { href: '/imports', labelKey: 'nav.imports', icon: FileUp },

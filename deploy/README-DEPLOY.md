@@ -33,6 +33,40 @@ seed job. The working split is **Vercel (frontend) + Render (backend + DB)**.
 3. After the frontend is up (below), set the API's **`CORS_ORIGINS`** to the
    Vercel origin and redeploy.
 
+### Free-tier caveats (current default in `render.yaml`)
+
+Both resources are `plan: free` so the Blueprint applies at **zero cost**, even on
+a workspace whose card is declined (the "Payment failed" state). Know these:
+
+- **One free Postgres per workspace.** If the workspace already has a free DB, the
+  Blueprint sync collides — **delete the existing free DB** in the Render dashboard
+  first, or `qalam-db` won't provision.
+- **The free DB expires 30 days after creation** (with a 14-day grace to upgrade
+  before data is deleted). Fine for the pitch — just don't be surprised on day 30+.
+- **Free web spins down after 15 min idle** → first hit after idle is a ~30–60 s
+  cold start. Warm it before sharing the link with a juror.
+- **Legacy plans are rejected.** Since Render's Oct-2024 flexible-plans migration,
+  `starter/standard/pro` can't back a NEW database. Valid DB instance types are
+  `free`, `basic-256mb`, `basic-1gb`, `basic-4gb`, `pro-*`, `accelerated-*`.
+
+**Upgrade path (once the card works / for production):** set the DB to
+`plan: basic-256mb` (optional `diskSizeGB: 15`) and the web service to
+`plan: starter` — no 30-day expiry, no cold starts. Both are left as inline
+comments in `render.yaml`.
+
+**Fallback — reuse an external Postgres (no Render DB at all):** if the card stays
+blocked or you already run a DB, delete the whole `databases:` block from
+`render.yaml`, change the web service's `DATABASE_URL` to `sync: false`, and paste a
+free external connection string at deploy time. Supabase and Neon free tiers both
+hand you a bare `postgres://…` and the app coerces the driver
+(`app/db.py:normalize_database_url`). Do **not** add `ipAllowList` on the external
+route — that field is for Render-managed DBs only.
+
+> Lead action (not the agent's): the "Payment failed" banner is a workspace billing
+> state — resolve it in the dashboard or deploy into a fresh free/Hobby workspace.
+> This Blueprint is already valid + zero-cost, so it applies the moment the
+> workspace is unblocked.
+
 ## Frontend → Vercel
 
 See [`deploy/vercel.md`](./vercel.md). TL;DR: import the repo with **Root

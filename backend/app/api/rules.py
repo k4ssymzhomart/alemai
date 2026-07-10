@@ -112,6 +112,14 @@ def patch_finding(
             ekd_code=(finding.details or {}).get("ekd_code"),
             amount=int(finding.amount_at_risk), status=finding.status.value,
         )
+    elif finding.status == FindingStatus.open:
+        # «Отменить исключение» (I2 undo) — symmetric restore event so the other
+        # window sees it and rehearsals reset without a reseed.
+        events_svc.finding_restored(
+            db, principal, finding_id=str(finding.id), rule_code=finding.rule_code,
+            ekd_code=(finding.details or {}).get("ekd_code"),
+            amount=int(finding.amount_at_risk),
+        )
     db.commit()
     db.refresh(finding)
     return FindingOut.model_validate(finding)

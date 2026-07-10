@@ -70,6 +70,21 @@ def finding_status_changed(
     )
 
 
+def finding_restored(
+    db: Session, principal: Principal | None, *, finding_id: str, rule_code: str,
+    ekd_code: str | None, amount: int,
+) -> Event:
+    """«Отменить исключение» (I2 undo) — position returned to the счёт-реестр."""
+    code = ekd_code or rule_code
+    return record_event(
+        db, type="finding_restored", severity="info", principal=principal,
+        entity_ref=f"finding:{finding_id}", link="/prebilling",
+        title_ru=f"Позиция возвращена в счёт-реестр · {code} · {_tenge(amount)}",
+        title_kk=f"Позиция шот-тізілімге қайтарылды · {code} · {_tenge(amount)}",
+        payload={"rule_code": rule_code, "ekd_code": ekd_code, "amount": amount},
+    )
+
+
 def rules_run_finished(
     db: Session, principal: Principal | None, *, scope: str, totals: dict[str, Any],
     triggered_by: str = "manual",

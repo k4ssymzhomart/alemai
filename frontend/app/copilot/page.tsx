@@ -1,11 +1,31 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
+import { ExternalLink } from 'lucide-react';
 
 import CodeChip from '@/components/vedomost/CodeChip';
 import api from '@/lib/api';
-import type { CopilotAnswer } from '@/lib/types';
+import type { CopilotAnswer, CopilotCitation } from '@/lib/types';
+
+// Map a copilot citation to the internal /regs viewer at its пункт (I1). The
+// external adilet URL becomes a secondary link. Matches by adilet doc id or a
+// keyword in the title/number; the first integer in the anchor is the пункт.
+const REGS_DOC_MATCH: [RegExp, string][] = [
+  [/V2000021904|монитор/i, 'pravila_monitoringa'],
+  [/V2000021831|оплат/i, 'pravila_oplaty'],
+  [/V2000021744|закуп/i, 'pravila_zakupa'],
+  [/206|единый пакет|бірыңғай/i, 'zakon_206_viii'],
+];
+
+function regsTarget(c: CopilotCitation): string | null {
+  const doc = REGS_DOC_MATCH.find(([re]) => re.test(`${c.doc_title} ${c.doc_number}`))?.[1];
+  if (!doc) return null;
+  const p = /\d+/.exec(c.anchor)?.[0];
+  const lang = c.lang === 'kk' ? 'kk' : 'ru';
+  return `/regs?doc=${doc}&lang=${lang}${p ? `&p=${p}` : ''}`;
+}
 
 interface Turn {
   question: string;
@@ -146,23 +166,42 @@ function TurnView({ turn, busyLast }: { turn: Turn; busyLast: boolean }) {
           {turn.answer.citations.length > 0 ? (
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span className="label-micro">{t('copilot.sources')}:</span>
-              {turn.answer.citations.map((c, j) =>
-                c.url ? (
-                  <a
+              {turn.answer.citations.map((c, j) => {
+                const internal = regsTarget(c);
+                const chip = <CodeChip code={`${c.anchor} · ${c.doc_number}`} />;
+                return (
+                  <span
                     key={j}
-                    href={c.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1"
                     title={`${c.doc_title} ${c.doc_number}`}
                   >
-                    <CodeChip code={`${c.anchor} · ${c.doc_number}`} />
-                  </a>
-                ) : (
-                  <span key={j} title={`${c.doc_title} ${c.doc_number}`}>
-                    <CodeChip code={`${c.anchor} · ${c.doc_number}`} />
+                    {internal ? (
+                      <Link href={internal}>{chip}</Link>
+                    ) : c.url ? (
+                      <a href={c.url} target="_blank" rel="noopener noreferrer">
+                        {chip}
+                      </a>
+                    ) : (
+                      chip
+                    )}
+                    {internal && c.url ? (
+                      <a
+                        href={c.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={c.doc_title}
+                        title={c.doc_title}
+                      >
+                        <ExternalLink
+                          className="h-3 w-3 text-ink/40 hover:text-accent"
+                          strokeWidth={1.75}
+                          aria-hidden
+                        />
+                      </a>
+                    ) : null}
                   </span>
-                ),
-              )}
+                );
+              })}
             </div>
           ) : null}
         </div>
