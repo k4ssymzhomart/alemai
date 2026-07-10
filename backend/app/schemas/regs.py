@@ -21,7 +21,7 @@ class TocNodeOut(BaseModel):
     title: str
     anchor: str
     line: int
-    children: list["TocNodeOut"] = []
+    children: list[TocNodeOut] = []
 
 
 class RegLineOut(BaseModel):

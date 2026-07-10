@@ -87,7 +87,7 @@ class TocNode:
     title: str
     anchor: str
     line: int
-    children: list["TocNode"] = field(default_factory=list)
+    children: list[TocNode] = field(default_factory=list)
 
 
 @dataclass(frozen=True, slots=True)
