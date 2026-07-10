@@ -1,8 +1,8 @@
 # Vercel — QALAM frontend (docs/25 H5)
 
 Vercel hosts the **frontend only** (Next.js). The FastAPI backend + Postgres
-live on Render (`deploy/render.yaml`) — Vercel can't run the API, the seed job,
-or a database.
+live on Render (`render.yaml` at the repo root) — Vercel can't run the API, the
+seed job, or a database.
 
 ## Import
 
