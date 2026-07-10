@@ -37,6 +37,11 @@ DB_BACKED_PATHS = {
     # does a live external fetch (fms.ecc.kz) — would add a 6s timeout to smoke.
     "/api/v1/radar/provider-status",
     "/api/v1/share/{code}",  # 404 for a random code (covered by integration)
+    # regs viewer (I1): 404 for a random doc_id / 422 without the ?q= query —
+    # legitimately non-200, covered by the regs integration tests.
+    "/api/v1/regs/{doc_id}/toc",
+    "/api/v1/regs/{doc_id}/content",
+    "/api/v1/regs/{doc_id}/search",
 }
 
 
