@@ -49,7 +49,7 @@ Lead's call, scoped honest: no messenger, no CRM, no external realtime SaaS (ven
 ## H5 · Deployment pack (answer: Vercel alone — NO; Vercel + Render — YES)
 
 Vercel can't host FastAPI+Postgres+seed jobs sanely. Build `deploy/`:
-- `deploy/render.yaml` — Render Blueprint: web service (backend Dockerfile, health `/api/v1/health`, env: DATABASE_URL, CORS_ORIGINS, SEED_ON_BOOT=1 first deploy), managed Postgres.
+- `render.yaml` (repo root — Render auto-discovers it there; moved out of `deploy/` to fix Blueprint sync) — Render Blueprint: web service (backend Dockerfile, health `/healthz`, env: PORT=8000, DATABASE_URL, CORS_ORIGINS, SECRET_KEY/SERVICE_TOKEN generated, SEED_ON_BOOT=1 first deploy), managed Postgres.
 - `deploy/vercel.md` + `vercel.json` if needed — frontend project config: root `frontend/`, env `NEXT_PUBLIC_API_BASE=https://<render-app>.onrender.com/api/v1`.
 - Backend: CORS middleware reads CORS_ORIGINS; make seed runnable via `SEED_ON_BOOT` startup hook (idempotent guard); ensure no localhost hardcodes in frontend (grep).
 - `deploy/README-DEPLOY.md`: exact click-path (Render Blueprint → env → deploy; Vercel import → env → deploy), plus alternative «Railway all-in-one» paragraph, plus the law: **the venue demo runs LOCAL compose regardless — the public URL is for jury follow-up, not the stage.**

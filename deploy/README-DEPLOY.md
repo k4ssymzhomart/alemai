@@ -15,12 +15,20 @@ seed job. The working split is **Vercel (frontend) + Render (backend + DB)**.
 
 ## Backend + DB → Render (Blueprint)
 
+> **The Blueprint file lives at the REPOSITORY ROOT: [`render.yaml`](../render.yaml).**
+> Render auto-discovers `render.yaml` at the repo root (the path is only
+> configurable at first setup). It used to live at `deploy/render.yaml`, which is
+> a common cause of a **"Blueprint sync failed"** email — that copy has been
+> removed. If you already created the `qalam` Blueprint pointing at the old path,
+> open it in the dashboard and clear any custom Blueprint path (or set it to
+> `render.yaml`) so it reads the root file.
+
 1. Render → **New → Blueprint** → pick this repo. Render reads
-   [`deploy/render.yaml`](./render.yaml) and provisions:
+   [`render.yaml`](../render.yaml) at the repo root and provisions:
    - a managed **Postgres** (`qalam-db`),
    - the **API** web service (`./backend/Dockerfile`, health `/healthz`),
-   - `DATABASE_URL` wired from the DB, `SECRET_KEY`/`SERVICE_TOKEN` generated,
-     `SEED_ON_BOOT=1`.
+   - `PORT=8000` (matches the container bind), `DATABASE_URL` wired from the DB,
+     `SECRET_KEY`/`SERVICE_TOKEN` generated, `SEED_ON_BOOT=1`.
 2. **Apply.** On first boot the API runs migrations and seeds the 5 login users
    + reference data (radar, deadlines) so login works immediately.
    - `DATABASE_URL` arrives as a bare `postgres://` string; the app coerces it to
@@ -32,11 +40,39 @@ seed job. The working split is **Vercel (frontend) + Render (backend + DB)**.
      login + empty-state app is usually enough; say so.
 3. After the frontend is up (below), set the API's **`CORS_ORIGINS`** to the
    Vercel origin and redeploy.
+4. **Verify the DB actually connected** (the `/healthz` check does *not* — it
+   returns a static `200` and never touches the DB, and boot-seed swallows its
+   own errors so the deploy still goes green). Open **qalam-api → Logs** and
+   confirm `bootstrap: SEED_ON_BOOT — seeded users + reference data`, **not**
+   `... skipped`. A skip means `DATABASE_URL` / migrations / `CREATE EXTENSION
+   vector` failed silently — fix before trusting any DB-backed route (login).
+
+### If you got a "Blueprint sync failed for qalam" email
+
+A valid `render.yaml` is necessary but not sufficient — a sync also fails on
+account state. Work these in order (the YAML itself is verified valid):
+
+1. **Billing (most likely).** Dashboard → **Workspace Settings → Billing**. Clear
+   the **"Payment failed"** state (add/fix a card, settle any past-due balance). A
+   workspace suspended for failed payment blocks **all** Blueprint syncs and
+   deploys — *workspace-wide, even for `plan: free` resources*. Free is zero-cost,
+   but it does **not** bypass a suspended workspace.
+2. **One free Postgres per workspace.** Check for any existing free Postgres —
+   including a `qalam-db` orphaned by an earlier partial sync. Delete it (or switch
+   this DB to `basic-256mb`, the commented upgrade path) so the free `qalam-db` can
+   provision. A second free DB will not coexist.
+3. **Blueprint path.** Dashboard → **Blueprints → qalam** → clear any custom path
+   (now that `render.yaml` is at the repo root, auto-discovery works) or set it to
+   `render.yaml`.
+4. **Re-sync and read the real error.** Click **Manual Sync** (or push a commit).
+   If it fails again, open the latest sync event and read the exact error text — it
+   names the failing resource/field precisely (the generic email does not).
 
 ### Free-tier caveats (current default in `render.yaml`)
 
-Both resources are `plan: free` so the Blueprint applies at **zero cost**, even on
-a workspace whose card is declined (the "Payment failed" state). Know these:
+Both resources are `plan: free` so the Blueprint applies at **zero cost** on a
+workspace in good standing. (A workspace *suspended* for a failed payment is still
+blocked — see the sync-failure steps above.) Know these:
 
 - **One free Postgres per workspace.** If the workspace already has a free DB, the
   Blueprint sync collides — **delete the existing free DB** in the Render dashboard

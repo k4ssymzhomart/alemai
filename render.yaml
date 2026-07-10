@@ -1,0 +1,69 @@
+# Render Blueprint — QALAM backend + managed Postgres.
+#
+# LOCATION: this file MUST live at the REPOSITORY ROOT (./render.yaml).
+# Render's Blueprint auto-discovery looks for ./render.yaml at the repo root
+# (the path is only customizable at first setup). Keeping the file under
+# ./deploy/ is a common source of "Blueprint sync failed" — this root copy is
+# the canonical one. The old deploy/render.yaml has been removed so two
+# divergent blueprints cannot coexist.
+#
+# READ BEFORE RE-SYNCING — a valid YAML does NOT clear the two most likely
+# causes of the "Blueprint sync failed for qalam" email (both are account-side,
+# see deploy/README-DEPLOY.md):
+#   1. Resolve the workspace "Payment failed" billing state. A failed/past-due
+#      workspace blocks ALL Blueprint syncs — workspace-wide, even on free plans.
+#   2. Delete any pre-existing free Postgres (Render allows only ONE free
+#      Postgres per workspace) so this free qalam-db can be created.
+#
+# Both resources are FREE tier (zero-cost). Trade-offs (fine for the pitch /
+# jury-follow-up window): the web service spins down after ~15 min idle
+# (~30-60 s cold start on first hit) and free Postgres expires 30 days after
+# creation. The venue demo runs LOCAL `docker compose` regardless.
+services:
+  - type: web
+    name: qalam-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile   # path relative to repo root
+    dockerContext: ./backend               # path relative to repo root
+    healthCheckPath: /healthz
+    plan: free
+    envVars:
+      # Pin the port Render routes to / health-checks. The Dockerfile hardcodes
+      # uvicorn to 0.0.0.0:8000 and ignores $PORT (EXPOSE 8000 is documentation
+      # only and is ignored for routing). Setting PORT=8000 makes Render target
+      # 8000 explicitly instead of relying on best-effort auto-detection (the
+      # docs only guarantee Render "usually" detects a non-$PORT bind). The app
+      # config ignores PORT (extra="ignore"), and local docker-compose uses its
+      # own env — so this is harmless everywhere except telling Render the port.
+      - key: PORT
+        value: "8000"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: qalam-db
+          property: connectionString   # bare postgres:// — app coerces to postgresql+psycopg://
+      - key: CORS_ORIGINS
+        sync: false   # set AFTER first deploy to the exact frontend origin, e.g.
+                      # https://qalam.vercel.app — NEVER '*' (allow_credentials=True
+                      # forbids wildcard). Left empty it falls back to
+                      # http://localhost:3000 and will block the Vercel frontend.
+      - key: SECRET_KEY
+        generateValue: true
+      - key: SERVICE_TOKEN
+        generateValue: true
+      - key: SEED_ON_BOOT
+        value: "1"    # run migrations + seed login/reference data on first boot.
+                      # bootstrap swallows errors so a bad DB does NOT fail the
+                      # deploy — after first deploy, confirm the service log shows
+                      # "bootstrap: SEED_ON_BOOT — seeded users + reference data",
+                      # NOT "skipped" (a skip means DATABASE_URL / migrations /
+                      # CREATE EXTENSION vector failed silently).
+
+databases:
+  - name: qalam-db
+    plan: free            # the only DB plan valid for a NEW db on a free workspace.
+                          # One free Postgres per workspace — delete any existing
+                          # free DB before syncing or this Apply fails.
+    ipAllowList: []       # internal-only: API reaches the DB over Render's private network
+    # Do NOT set diskSizeGB on free (fixed 1 GB) — that field is only valid on basic-*/pro-*.
+    # UPGRADE PATH (production / once billing is fixed): DB plan: basic-256mb
+    #   (optional diskSizeGB: 15) and web service plan: starter — no expiry, no cold start.
