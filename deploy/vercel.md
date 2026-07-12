@@ -9,9 +9,16 @@ seed job, or a database.
 1. Vercel → **Add New… → Project** → import this repo.
 2. **Root Directory: `frontend/`** (important — the Next app is not at the repo
    root). Framework preset auto-detects **Next.js**.
-3. **Environment Variables:**
-   - `NEXT_PUBLIC_API_BASE = https://<your-render-app>.onrender.com/api/v1`
-4. **Deploy.**
+3. **Environment Variables** (⚠️ the #1 gotcha — set this BEFORE the build):
+   - `NEXT_PUBLIC_API_BASE = https://qalam-api.onrender.com/api/v1`
+   - It is a **build-time** var (Next.js inlines `NEXT_PUBLIC_*` into the client
+     bundle), so setting it later has **no effect until you redeploy**. If it is
+     missing, the bundle falls back to `http://localhost:8800/api/v1` — which
+     both points at nothing in production and is blocked as **mixed content**
+     (an HTTPS page cannot call `http://`). Symptom: login does nothing / network
+     error in the console.
+4. **Deploy.** (After changing this env var later, **Redeploy** — do not just
+   "Redeploy from existing build"; force a fresh build so the new value inlines.)
 
 ## After both are up
 

@@ -57,6 +57,14 @@ services:
                       # "bootstrap: SEED_ON_BOOT — seeded users + reference data",
                       # NOT "skipped" (a skip means DATABASE_URL / migrations /
                       # CREATE EXTENSION vector failed silently).
+      # The frontend (Vercel) and API (Render) are DIFFERENT sites, so the
+      # session cookie must be SameSite=None + Secure or the browser will not
+      # store/send it on API calls. Both ends are HTTPS. (Local docker-compose
+      # is same-site and keeps the Lax/insecure defaults.)
+      - key: COOKIE_SAMESITE
+        value: "none"
+      - key: COOKIE_SECURE
+        value: "true"
 
 databases:
   - name: qalam-db

@@ -25,8 +25,11 @@ def _set_session_cookie(response: Response, principal: Principal) -> None:
         value=sign_session(principal),
         max_age=settings.session_max_age,
         httponly=True,
-        samesite="lax",  # :3000 and :8800 are same-site (localhost) → cookie flows
-        secure=False,  # HTTP localhost demo; flip to True behind TLS
+        # Local (:3000↔:8800, same-site localhost) uses the Lax/insecure default;
+        # a cross-site cloud deploy (Vercel frontend ≠ Render API) needs
+        # COOKIE_SAMESITE=none + COOKIE_SECURE=true or the browser drops it. H5.
+        samesite=settings.cookie_samesite,
+        secure=settings.cookie_secure,
         path="/",
     )
 
