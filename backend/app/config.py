@@ -1,6 +1,7 @@
 """Application settings loaded from environment variables (pydantic-settings)."""
 
 from functools import lru_cache
+from urllib.parse import urlsplit
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -32,14 +33,36 @@ class Settings(BaseSettings):
     secret_key: str = "qalam-demo-secret-change-in-prod-0a1b2c3d4e5f"
     session_cookie: str = "qalam_session"
     session_max_age: int = 86_400  # 24h
+    # Cross-site deploys (frontend on Vercel, API on Render are different sites)
+    # require SameSite=None + Secure or the browser won't store/send the session
+    # cookie on API calls. Local same-site HTTP keeps the Lax/insecure defaults.
+    # Cloud sets COOKIE_SAMESITE=none + COOKIE_SECURE=true (see render.yaml). H5.
+    # NB: Safari/ITP blocks third-party cookies outright — cross-site cookie auth
+    # works on Chromium/Firefox; a token/header scheme would be needed for Safari.
+    cookie_samesite: str = "lax"
+    cookie_secure: bool = False
     # Header token that lets headless scripts (scripts/qa_golden.py, CI) act as
     # an admin service principal without a login round-trip.
     service_token: str = "qalam-service-token-demo"
 
     @property
     def cors_origins_list(self) -> list[str]:
-        """CORS allow-list parsed from the comma-separated ``cors_origins``."""
-        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+        """CORS allow-list from the comma-separated ``cors_origins``, each
+        normalized to ``scheme://host[:port]``. A pasted full URL with a path
+        (e.g. ``https://app.vercel.app/login``) or a trailing slash would never
+        match the browser's ``Origin`` header (always bare scheme+host), so we
+        strip everything past the authority. H5."""
+        origins: list[str] = []
+        for raw in self.cors_origins.split(","):
+            raw = raw.strip()
+            if not raw:
+                continue
+            parts = urlsplit(raw)
+            if parts.scheme and parts.netloc:
+                origins.append(f"{parts.scheme}://{parts.netloc}")
+            else:
+                origins.append(raw.rstrip("/"))
+        return origins
 
 
 @lru_cache(maxsize=1)

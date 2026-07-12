@@ -39,7 +39,14 @@ seed job. The working split is **Vercel (frontend) + Render (backend + DB)**.
      datagen dir), or point a one-off job at the DB. For jury follow-up the
      login + empty-state app is usually enough; say so.
 3. After the frontend is up (below), set the API's **`CORS_ORIGINS`** to the
-   Vercel origin and redeploy.
+   Vercel **origin** and redeploy. Use the bare origin — scheme + host only,
+   e.g. `https://alemai-mu.vercel.app` — **not** a full page URL like
+   `…/login` and **not** `*` (`allow_credentials=True` forbids the wildcard).
+   The browser's `Origin` header is always just scheme+host, so a value with a
+   path never matches. (The app now defensively strips any path/trailing slash,
+   but set it correctly anyway.) This is a **cross-site** cookie setup, so the
+   API also runs with `COOKIE_SAMESITE=none` + `COOKIE_SECURE=true` (baked into
+   `render.yaml`) — required or the browser drops the session cookie.
 4. **Verify the DB actually connected** (the `/healthz` check does *not* — it
    returns a static `200` and never touches the DB, and boot-seed swallows its
    own errors so the deploy still goes green). Open **qalam-api → Logs** and

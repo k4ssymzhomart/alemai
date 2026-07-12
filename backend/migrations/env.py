@@ -18,14 +18,20 @@ if str(BACKEND_DIR) not in sys.path:
 
 import app.models  # noqa: E402,F401  (registers all tables on Base.metadata)
 from app.config import get_settings  # noqa: E402
-from app.db import Base  # noqa: E402
+from app.db import Base, normalize_database_url  # noqa: E402
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name, disable_existing_loggers=False)
 
-config.set_main_option("sqlalchemy.url", get_settings().database_url)
+# Coerce the URL exactly like the app does (app/db.py): managed Postgres
+# (Render/Heroku/Railway) hands out a bare ``postgres://`` string, but
+# SQLAlchemy 2.0 dropped that dialect alias — without this, alembic raises
+# NoSuchModuleError and migrations never run on a cloud DB. The ``%`` escape is
+# for ConfigParser interpolation (alembic stores this via set_main_option).
+_alembic_url = normalize_database_url(get_settings().database_url)
+config.set_main_option("sqlalchemy.url", _alembic_url.replace("%", "%%"))
 
 target_metadata = Base.metadata
 
