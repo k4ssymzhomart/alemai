@@ -33,11 +33,23 @@ seed job. The working split is **Vercel (frontend) + Render (backend + DB)**.
    + reference data (radar, deadlines) so login works immediately.
    - `DATABASE_URL` arrives as a bare `postgres://` string; the app coerces it to
      `postgresql+psycopg://` (`app/db.py:normalize_database_url`) — nothing to edit.
-   - **Full synthetic dataset** (claims, the 60.8% / 46-позиций numbers) is NOT
-     seeded on boot (datagen isn't in the backend image). To load it on the
-     hosted DB: `render ssh` into the service → `python -m app.seed` (needs the
-     datagen dir), or point a one-off job at the DB. For jury follow-up the
-     login + empty-state app is usually enough; say so.
+   - **Full synthetic dataset** (claims — the 60.8% / 46-позиций numbers) is NOT
+     seeded on boot (datagen isn't in the backend image, and generating ~497k
+     claims would OOM a free 512 MB instance). Until you load it, Обзор / Риски /
+     Сверка / Аномалии show empty / `0,0%`; login, nav, Календарь, radar and the
+     reference screens all work. To load it into the hosted DB from your machine
+     (generation runs locally in the py3.12 api image; rows COPY up over the net,
+     ~a few min), grab the DB's **External Connection String** (Render → qalam-db
+     → Connect) and run:
+
+     ```bash
+     make seed-remote DATABASE_URL='postgres://…external-render-url…'
+     ```
+
+     It is idempotent (TRUNCATE + COPY) and re-seeds the 5 login users too. On an
+     SSL error append `?sslmode=require`; if the free 1 GB DB fills up, upgrade it
+     to `basic-256mb` (see `render.yaml`) or seed a subset. For jury follow-up the
+     login + reference-data app is often enough — loading claims is optional.
 3. After the frontend is up (below), set the API's **`CORS_ORIGINS`** to the
    Vercel **origin** and redeploy. Use the bare origin — scheme + host only,
    e.g. `https://alemai-mu.vercel.app` — **not** a full page URL like

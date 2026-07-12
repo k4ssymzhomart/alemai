@@ -1,6 +1,6 @@
 # IGERIM — hackathon monorepo make targets (docs/05 §1: `make up seed reset demo`)
 
-.PHONY: up down logs seed reset demo-reset demo eval-copilot fmt lint
+.PHONY: up down logs seed seed-remote reset demo-reset demo eval-copilot fmt lint
 
 ## Bring up the whole stack (db + api + web), rebuilding images
 up:
@@ -17,6 +17,19 @@ logs:
 ## Seed the database inside the api container (migrations + datagen + COPY + MV refresh)
 seed:
 	docker compose exec api python -m app.seed
+
+## Seed a REMOTE database (e.g. the hosted Render Postgres) with the FULL dataset.
+## Data is generated locally in a throwaway api container (py3.12 + datagen mounted;
+## no free-tier RAM limit) and COPYed to the remote DB over the network (~a few min).
+## Idempotent (TRUNCATE + COPY). Requires Docker running + the EXTERNAL connection
+## string from the Render dashboard (qalam-db -> Connect -> External Connection String).
+## Usage:
+##   make seed-remote DATABASE_URL='postgres://user:pass@dpg-xxxx.oregon-postgres.render.com/dbname'
+## If it errors on SSL, append '?sslmode=require' to the URL. If it errors on disk,
+## the free 1 GB DB is full — upgrade to basic-256mb (render.yaml) or use --sample.
+seed-remote:
+	@test -n "$(DATABASE_URL)" || { echo "ERROR: set DATABASE_URL to the Render EXTERNAL url"; exit 1; }
+	docker compose run --rm --no-deps -e DATABASE_URL='$(DATABASE_URL)' api python -m app.seed
 
 reset: demo-reset
 
